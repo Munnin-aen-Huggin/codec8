@@ -1,5 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { fetchUserRepos } from '$lib/server/github';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ cookies }) => {
@@ -19,7 +20,21 @@ export const load: PageServerLoad = async ({ cookies }) => {
     throw redirect(302, '/');
   }
 
-  const { data: repos } = await supabaseAdmin.from('repositories').select('*').eq('user_id', userId);
+  const { data: connectedRepos } = await supabaseAdmin
+    .from('repositories')
+    .select('*')
+    .eq('user_id', userId);
+
+  let availableRepos: Awaited<ReturnType<typeof fetchUserRepos>> = [];
+  let githubError: string | null = null;
+
+  if (profile.github_token) {
+    try {
+      availableRepos = await fetchUserRepos(profile.github_token);
+    } catch (err) {
+      githubError = err instanceof Error ? err.message : 'Failed to fetch GitHub repos';
+    }
+  }
 
   return {
     user: {
@@ -28,6 +43,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
       github_username: profile.github_username,
       plan: profile.plan
     },
-    repos: repos || []
+    connectedRepos: connectedRepos || [],
+    availableRepos,
+    githubError
   };
 };

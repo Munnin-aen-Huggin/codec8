@@ -49,10 +49,35 @@
 
 			<!-- CTA: Single field form -->
 			<div class="hero-cta-section">
-				<form class="email-form" id="heroForm">
-					<input type="email" placeholder="Enter your email" required />
-					<button type="submit" class="cta-primary">Get Early Access →</button>
-				</form>
+				{#if heroFormState === 'success'}
+					<div class="success-message">
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+							<polyline points="22 4 12 14.01 9 11.01"></polyline>
+						</svg>
+						<span>You're in! Check your email for next steps.</span>
+					</div>
+				{:else}
+					<form class="email-form" id="heroForm" on:submit={handleHeroSubmit}>
+						<input
+							type="email"
+							placeholder="Enter your email"
+							bind:value={heroEmail}
+							disabled={heroFormState === 'loading'}
+							required
+						/>
+						<button type="submit" class="cta-primary" disabled={heroFormState === 'loading'}>
+							{#if heroFormState === 'loading'}
+								<span class="spinner"></span> Subscribing...
+							{:else}
+								Get Early Access →
+							{/if}
+						</button>
+					</form>
+					{#if heroFormState === 'error' && heroErrorMessage}
+						<div class="error-message">{heroErrorMessage}</div>
+					{/if}
+				{/if}
 
 				<!-- Risk Reversal -->
 				<div class="risk-reversal">
@@ -427,10 +452,35 @@ export async function getUser(id: string) {
 		<h2>Stop writing docs manually</h2>
 		<p>Join 800+ developers who've automated their documentation.</p>
 
-		<form class="email-form" id="finalForm">
-			<input type="email" placeholder="Enter your email" required />
-			<button type="submit" class="cta-primary">Get Lifetime Access — $299 →</button>
-		</form>
+		{#if finalFormState === 'success'}
+			<div class="success-message">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+					<polyline points="22 4 12 14.01 9 11.01"></polyline>
+				</svg>
+				<span>You're in! Check your email for next steps.</span>
+			</div>
+		{:else}
+			<form class="email-form" id="finalForm" on:submit={handleFinalSubmit}>
+				<input
+					type="email"
+					placeholder="Enter your email"
+					bind:value={finalEmail}
+					disabled={finalFormState === 'loading'}
+					required
+				/>
+				<button type="submit" class="cta-primary" disabled={finalFormState === 'loading'}>
+					{#if finalFormState === 'loading'}
+						<span class="spinner"></span> Subscribing...
+					{:else}
+						Get Lifetime Access — $299 →
+					{/if}
+				</button>
+			</form>
+			{#if finalFormState === 'error' && finalErrorMessage}
+				<div class="error-message">{finalErrorMessage}</div>
+			{/if}
+		{/if}
 
 		<div class="risk-reversal" style="margin-top: 16px">
 			<span>
@@ -474,6 +524,66 @@ export async function getUser(id: string) {
 
 <script lang="ts">
 	import { onMount } from 'svelte';
+
+	let heroEmail = '';
+	let finalEmail = '';
+	let heroFormState: 'idle' | 'loading' | 'success' | 'error' = 'idle';
+	let finalFormState: 'idle' | 'loading' | 'success' | 'error' = 'idle';
+	let heroErrorMessage = '';
+	let finalErrorMessage = '';
+
+	async function handleSubscribe(
+		email: string,
+		setFormState: (state: 'idle' | 'loading' | 'success' | 'error') => void,
+		setErrorMessage: (msg: string) => void
+	) {
+		if (!email) {
+			setFormState('error');
+			setErrorMessage('Please enter your email');
+			return;
+		}
+
+		setFormState('loading');
+		setErrorMessage('');
+
+		try {
+			const response = await fetch('/api/subscribe', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email })
+			});
+
+			const data = await response.json();
+
+			if (data.success) {
+				setFormState('success');
+			} else {
+				setFormState('error');
+				setErrorMessage(data.message || 'Something went wrong');
+			}
+		} catch {
+			setFormState('error');
+			setErrorMessage('Network error. Please try again.');
+		}
+	}
+
+	function handleHeroSubmit(e: Event) {
+		e.preventDefault();
+		handleSubscribe(
+			heroEmail,
+			(state) => (heroFormState = state),
+			(msg) => (heroErrorMessage = msg)
+		);
+	}
+
+	function handleFinalSubmit(e: Event) {
+		e.preventDefault();
+		handleSubscribe(
+			finalEmail,
+			(state) => (finalFormState = state),
+			(msg) => (finalErrorMessage = msg)
+		);
+	}
 
 	onMount(() => {
 		// Sticky header on scroll
@@ -561,14 +671,6 @@ export async function getUser(id: string) {
 			if (el) (el as HTMLElement).style.display = 'none';
 		});
 
-		// Form handling
-		document.querySelectorAll('form').forEach((form) => {
-			form.addEventListener('submit', (e) => {
-				e.preventDefault();
-				const email = (form.querySelector('input[type="email"]') as HTMLInputElement | null)?.value ?? '';
-				alert('Thanks! Check your email for access. (Demo - would submit: ' + email + ')');
-			});
-		});
 
 		// Pricing CTA scrolls to hero form
 		const pricingCTA = document.getElementById('pricingCTA');
@@ -857,6 +959,71 @@ export async function getUser(id: string) {
 		background: var(--accent-hover);
 		transform: translateY(-2px);
 		box-shadow: 0 8px 30px var(--accent-glow);
+	}
+
+	.cta-primary:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	.cta-primary:disabled:hover {
+		background: var(--accent);
+		box-shadow: none;
+	}
+
+	.email-form input:disabled {
+		opacity: 0.7;
+		cursor: not-allowed;
+	}
+
+	/* Success/Error Messages */
+	.success-message {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		background: rgba(34, 197, 94, 0.1);
+		border: 1px solid rgba(34, 197, 94, 0.3);
+		color: var(--accent);
+		padding: 16px 24px;
+		border-radius: 10px;
+		font-size: 1rem;
+		font-weight: 600;
+		max-width: 480px;
+		margin: 0 auto 16px;
+	}
+
+	.success-message svg {
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+	}
+
+	.error-message {
+		color: var(--danger);
+		font-size: 0.9rem;
+		margin-top: 8px;
+		text-align: center;
+	}
+
+	/* Spinner Animation */
+	.spinner {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		border: 2px solid rgba(0, 0, 0, 0.3);
+		border-top-color: #000;
+		border-radius: 50%;
+		animation: spin 0.8s linear infinite;
+		vertical-align: middle;
+		margin-right: 4px;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
 	}
 
 	/* RISK REVERSAL - Remove objections */
