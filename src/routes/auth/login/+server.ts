@@ -28,6 +28,18 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
     });
   }
 
+  // Store redirect intent for checkout flow
+  const redirectTo = url.searchParams.get('redirect');
+  const tier = url.searchParams.get('tier');
+  if (redirectTo === 'checkout' && tier) {
+    cookies.set('checkout_tier', tier, {
+      path: '/',
+      httpOnly: true,
+      secure: !dev,
+      maxAge: 60 * 10
+    });
+  }
+
   // Build GitHub OAuth URL
   const params = new URLSearchParams({
     client_id: GITHUB_CLIENT_ID,

@@ -43,6 +43,21 @@ export const load: PageServerLoad = async ({ cookies }) => {
     .select('*')
     .eq('user_id', userId);
 
+  // Get documentation status for each connected repo
+  const repoIds = (connectedRepos || []).map((r) => r.id);
+  let repoDocs: { repo_id: string; has_docs: boolean }[] = [];
+
+  if (repoIds.length > 0) {
+    const { data: docs } = await supabaseAdmin
+      .from('documentation')
+      .select('repo_id')
+      .in('repo_id', repoIds);
+
+    // Create a set of repo IDs that have docs
+    const reposWithDocs = new Set((docs || []).map((d) => d.repo_id));
+    repoDocs = repoIds.map((id) => ({ repo_id: id, has_docs: reposWithDocs.has(id) }));
+  }
+
   let availableRepos: Awaited<ReturnType<typeof fetchUserRepos>> = [];
   let githubError: string | null = null;
 
@@ -63,6 +78,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     },
     connectedRepos: connectedRepos || [],
     availableRepos,
-    githubError
+    githubError,
+    repoDocs
   };
 };

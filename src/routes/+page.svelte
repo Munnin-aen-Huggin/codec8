@@ -8,7 +8,7 @@
 	/>
 
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link
 		href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
 		rel="stylesheet"
@@ -407,8 +407,17 @@ export async function getUser(id: string) {
 				<li>All future features included</li>
 			</ul>
 
-			<button class="pricing-cta" id="pricingCTA">
-				Get Lifetime Access — $299 →
+			<button
+				class="pricing-cta"
+				id="pricingCTA"
+				on:click={() => handleCheckout('ltd')}
+				disabled={checkoutLoading}
+			>
+				{#if checkoutLoading}
+					<span class="spinner"></span> Processing...
+				{:else}
+					Get Lifetime Access — $299 →
+				{/if}
 			</button>
 
 			<div class="pricing-guarantee">
@@ -550,6 +559,7 @@ export async function getUser(id: string) {
 
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { auth } from '$lib/stores/auth';
 
 	let heroEmail = '';
 	let finalEmail = '';
@@ -557,6 +567,42 @@ export async function getUser(id: string) {
 	let finalFormState: 'idle' | 'loading' | 'success' | 'error' = 'idle';
 	let heroErrorMessage = '';
 	let finalErrorMessage = '';
+	let checkoutLoading = false;
+
+	async function handleCheckout(tier: string = 'ltd') {
+		// Check if user is logged in
+		const user = $auth.user;
+
+		if (!user) {
+			// Redirect to login with return URL
+			window.location.href = '/auth/login?redirect=checkout&tier=' + tier;
+			return;
+		}
+
+		checkoutLoading = true;
+
+		try {
+			const response = await fetch('/api/stripe/checkout', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ tier })
+			});
+
+			const data = await response.json();
+
+			if (data.success && data.url) {
+				// Redirect to Stripe checkout
+				window.location.href = data.url;
+			} else {
+				alert(data.message || 'Failed to start checkout. Please try again.');
+				checkoutLoading = false;
+			}
+		} catch (err) {
+			console.error('Checkout error:', err);
+			alert('Failed to start checkout. Please try again.');
+			checkoutLoading = false;
+		}
+	}
 
 	async function handleSubscribe(
 		email: string,
@@ -698,17 +744,11 @@ export async function getUser(id: string) {
 		});
 
 
-		// Pricing CTA scrolls to hero form
-		const pricingCTA = document.getElementById('pricingCTA');
-		pricingCTA?.addEventListener('click', () => {
-			document.getElementById('heroForm')?.scrollIntoView({ behavior: 'smooth' });
-		});
-
 		// Smooth scroll for anchor links
 		document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-			anchor.addEventListener('click', function (e) {
+			anchor.addEventListener('click', function (this: HTMLAnchorElement, e: Event) {
 				e.preventDefault();
-				const target = document.querySelector((this as HTMLAnchorElement).getAttribute('href') || '');
+				const target = document.querySelector(this.getAttribute('href') || '');
 				if (target) {
 					(target as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'start' });
 				}

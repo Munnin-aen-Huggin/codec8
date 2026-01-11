@@ -1,7 +1,11 @@
 <script lang="ts">
-  import { auth } from '$lib/stores/auth';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
   import { repos } from '$lib/stores/repos';
+  import { toast } from '$lib/stores/toast';
   import RepoCard from '$lib/components/RepoCard.svelte';
+  import RepoCardSkeleton from '$lib/components/RepoCardSkeleton.svelte';
   import type { PageData } from './$types';
   import type { GitHubRepo } from '$lib/server/github';
 
@@ -10,6 +14,46 @@
   let showConnectModal = false;
   let connectingRepoId: number | null = null;
   let disconnectingRepoId: string | null = null;
+  let generatingRepoId: string | null = null;
+  let checkoutLoading = false;
+
+  // Handle checkout redirect from login
+  onMount(async () => {
+    const checkoutTier = $page.url.searchParams.get('checkout');
+    if (checkoutTier && ['ltd', 'pro', 'dfy'].includes(checkoutTier)) {
+      // Clear the URL parameter
+      goto('/dashboard', { replaceState: true });
+      // Initiate checkout
+      await initiateCheckout(checkoutTier);
+    }
+  });
+
+  async function initiateCheckout(tier: string) {
+    checkoutLoading = true;
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier })
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error(result.message || 'Failed to start checkout. Please try again.');
+        checkoutLoading = false;
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      toast.error('Failed to start checkout. Please try again.');
+      checkoutLoading = false;
+    }
+  }
+
+  // Track which repos have documentation
+  $: repoDocsMap = new Map(data.repoDocs?.map((rd) => [rd.repo_id, rd.has_docs]) || []);
 
   $: {
     repos.setAvailable(data.availableRepos);
@@ -50,8 +94,9 @@
       repos.addConnected(newRepo);
       data.connectedRepos = [...data.connectedRepos, newRepo];
       showConnectModal = false;
+      toast.success(`${newRepo.name} connected successfully!`);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to connect repository');
+      toast.error(err instanceof Error ? err.message : 'Failed to connect repository');
     } finally {
       connectingRepoId = null;
     }
@@ -73,10 +118,51 @@
 
       repos.removeConnected(repoId);
       data.connectedRepos = data.connectedRepos.filter((r) => r.id !== repoId);
+      toast.success('Repository disconnected');
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to disconnect repository');
+      toast.error(err instanceof Error ? err.message : 'Failed to disconnect repository');
     } finally {
       disconnectingRepoId = null;
+    }
+  }
+
+  async function generateDocs(repoId: string) {
+    generatingRepoId = repoId;
+    try {
+      const response = await fetch('/api/docs/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          repoId,
+          types: ['readme', 'api', 'architecture', 'setup']
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to generate documentation');
+      }
+
+      const result = await response.json();
+
+      if (result.errors?.length > 0) {
+        result.errors.forEach((e: { type: string; error: string }) => {
+          toast.warning(`${e.type}: ${e.error}`);
+        });
+      }
+
+      // Update the docs map to show docs are ready
+      if (result.docs?.length > 0) {
+        repoDocsMap.set(repoId, true);
+        repoDocsMap = repoDocsMap; // Trigger reactivity
+        toast.success('Documentation generated successfully!');
+        // Navigate to the repo docs page
+        goto(`/dashboard/${repoId}`);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to generate documentation');
+    } finally {
+      generatingRepoId = null;
     }
   }
 </script>
@@ -90,9 +176,19 @@
     <div class="container mx-auto px-6 py-4 flex justify-between items-center">
       <a href="/" class="text-xl font-bold text-gray-900">CodeDoc AI</a>
       <div class="flex items-center gap-4">
-        <span class="text-sm text-gray-500">
-          {data.user.plan === 'free' ? 'Free Plan' : data.user.plan.toUpperCase()}
-        </span>
+        {#if data.user.plan === 'free'}
+          <button
+            on:click={() => initiateCheckout('ltd')}
+            disabled={checkoutLoading}
+            class="px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50"
+          >
+            {checkoutLoading ? 'Loading...' : 'Upgrade'}
+          </button>
+        {:else}
+          <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+            {data.user.plan.toUpperCase()}
+          </span>
+        {/if}
         <span class="text-gray-600">
           {data.user.github_username}
         </span>
@@ -144,12 +240,13 @@
         <p class="text-sm text-amber-700 mt-1">
           Upgrade to the Lifetime Deal for unlimited repositories.
         </p>
-        <a
-          href="/#pricing"
-          class="inline-block mt-2 text-sm font-medium text-amber-800 underline hover:no-underline"
+        <button
+          on:click={() => initiateCheckout('ltd')}
+          disabled={checkoutLoading}
+          class="inline-block mt-2 text-sm font-medium text-amber-800 underline hover:no-underline disabled:opacity-50"
         >
-          View pricing
-        </a>
+          {checkoutLoading ? 'Loading...' : 'Upgrade now — $299'}
+        </button>
       </div>
     {/if}
 
@@ -161,7 +258,10 @@
               connectedRepo={repo}
               isConnected={true}
               onDisconnect={() => disconnectRepo(repo.id)}
+              onGenerate={() => generateDocs(repo.id)}
               loading={disconnectingRepoId === repo.id}
+              generating={generatingRepoId === repo.id}
+              hasDocumentation={repoDocsMap.get(repo.id) || false}
             />
           </a>
         {/each}

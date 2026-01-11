@@ -156,6 +156,14 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 		// Clear intended plan cookie if it exists
 		cookies.delete('intended_plan', { path: '/' });
+
+		// Check for checkout redirect
+		const checkoutTier = cookies.get('checkout_tier');
+		if (checkoutTier) {
+			cookies.delete('checkout_tier', { path: '/' });
+			// Redirect to a page that will initiate checkout
+			throw redirect(302, `/dashboard?checkout=${checkoutTier}`);
+		}
 	} catch (err) {
 		console.error('OAuth callback error:', err);
 		if (err && typeof err === 'object' && 'status' in err) {
