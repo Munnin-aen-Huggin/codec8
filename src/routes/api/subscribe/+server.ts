@@ -1,8 +1,6 @@
 import { json } from '@sveltejs/kit';
+import { supabaseAdmin } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
-
-const CONVERTKIT_API_KEY = 'JkSB5SpOg91dr0OhuhxvSA';
-const CONVERTKIT_FORM_ID = '8ab91a364f';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -17,23 +15,22 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json({ success: false, message: 'Invalid email format' }, { status: 400 });
 		}
 
-		const response = await fetch(
-			`https://api.convertkit.com/v3/forms/${CONVERTKIT_FORM_ID}/subscribe`,
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					api_key: CONVERTKIT_API_KEY,
-					email
-				})
-			}
-		);
+		// Insert email into Supabase email_signups table
+		const { error } = await supabaseAdmin
+			.from('email_signups')
+			.insert({
+				email: email.toLowerCase().trim(),
+				source: 'landing_page'
+			});
 
-		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({}));
-			console.error('ConvertKit API error:', errorData);
+		// Handle duplicate emails gracefully - if it's a duplicate, still return success
+		if (error) {
+			// Postgres unique constraint violation code is 23505
+			if (error.code === '23505') {
+				return json({ success: true, message: 'You are already subscribed!' });
+			}
+
+			console.error('Supabase insert error:', error);
 			return json(
 				{ success: false, message: 'Failed to subscribe. Please try again.' },
 				{ status: 500 }

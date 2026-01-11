@@ -19,9 +19,24 @@
 <header class="sticky-header" id="stickyHeader">
 	<div class="container">
 		<div class="logo">📄 CodeDoc AI</div>
-		<a href="#pricing" class="cta-small">Get Lifetime Access — $299</a>
+		<div class="header-actions">
+			<a href="/auth/login" class="header-link">Sign In</a>
+			<a href="#pricing" class="cta-small">Get Lifetime Access — $299</a>
+		</div>
 	</div>
 </header>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+	<div class="container">
+		<div class="logo">📄 CodeDoc AI</div>
+		<div class="nav-actions">
+			<a href="#pricing" class="nav-link">Pricing</a>
+			<a href="/auth/login" class="nav-link">Sign In</a>
+			<a href="/auth/login" class="nav-cta">Start Free</a>
+		</div>
+	</div>
+</nav>
 
 <!-- Hero Section -->
 <section class="hero">
@@ -78,6 +93,17 @@
 						<div class="error-message">{heroErrorMessage}</div>
 					{/if}
 				{/if}
+
+				<!-- Or Try Free CTA -->
+				<div class="or-divider">
+					<span>or</span>
+				</div>
+				<a href="/auth/login" class="cta-secondary">
+					<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+						<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+					</svg>
+					Try Free with GitHub
+				</a>
 
 				<!-- Risk Reversal -->
 				<div class="risk-reversal">
@@ -503,10 +529,10 @@ export async function getUser(id: string) {
 <footer>
 	<div class="container">
 		<div class="footer-links">
-			<a href="#">Privacy</a>
-			<a href="#">Terms</a>
-			<a href="#">Contact</a>
-			<a href="#">Twitter</a>
+			<a href="/privacy">Privacy</a>
+			<a href="/terms">Terms</a>
+			<a href="mailto:support@codedoc.ai">Contact</a>
+			<a href="https://twitter.com/codedocai" target="_blank" rel="noopener noreferrer">Twitter</a>
 		</div>
 		<p class="footer-copy">© 2026 CodeDoc AI. All rights reserved.</p>
 	</div>
@@ -815,6 +841,141 @@ export async function getUser(id: string) {
 
 	.sticky-header .cta-small:hover {
 		background: var(--accent-hover);
+	}
+
+	.sticky-header .header-actions {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+	}
+
+	.sticky-header .header-link {
+		color: var(--text-secondary);
+		text-decoration: none;
+		font-size: 0.9rem;
+		transition: color 0.2s;
+	}
+
+	.sticky-header .header-link:hover {
+		color: var(--text);
+	}
+
+	/* ==========================================
+	   TOP NAVIGATION - Always visible
+	   ========================================== */
+	.top-nav {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 100;
+		padding: 20px 0;
+	}
+
+	.top-nav .container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.top-nav .logo {
+		font-weight: 700;
+		font-size: 1.2rem;
+		color: var(--text);
+	}
+
+	.nav-actions {
+		display: flex;
+		align-items: center;
+		gap: 24px;
+	}
+
+	.nav-link {
+		color: var(--text-secondary);
+		text-decoration: none;
+		font-size: 0.95rem;
+		transition: color 0.2s;
+	}
+
+	.nav-link:hover {
+		color: var(--text);
+	}
+
+	.nav-cta {
+		background: var(--accent);
+		color: #000;
+		padding: 10px 20px;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 0.95rem;
+		text-decoration: none;
+		transition: all 0.2s;
+	}
+
+	.nav-cta:hover {
+		background: var(--accent-hover);
+		transform: translateY(-1px);
+	}
+
+	/* Or Divider */
+	.or-divider {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 16px 0;
+		color: var(--text-muted);
+		font-size: 0.85rem;
+	}
+
+	.or-divider span {
+		padding: 0 16px;
+		position: relative;
+	}
+
+	.or-divider span::before,
+	.or-divider span::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		width: 80px;
+		height: 1px;
+		background: var(--border);
+	}
+
+	.or-divider span::before {
+		right: 100%;
+	}
+
+	.or-divider span::after {
+		left: 100%;
+	}
+
+	/* Secondary CTA (GitHub login) */
+	.cta-secondary {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		background: transparent;
+		color: var(--text);
+		padding: 14px 28px;
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		font-size: 1rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: all 0.2s;
+		cursor: pointer;
+	}
+
+	.cta-secondary:hover {
+		background: var(--bg-hover);
+		border-color: var(--text-muted);
+	}
+
+	.cta-secondary svg {
+		width: 20px;
+		height: 20px;
 	}
 
 	/* ==========================================

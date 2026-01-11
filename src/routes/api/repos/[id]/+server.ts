@@ -8,7 +8,18 @@ export const GET: RequestHandler = async ({ cookies, params }) => {
     throw error(401, 'Unauthorized');
   }
 
-  const [userId] = session.split(':');
+  let userId: string;
+  try {
+    const parsed = JSON.parse(session);
+    userId = parsed.userId;
+  } catch {
+    throw error(401, 'Invalid session');
+  }
+
+  if (!userId) {
+    throw error(401, 'Invalid session');
+  }
+
   const { id } = params;
 
   const { data: repo, error: dbError } = await supabaseAdmin
@@ -31,7 +42,18 @@ export const DELETE: RequestHandler = async ({ cookies, params }) => {
     throw error(401, 'Unauthorized');
   }
 
-  const [userId] = session.split(':');
+  let userId: string;
+  try {
+    const parsed = JSON.parse(session);
+    userId = parsed.userId;
+  } catch {
+    throw error(401, 'Invalid session');
+  }
+
+  if (!userId) {
+    throw error(401, 'Invalid session');
+  }
+
   const { id } = params;
 
   const { data: repo } = await supabaseAdmin

@@ -8,7 +8,19 @@ export const GET: RequestHandler = async ({ cookies }) => {
     throw error(401, 'Unauthorized');
   }
 
-  const [userId] = session.split(':');
+  let userId: string;
+  try {
+    const parsed = JSON.parse(session);
+    userId = parsed.userId;
+  } catch {
+    console.error('Failed to parse session cookie:', session);
+    throw error(401, 'Invalid session');
+  }
+
+  if (!userId) {
+    console.error('No userId in session:', session);
+    throw error(401, 'Invalid session');
+  }
 
   const { data: repos, error: dbError } = await supabaseAdmin
     .from('repositories')
@@ -30,15 +42,34 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
     throw error(401, 'Unauthorized');
   }
 
-  const [userId] = session.split(':');
+  let userId: string;
+  try {
+    const parsed = JSON.parse(session);
+    userId = parsed.userId;
+  } catch {
+    console.error('Failed to parse session cookie:', session);
+    throw error(401, 'Invalid session');
+  }
 
-  const { data: profile } = await supabaseAdmin
+  if (!userId) {
+    console.error('No userId in session:', session);
+    throw error(401, 'Invalid session');
+  }
+
+  console.log('Looking for profile with user ID:', userId);
+
+  const { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
     .select('plan')
     .eq('id', userId)
     .single();
 
+  if (profileError) {
+    console.error('Profile query error:', profileError);
+  }
+
   if (!profile) {
+    console.error('User not found for ID:', userId);
     throw error(401, 'User not found');
   }
 

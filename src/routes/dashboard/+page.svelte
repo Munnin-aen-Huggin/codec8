@@ -96,13 +96,15 @@
         <span class="text-gray-600">
           {data.user.github_username}
         </span>
-        <a
-          href="/auth/logout"
-          class="text-gray-500 hover:text-gray-700"
-          data-testid="logout-button"
-        >
-          Logout
-        </a>
+        <form action="/auth/logout" method="POST" class="inline">
+          <button
+            type="submit"
+            class="text-gray-500 hover:text-gray-700"
+            data-testid="logout-button"
+          >
+            Logout
+          </button>
+        </form>
       </div>
     </div>
   </header>
@@ -143,7 +145,7 @@
           Upgrade to the Lifetime Deal for unlimited repositories.
         </p>
         <a
-          href="/pricing"
+          href="/#pricing"
           class="inline-block mt-2 text-sm font-medium text-amber-800 underline hover:no-underline"
         >
           View pricing

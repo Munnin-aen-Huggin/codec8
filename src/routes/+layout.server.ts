@@ -6,7 +6,18 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
 
   if (!session) return { user: null };
 
-  const [userId] = session.split(':');
+  let userId: string;
+  try {
+    const parsed = JSON.parse(session);
+    userId = parsed.userId;
+  } catch {
+    // Invalid session format, treat as logged out
+    return { user: null };
+  }
+
+  if (!userId) {
+    return { user: null };
+  }
 
   const { data: profile } = await supabaseAdmin
     .from('profiles')

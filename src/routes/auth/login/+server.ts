@@ -1,17 +1,18 @@
 import { redirect } from '@sveltejs/kit';
 import { GITHUB_CLIENT_ID } from '$env/static/private';
 import { PUBLIC_APP_URL } from '$env/static/public';
+import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies, url }) => {
   // Generate random state for CSRF protection
   const state = crypto.randomUUID().replace(/-/g, '');
-  
+
   // Store state in cookie
   cookies.set('oauth_state', state, {
     path: '/',
     httpOnly: true,
-    secure: true,
+    secure: !dev,
     sameSite: 'lax',
     maxAge: 60 * 10 // 10 minutes
   });
@@ -22,6 +23,7 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
     cookies.set('intended_plan', plan, {
       path: '/',
       httpOnly: true,
+      secure: !dev,
       maxAge: 60 * 10
     });
   }

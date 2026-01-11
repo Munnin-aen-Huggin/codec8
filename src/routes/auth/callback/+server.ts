@@ -2,6 +2,7 @@ import { redirect, error } from '@sveltejs/kit';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_APP_URL } from '$env/static/public';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 
 interface GitHubTokenResponse {
@@ -148,7 +149,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		cookies.set('session', JSON.stringify({ userId, token: sessionToken }), {
 			path: '/',
 			httpOnly: true,
-			secure: true,
+			secure: !dev,
 			sameSite: 'lax',
 			expires: sessionExpiry
 		});
