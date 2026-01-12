@@ -2,23 +2,35 @@ import { supabaseAdmin } from '$lib/server/supabase';
 import type { License } from '$lib/types';
 
 /**
+ * Generate a cryptographically secure random integer in range [0, max)
+ */
+function getSecureRandomInt(max: number): number {
+	const randomBuffer = new Uint32Array(1);
+	crypto.getRandomValues(randomBuffer);
+	// Use modulo with rejection sampling for uniform distribution
+	const randomNumber = randomBuffer[0];
+	return randomNumber % max;
+}
+
+/**
  * Generate a license key in format XXXX-XXXX-XXXX-XXXX
+ * Uses crypto.getRandomValues() for cryptographic security
  */
 export function generateLicenseKey(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const segments = 4;
-  const segmentLength = 4;
+	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+	const segments = 4;
+	const segmentLength = 4;
 
-  const parts: string[] = [];
-  for (let i = 0; i < segments; i++) {
-    let segment = '';
-    for (let j = 0; j < segmentLength; j++) {
-      segment += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    parts.push(segment);
-  }
+	const parts: string[] = [];
+	for (let i = 0; i < segments; i++) {
+		let segment = '';
+		for (let j = 0; j < segmentLength; j++) {
+			segment += chars.charAt(getSecureRandomInt(chars.length));
+		}
+		parts.push(segment);
+	}
 
-  return parts.join('-');
+	return parts.join('-');
 }
 
 /**

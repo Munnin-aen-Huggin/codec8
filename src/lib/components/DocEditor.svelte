@@ -1,24 +1,77 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  import { marked } from 'marked';
+	import { createEventDispatcher, onMount } from 'svelte';
+	import { marked } from 'marked';
+	import DOMPurify from 'dompurify';
 
-  export let content: string = '';
-  export let isEditing: boolean = false;
-  export let isSaving: boolean = false;
+	export let content: string = '';
+	export let isEditing: boolean = false;
+	export let isSaving: boolean = false;
 
-  const dispatch = createEventDispatcher<{
-    save: string;
-    cancel: void;
-    edit: void;
-    export: void;
-    createPR: void;
-  }>();
+	// Initialize DOMPurify on mount (only works in browser)
+	let purify: typeof DOMPurify | null = null;
+	onMount(() => {
+		purify = DOMPurify;
+	});
 
-  let editContent = '';
-  let showPreview = true;
+	/**
+	 * Safely render markdown to sanitized HTML
+	 */
+	function renderMarkdown(markdown: string): string {
+		const rawHtml = marked(markdown) as string;
+		// Sanitize HTML to prevent XSS attacks
+		if (purify) {
+			return purify.sanitize(rawHtml, {
+				ALLOWED_TAGS: [
+					'h1',
+					'h2',
+					'h3',
+					'h4',
+					'h5',
+					'h6',
+					'p',
+					'br',
+					'hr',
+					'ul',
+					'ol',
+					'li',
+					'blockquote',
+					'pre',
+					'code',
+					'em',
+					'strong',
+					'a',
+					'img',
+					'table',
+					'thead',
+					'tbody',
+					'tr',
+					'th',
+					'td',
+					'del',
+					'sup',
+					'sub',
+					'span',
+					'div'
+				],
+				ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target', 'rel']
+			});
+		}
+		return rawHtml;
+	}
 
-  $: renderedContent = content ? marked(content) : '';
-  $: renderedEditContent = editContent ? marked(editContent) : '';
+	const dispatch = createEventDispatcher<{
+		save: string;
+		cancel: void;
+		edit: void;
+		export: void;
+		createPR: void;
+	}>();
+
+	let editContent = '';
+	let showPreview = true;
+
+	$: renderedContent = content ? renderMarkdown(content) : '';
+	$: renderedEditContent = editContent ? renderMarkdown(editContent) : '';
 
   export function startEdit() {
     editContent = content;
