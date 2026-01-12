@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { trackFeedbackSubmitted } from '$lib/utils/analytics';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const session = cookies.get('session');
@@ -53,6 +54,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			console.error('Feedback insert error:', insertError);
 			throw error(500, 'Failed to save feedback');
 		}
+
+		// Track analytics event
+		trackFeedbackSubmitted(userId || 'anonymous', type);
 
 		return json({
 			success: true,

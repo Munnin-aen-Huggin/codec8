@@ -13,6 +13,7 @@ import type { RequestHandler } from './$types';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { fetchRepoContext } from '$lib/utils/parser';
 import { generateMultipleDocs } from '$lib/server/claude';
+import { trackDocsGenerated } from '$lib/utils/analytics';
 import type { DocType } from '$lib/utils/prompts';
 
 export const POST: RequestHandler = async ({ cookies, request }) => {
@@ -158,6 +159,11 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 			.from('repositories')
 			.update({ last_synced: new Date().toISOString() })
 			.eq('id', repoId);
+
+		// Track analytics event for successful generations
+		if (savedDocs.length > 0) {
+			trackDocsGenerated(userId, repoId, savedDocs.map(d => d.type));
+		}
 
 		return json({
 			docs: savedDocs,

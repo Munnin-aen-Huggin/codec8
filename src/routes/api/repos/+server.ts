@@ -1,5 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { trackRepoConnected } from '$lib/utils/analytics';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies }) => {
@@ -123,6 +124,9 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
     console.error('Failed to connect repository:', insertError);
     throw error(500, 'Failed to connect repository');
   }
+
+  // Track analytics event
+  trackRepoConnected(userId, full_name, newRepo.id);
 
   return json(newRepo, { status: 201 });
 };

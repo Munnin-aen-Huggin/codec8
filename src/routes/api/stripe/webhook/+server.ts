@@ -1,7 +1,8 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { constructWebhookEvent, generateLicenseKey, stripe } from '$lib/server/stripe';
+import { constructWebhookEvent, generateLicenseKey } from '$lib/server/stripe';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { trackCheckoutCompleted } from '$lib/utils/analytics';
 import { STRIPE_WEBHOOK_SECRET } from '$env/static/private';
 import type Stripe from 'stripe';
 
@@ -94,6 +95,10 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
 
     console.log(`Successfully upgraded user ${userId} to ${tier} with license ${licenseKey}`);
+
+    // Track analytics event
+    const amount = session.amount_total ? session.amount_total / 100 : undefined;
+    trackCheckoutCompleted(userId, tier, amount);
 
     // Optional: Send confirmation email
     // await sendUpgradeEmail(userId, tier, licenseKey);

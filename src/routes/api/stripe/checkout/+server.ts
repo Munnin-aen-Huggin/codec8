@@ -1,7 +1,8 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { createCheckoutSession, type PriceTier, PRICES } from '$lib/server/stripe';
+import { createCheckoutSession, type PriceTier } from '$lib/server/stripe';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { trackCheckoutStarted } from '$lib/utils/analytics';
 import { PUBLIC_APP_URL } from '$env/static/public';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -44,6 +45,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   }
 
   try {
+    // Track checkout started event
+    trackCheckoutStarted(profile.id, tier);
+
     // Create Stripe checkout session
     const checkoutSession = await createCheckoutSession({
       userId: profile.id,

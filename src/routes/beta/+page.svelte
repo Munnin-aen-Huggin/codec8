@@ -49,7 +49,12 @@
 	<meta name="description" content="Join the CodeDoc AI beta program and get early access to AI-powered documentation generation." />
 </svelte:head>
 
-<Header user={data.user} />
+{#if data.user}
+	<Header
+		username={data.user.github_username || data.user.email || ''}
+		plan={data.user.plan || 'free'}
+	/>
+{/if}
 
 <main class="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-12">
 	<div class="max-w-2xl mx-auto px-4">

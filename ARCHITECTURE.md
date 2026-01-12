@@ -26,15 +26,15 @@ flowchart TB
 
     subgraph Server["Server (SvelteKit API)"]
         subgraph Auth["Auth Routes"]
-            AL[/auth/login]
-            AC[/auth/callback]
-            AO[/auth/logout]
+            AL["/auth/login"]
+            AC["/auth/callback"]
+            AO["/auth/logout"]
         end
 
         subgraph API["API Routes"]
-            AR[/api/repos]
-            AD[/api/docs]
-            AST[/api/stripe]
+            AR["/api/repos"]
+            AD["/api/docs"]
+            AST["/api/stripe"]
         end
 
         subgraph ServerLib["Server Modules"]
