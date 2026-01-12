@@ -64,15 +64,18 @@
 - Secure license key generation (crypto.getRandomValues)
 - Markdown sanitization (DOMPurify)
 - `.env.example` documentation
+- Demo video script (8 scenes, 2-3 min)
+- Product Hunt submission draft
+- Launch copy (Twitter, HN, Reddit, Email)
 
 ## Current Position
 
 Phase: 5 of 6 (Pre-Launch)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-12 - Completed 05-01-PLAN.md
+Last activity: 2026-01-12 - Completed 05-02-PLAN.md
 
-Progress: ████████░░ 80%
+Progress: █████████░ 90%
 
 ## In Progress
 
@@ -81,13 +84,15 @@ Progress: ████████░░ 80%
 
 Plans in `.planning/phases/05-pre-launch/`:
 - `05-01-PLAN.md` - Beta Testing & Bug Fixes - COMPLETE
-- `05-02-PLAN.md` - Launch Assets (demo video, screenshots, copy)
+- `05-02-PLAN.md` - Launch Assets - COMPLETE
 - `05-03-PLAN.md` - Launch Infrastructure (email, analytics, PH submission)
 
-**Manual tasks remaining from 05-01:**
+**Manual tasks remaining:**
 - Beta user recruitment (10-20 users)
 - Bug triage from beta feedback
 - Create `beta_signups` and `feedback` tables in Supabase
+- Record demo video using script
+- Capture screenshots for Product Hunt
 
 ## Blockers
 

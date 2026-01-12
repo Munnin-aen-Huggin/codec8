@@ -99,18 +99,19 @@
 
 ### Phase 5: Pre-Launch (Days 8-14) - IN PROGRESS
 
-**Status:** In progress (1/3 plans complete)
+**Status:** In progress (2/3 plans complete)
 
 **Deliverables:**
 - [x] Beta signup page (`/beta`)
 - [x] Feedback collection system
 - [x] Security fixes (crypto.getRandomValues, DOMPurify, .env.example)
+- [x] Demo video script (8 scenes, 2-3 min)
+- [x] Product Hunt submission draft
+- [x] Launch copy (Twitter, HN, Reddit, Email, LinkedIn, Discord)
 - [ ] Beta testing with 10-20 users (manual)
 - [ ] Bug fixes from beta feedback (manual)
-- [ ] Demo video (2-3 minutes)
-- [ ] Screenshots for launch assets
-- [ ] Product Hunt submission prep
-- [ ] Launch copy and messaging
+- [ ] Demo video recording (manual)
+- [ ] Screenshots for launch assets (manual)
 - [ ] Email list setup
 
 **Key Files:**
@@ -119,6 +120,9 @@
 - `src/routes/api/feedback/+server.ts` - Feedback API
 - `src/lib/components/FeedbackWidget.svelte` - Feedback widget
 - `.env.example` - Environment variable documentation
+- `.planning/assets/demo-video-script.md` - Video script
+- `.planning/assets/product-hunt-submission.md` - PH draft
+- `.planning/assets/launch-copy.md` - Multi-platform copy
 
 ---
 
