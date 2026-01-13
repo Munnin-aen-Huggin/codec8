@@ -1,73 +1,132 @@
 import Stripe from 'stripe';
 import { STRIPE_SECRET_KEY } from '$env/static/private';
+import {
+  STRIPE_PRICE_SINGLE,
+  STRIPE_PRICE_PRO,
+  STRIPE_PRICE_TEAM
+} from '$env/static/private';
 
 export const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2025-12-15.clover'
 });
 
-// Product/Price IDs - set these in Stripe Dashboard
-export const PRICES = {
-  ltd: process.env.STRIPE_PRICE_LTD || 'price_ltd_placeholder',
-  pro: process.env.STRIPE_PRICE_PRO || 'price_pro_placeholder',
-  dfy: process.env.STRIPE_PRICE_DFY || 'price_dfy_placeholder'
-} as const;
+// Product types
+export type ProductType = 'single' | 'pro' | 'team';
+type PurchaseMode = 'payment' | 'subscription';
 
-export type PriceTier = keyof typeof PRICES;
+interface ProductConfig {
+  priceId: string;
+  mode: PurchaseMode;
+  trialDays?: number;
+}
 
-// Plan limits
+const PRODUCTS: Record<ProductType, ProductConfig> = {
+  single: {
+    priceId: STRIPE_PRICE_SINGLE || 'price_single_placeholder',
+    mode: 'payment'
+  },
+  pro: {
+    priceId: STRIPE_PRICE_PRO || 'price_pro_placeholder',
+    mode: 'subscription',
+    trialDays: 7
+  },
+  team: {
+    priceId: STRIPE_PRICE_TEAM || 'price_team_placeholder',
+    mode: 'subscription',
+    trialDays: 7
+  }
+};
+
+// Plan limits for subscription tiers
 export const PLAN_LIMITS = {
-  free: { repos: 1, docs_per_month: 3 },
-  ltd: { repos: -1, docs_per_month: -1 }, // -1 = unlimited
-  pro: { repos: -1, docs_per_month: -1 },
-  dfy: { repos: -1, docs_per_month: -1 }
+  free: { repos: 1, docsPerMonth: 3 },
+  single: { repos: 1, docsPerMonth: -1 }, // 1 specific repo, unlimited regenerations with payment
+  pro: { reposPerMonth: 30 },
+  team: { reposPerMonth: 100, seats: 5 }
 } as const;
 
-/**
- * Create a Stripe Checkout session for a one-time payment
- */
 export async function createCheckoutSession({
   userId,
   userEmail,
-  tier,
+  product,
+  repoUrl,
   successUrl,
   cancelUrl
 }: {
   userId: string;
   userEmail: string;
-  tier: PriceTier;
+  product: ProductType;
+  repoUrl?: string; // For single repo purchase
   successUrl: string;
   cancelUrl: string;
-}): Promise<Stripe.Checkout.Session> {
-  const priceId = PRICES[tier];
+}): Promise<string> {
+  const config = PRODUCTS[product];
 
-  if (!priceId || priceId.includes('placeholder')) {
-    throw new Error(`Price ID not configured for tier: ${tier}`);
+  if (!config.priceId || config.priceId.includes('placeholder')) {
+    throw new Error(`Price ID not configured for product: ${product}`);
   }
 
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    mode: config.mode,
+    payment_method_types: ['card'],
+    customer_email: userEmail,
+    line_items: [{ price: config.priceId, quantity: 1 }],
+    metadata: {
+      userId,
+      product,
+      repoUrl: repoUrl || ''
+    },
+    success_url: successUrl,
+    cancel_url: cancelUrl
+  };
+
+  // Add trial for subscriptions
+  if (config.mode === 'subscription' && config.trialDays) {
+    sessionParams.subscription_data = {
+      trial_period_days: config.trialDays
+    };
+  }
+
+  const session = await stripe.checkout.sessions.create(sessionParams);
+  return session.url || '';
+}
+
+export async function createRegenerateCheckout({
+  userId,
+  repoId,
+  successUrl,
+  cancelUrl
+}: {
+  userId: string;
+  repoId: string;
+  successUrl: string;
+  cancelUrl: string;
+}): Promise<string> {
+  // $9 one-time for regenerating a single-repo purchase
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
-    customer_email: userEmail,
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1
-      }
-    ],
+    line_items: [{
+      price_data: {
+        currency: 'usd',
+        unit_amount: 900, // $9 in cents
+        product_data: { name: 'Regenerate Documentation' }
+      },
+      quantity: 1
+    }],
     metadata: {
       userId,
-      tier
+      repoId,
+      type: 'regenerate'
     },
     success_url: successUrl,
     cancel_url: cancelUrl
   });
 
-  return session;
+  return session.url || '';
 }
 
-/**
- * Verify a Stripe webhook signature
- */
+// Keep existing utilities
 export function constructWebhookEvent(
   payload: string,
   signature: string,
@@ -96,50 +155,47 @@ export function generateLicenseKey(): string {
   return parts.join('-');
 }
 
-/**
- * Get price details for display
- */
+// Price display info (updated for new model)
 export const PRICE_DETAILS = {
-  ltd: {
-    name: 'Lifetime Deal',
-    price: 299,
-    originalPrice: 499,
-    description: 'Pay once, use forever. All future updates included.',
+  single: {
+    name: 'Single Repo',
+    price: 39,
+    type: 'one-time',
+    description: 'Full documentation suite for one repository',
     features: [
-      'Unlimited repositories',
-      'All documentation types',
-      'Architecture diagrams',
-      'Export to Markdown & PR',
-      'Auto-sync on push',
+      'All 4 documentation types',
       'Private repo support',
-      'Priority email support',
-      'All future features'
+      'Export & create PRs',
+      'Keep forever',
+      'Regenerate: $9'
     ]
   },
   pro: {
-    name: 'Pro Setup',
-    price: 497,
-    originalPrice: 697,
-    description: 'Lifetime Deal + 30-min onboarding call',
+    name: 'Pro',
+    price: 99,
+    type: 'monthly',
+    description: '30 repos per month with all features',
     features: [
-      'Everything in Lifetime Deal',
-      '30-minute onboarding call',
-      'Personalized setup assistance',
-      'Best practices walkthrough',
-      'Priority support'
+      '30 repos per month',
+      'All 4 documentation types',
+      'Private repo support',
+      'Auto-sync on push',
+      'Priority support',
+      '7-day free trial'
     ]
   },
-  dfy: {
-    name: 'Done-For-You',
-    price: 2500,
-    originalPrice: null,
-    description: 'We document everything for you',
+  team: {
+    name: 'Team',
+    price: 249,
+    type: 'monthly',
+    description: '100 repos per month with team features',
     features: [
-      'Everything in Pro Setup',
-      'Full documentation service',
-      'Custom documentation style',
-      'Multiple revision rounds',
-      'Dedicated support'
+      '100 repos per month',
+      '5 team members',
+      'Everything in Pro',
+      'Custom templates',
+      'Slack integration',
+      '7-day free trial'
     ]
   }
 } as const;

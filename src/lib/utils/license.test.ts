@@ -27,41 +27,46 @@ describe('License Key Generation', () => {
 describe('Plan Limits', () => {
   it('should have correct limits for free plan', () => {
     expect(PLAN_LIMITS.free.repos).toBe(1);
-    expect(PLAN_LIMITS.free.docs_per_month).toBe(3);
+    expect(PLAN_LIMITS.free.docsPerMonth).toBe(3);
   });
 
-  it('should have unlimited repos for paid plans', () => {
-    expect(PLAN_LIMITS.ltd.repos).toBe(-1);
-    expect(PLAN_LIMITS.pro.repos).toBe(-1);
-    expect(PLAN_LIMITS.dfy.repos).toBe(-1);
+  it('should have correct limits for single repo purchase', () => {
+    expect(PLAN_LIMITS.single.repos).toBe(1);
+    expect(PLAN_LIMITS.single.docsPerMonth).toBe(-1); // Unlimited
   });
 
-  it('should have unlimited docs for paid plans', () => {
-    expect(PLAN_LIMITS.ltd.docs_per_month).toBe(-1);
-    expect(PLAN_LIMITS.pro.docs_per_month).toBe(-1);
-    expect(PLAN_LIMITS.dfy.docs_per_month).toBe(-1);
+  it('should have correct repo limits for subscription plans', () => {
+    expect(PLAN_LIMITS.pro.reposPerMonth).toBe(30);
+    expect(PLAN_LIMITS.team.reposPerMonth).toBe(100);
+  });
+
+  it('should have team seats for team plan', () => {
+    expect(PLAN_LIMITS.team.seats).toBe(5);
   });
 });
 
 describe('Price Details', () => {
-  it('should have correct price for LTD', () => {
-    expect(PRICE_DETAILS.ltd.price).toBe(299);
-    expect(PRICE_DETAILS.ltd.name).toBe('Lifetime Deal');
+  it('should have correct price for Single Repo', () => {
+    expect(PRICE_DETAILS.single.price).toBe(39);
+    expect(PRICE_DETAILS.single.name).toBe('Single Repo');
+    expect(PRICE_DETAILS.single.type).toBe('one-time');
   });
 
   it('should have correct price for Pro', () => {
-    expect(PRICE_DETAILS.pro.price).toBe(497);
-    expect(PRICE_DETAILS.pro.name).toBe('Pro Setup');
+    expect(PRICE_DETAILS.pro.price).toBe(99);
+    expect(PRICE_DETAILS.pro.name).toBe('Pro');
+    expect(PRICE_DETAILS.pro.type).toBe('monthly');
   });
 
-  it('should have correct price for DFY', () => {
-    expect(PRICE_DETAILS.dfy.price).toBe(2500);
-    expect(PRICE_DETAILS.dfy.name).toBe('Done-For-You');
+  it('should have correct price for Team', () => {
+    expect(PRICE_DETAILS.team.price).toBe(249);
+    expect(PRICE_DETAILS.team.name).toBe('Team');
+    expect(PRICE_DETAILS.team.type).toBe('monthly');
   });
 
   it('should have features for each tier', () => {
-    expect(PRICE_DETAILS.ltd.features.length).toBeGreaterThan(0);
+    expect(PRICE_DETAILS.single.features.length).toBeGreaterThan(0);
     expect(PRICE_DETAILS.pro.features.length).toBeGreaterThan(0);
-    expect(PRICE_DETAILS.dfy.features.length).toBeGreaterThan(0);
+    expect(PRICE_DETAILS.team.features.length).toBeGreaterThan(0);
   });
 });

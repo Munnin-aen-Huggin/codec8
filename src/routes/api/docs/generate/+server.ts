@@ -14,6 +14,7 @@ import { supabaseAdmin } from '$lib/server/supabase';
 import { fetchRepoContext } from '$lib/utils/parser';
 import { generateMultipleDocs } from '$lib/server/claude';
 import { trackDocsGenerated } from '$lib/utils/analytics';
+import { trackEvent, EVENTS } from '$lib/server/analytics';
 import type { DocType } from '$lib/utils/prompts';
 
 export const POST: RequestHandler = async ({ cookies, request }) => {
@@ -163,6 +164,13 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 		// Track analytics event for successful generations
 		if (savedDocs.length > 0) {
 			trackDocsGenerated(userId, repoId, savedDocs.map(d => d.type));
+			// Also track with server-side analytics
+			await trackEvent(EVENTS.DOC_GENERATED, {
+				repo_id: repoId,
+				repo_name: repo.full_name,
+				doc_types: savedDocs.map(d => d.type).join(','),
+				doc_count: savedDocs.length
+			}, userId);
 		}
 
 		return json({

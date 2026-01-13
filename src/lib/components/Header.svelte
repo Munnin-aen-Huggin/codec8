@@ -91,7 +91,7 @@
           on:click={() => { handleUpgrade(); mobileMenuOpen = false; }}
           disabled={upgradeLoading}
         >
-          {upgradeLoading ? 'Loading...' : 'Upgrade to Lifetime'}
+          {upgradeLoading ? 'Loading...' : 'Upgrade to Pro'}
         </button>
       {/if}
 

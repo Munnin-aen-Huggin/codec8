@@ -2,6 +2,7 @@ import { redirect, error } from '@sveltejs/kit';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_APP_URL } from '$env/static/public';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { trackEvent, EVENTS } from '$lib/server/analytics';
 import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 
@@ -111,6 +112,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 		let userId: string;
 
+		let isNewUser = false;
+
 		if (existingProfile) {
 			// Update existing user's token
 			userId = existingProfile.id;
@@ -123,6 +126,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				.eq('id', userId);
 		} else {
 			// Create new user profile
+			isNewUser = true;
 			const newUserId = crypto.randomUUID();
 			const { error: insertError } = await supabaseAdmin.from('profiles').insert({
 				id: newUserId,
@@ -139,6 +143,13 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 			userId = newUserId;
 		}
+
+		// Track signup or login event
+		await trackEvent(
+			isNewUser ? EVENTS.SIGNUP_COMPLETED : EVENTS.LOGIN_COMPLETED,
+			{ provider: 'github' },
+			userId
+		);
 
 		// Create session token
 		const sessionToken = crypto.randomUUID();

@@ -4,9 +4,9 @@
 
 ## Build Progress
 
-**Current Phase:** Phase 5 - Pre-Launch (COMPLETE)
-**Next Phase:** Phase 6 - Launch
-**Day:** Ready for launch
+**Current Phase:** Phase 7 - SaaS Transformation (COMPLETE)
+**Plan Progress:** 7 of 7 plans complete
+**Day:** Post-foundation, ready for launch
 
 ## Feature Status
 
@@ -17,90 +17,83 @@
 | Repo Connection | Complete | With toast notifications |
 | Doc Generation | Complete | Claude API integration |
 | Doc Viewer/Editor | Complete | With markdown preview |
-| Payments (Stripe) | Complete | Checkout, webhooks, success |
+| Payments (Stripe) | Complete | Hybrid pricing model |
 | UI Components | Complete | Toast, Skeleton, DocTabs, DocEditor |
-| Unit Tests | Complete | 22 tests passing |
+| Unit Tests | Complete | Updated for new pricing |
 | Polish | Complete | Mobile responsive, error handling |
 | Beta Infrastructure | Complete | Signup page, feedback widget |
 | Security Fixes | Complete | crypto.getRandomValues, DOMPurify |
 | Launch Assets | Complete | Video script, PH draft, copy |
 | Analytics | Complete | Event tracking for key actions |
+| Rate Limiting | Complete | IP-based demo limiting |
+| Try-Without-Signup | Complete | /try page, README only |
+| Hybrid Pricing | Complete | $39 one-time, $99/$249 subscriptions |
+| CRO Landing Page | Complete | New design with hybrid pricing |
+| Dashboard Usage Display | Complete | Usage stats, purchased repos, upgrade CTAs |
 
 ## Completed Work
 
-### Phase 1 (Days 1-2)
-- SvelteKit project with TypeScript
-- Supabase integration (auth + database)
-- GitHub OAuth flow
-- Landing page
-- Dashboard with repo listing
-- RepoCard component
-- Basic routing structure
-- Vercel deployment
+### Phase 1-5: Foundation through Pre-Launch
+- See previous commit history for full details
+- All foundation features complete
 
-### Phase 2 (Day 3)
-- Claude API client (`src/lib/server/claude.ts`)
-- Documentation generation endpoint
-- Repo detail page with doc viewer/editor
-- Prompt templates for doc types
+### Phase 7: SaaS Transformation (IN PROGRESS)
 
-### Phase 3 (Day 4)
-- Stripe server integration
-- Checkout session endpoint
-- Webhook handler for payment events
-- Success page with license display
-- Plan upgrade logic with license generation
-- Dashboard upgrade button
+**Plan 07-01: Rate Limiting Utilities** - COMPLETE
+- `src/lib/server/ratelimit.ts` - IP-based rate limiting
+- `src/lib/server/botdetect.ts` - Bot detection utilities
 
-### Phase 4 (Day 5)
-- Toast notification system (`src/lib/stores/toast.ts`, `src/lib/components/Toast.svelte`)
-- DocTabs component for navigation
-- DocEditor component with live preview
-- Skeleton loading components
-- Header component with mobile menu
-- Unit tests for toast store (11 tests)
-- Unit tests for license utilities (10 tests)
-- Replaced all `alert()` calls with toast notifications
-- Mobile responsive improvements
+**Plan 07-02: Demo API Endpoint** - COMPLETE
+- `src/routes/api/try/+server.ts` - Demo generation endpoint
+- `src/lib/server/usage.ts` - Subscription usage tracking
 
-### Phase 5 (Pre-Launch) - COMPLETE
-**Plan 05-01: Beta Testing & Bug Fixes**
-- Beta signup page (`/beta`)
-- Feedback collection widget
-- Secure license key generation (crypto.getRandomValues)
-- Markdown sanitization (DOMPurify)
-- `.env.example` documentation
+**Plan 07-03: Demo Page UI** - COMPLETE
+- `src/routes/try/+page.svelte` - Demo page
+- `src/lib/components/LockedDocPreview.svelte` - Upsell component
 
-**Plan 05-02: Launch Assets**
-- Demo video script (8 scenes, 2-3 min)
-- Product Hunt submission draft
-- Launch copy (Twitter, HN, Reddit, Email, LinkedIn, Discord)
+**Plan 07-04: Hybrid Pricing Implementation** - COMPLETE
+- Updated `src/lib/server/stripe.ts` - New pricing model
+- Updated webhook handler for both one-time and subscription payments
 
-**Plan 05-03: Launch Infrastructure**
-- Analytics event tracking (`src/lib/utils/analytics.ts`)
-- Launch day runbook
-- FAQ section verified on landing page
+**Plan 07-05: Landing Page CRO Update** - COMPLETE
+- Complete rewrite of `src/routes/+page.svelte`
+- Removed all fake social proof (fake user counts, activity ticker, countdown)
+- New sections: Hero, What You Get, Free vs Paid, How It Works, Pricing (4 tiers), FAQ accordion, Final CTA
+- Updated related components to remove LTD references
+
+**Plan 07-06: Analytics System** - COMPLETE
+- `src/lib/server/analytics.ts` - Server-side event tracking to Supabase
+- `src/lib/stores/analytics.ts` - Client-side anonymous ID store
+- Event tracking added to demo, auth, payment, and doc generation flows
+
+**Plan 07-07: Dashboard Usage Display** - COMPLETE
+- Updated `src/routes/dashboard/+page.server.ts` - Fetches subscription/usage data
+- Updated `src/routes/dashboard/+page.svelte` - Usage stats, purchased repos, upgrade CTAs
+- Dark theme styling with emerald accent
 
 ## Current Position
 
-Phase: 5 of 6 (Pre-Launch) - COMPLETE
-Plan: 3 of 3 complete
-Status: Ready for Phase 6 (Launch)
-Last activity: 2026-01-13 - Completed 05-03-PLAN.md
+Phase: 7 of 7 (SaaS Transformation) - COMPLETE
+Plan: 7 of 7 complete
+Status: Phase 7 complete, ready for launch
+Last activity: 2026-01-13 - Completed 07-07 (Dashboard Usage Display)
 
-Progress: ██████████ 95%
+Progress: ████████████ 100%
+
+## New Pricing Model
+
+| Tier | Price | Type | Features |
+|------|-------|------|----------|
+| Free Demo | $0 | - | README only, 1/day, public repos |
+| Single Repo | $39 | One-time | All 4 doc types, 1 repo forever |
+| Pro | $99/mo | Subscription | 30 repos/month, all features |
+| Team | $249/mo | Subscription | 100 repos/month, 5 seats |
 
 ## Next Steps
 
-### Phase 6: Launch
-Ready to begin. See `.planning/ROADMAP.md` for deliverables:
-- Product Hunt launch
-- Hacker News Show HN post
-- Reddit posts
-- LTD community outreach
-- Customer support setup
-- Analytics monitoring
-- Iterate based on feedback
+### Phase 7 Completed
+- [x] 07-06: Analytics & Event Tracking
+- [x] 07-07: Dashboard Usage Display
 
 ### Manual Tasks (Pre-Launch)
 - [ ] Beta user recruitment (10-20 users)
@@ -110,7 +103,6 @@ Ready to begin. See `.planning/ROADMAP.md` for deliverables:
 - [ ] Email list setup (third-party)
 - [ ] Product Hunt submission
 - [ ] Monitoring setup (Vercel Analytics, error tracking)
-- [ ] Fix video script messaging (UAT-001 - optional)
 
 ## Blockers
 
@@ -129,13 +121,7 @@ None currently.
 | RepoCard.svelte | Complete | Repository display card |
 | Header.svelte | Complete | Responsive header with mobile menu |
 | FeedbackWidget.svelte | Complete | Floating feedback button |
-
-### Stores (`src/lib/stores/`)
-| Store | Status | Description |
-|-------|--------|-------------|
-| auth.ts | Complete | User authentication state |
-| repos.ts | Complete | Repository state management |
-| toast.ts | Complete | Toast notification management |
+| LockedDocPreview.svelte | Complete | Upsell component for locked docs |
 
 ### Server Utilities (`src/lib/server/`)
 | Utility | Status | Description |
@@ -143,38 +129,26 @@ None currently.
 | supabase.ts | Complete | Supabase clients |
 | github.ts | Complete | GitHub API functions |
 | claude.ts | Complete | Claude API + prompts |
-| stripe.ts | Complete | Stripe functions |
+| stripe.ts | Complete | Hybrid pricing functions |
+| ratelimit.ts | Complete | Rate limiting utilities |
+| botdetect.ts | Complete | Bot detection utilities |
+| usage.ts | Complete | Subscription usage tracking |
+| analytics.ts | Complete | Server-side event tracking |
 
-### Utilities (`src/lib/utils/`)
-| Utility | Status | Description |
-|---------|--------|-------------|
-| analytics.ts | Complete | Event tracking |
-| license.ts | Complete | License key generation |
-| prompts.ts | Complete | AI prompt templates |
-| parser.ts | Complete | Code parsing utilities |
+### Stores (`src/lib/stores/`)
+| Store | Status | Description |
+|-------|--------|-------------|
+| auth.ts | Complete | User authentication state |
+| repos.ts | Complete | Repository state |
+| toast.ts | Complete | Toast notifications |
+| analytics.ts | Complete | Anonymous ID for tracking |
 
 ### Tests
 | Test File | Tests | Status |
 |-----------|-------|--------|
 | toast.test.ts | 11 | Passing |
-| license.test.ts | 10 | Passing |
+| license.test.ts | 10 | Updated for new pricing |
 | demo.spec.ts | 1 | Needs browser setup |
-
-## Test Results (2026-01-13)
-
-### Unit Tests: 22/22 PASSING
-```
-✓ src/lib/stores/toast.test.ts (11 tests)
-✓ src/lib/utils/license.test.ts (10 tests)
-✓ tests/unit/demo.test.ts (1 test)
-```
-
-### Build: PASSING
-```
-npm run build - SUCCESS
-```
-
-### TypeScript/Svelte Check: PASSING (0 errors, 3 warnings)
 
 ## Quick Commands
 
@@ -198,9 +172,9 @@ ANTHROPIC_API_KEY=
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_PRICE_LTD=
+STRIPE_PRICE_SINGLE=
 STRIPE_PRICE_PRO=
-STRIPE_PRICE_DFY=
+STRIPE_PRICE_TEAM=
 PUBLIC_APP_URL=
 ```
 

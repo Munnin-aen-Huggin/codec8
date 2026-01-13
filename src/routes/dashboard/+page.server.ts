@@ -8,6 +8,12 @@ interface SessionData {
   token: string;
 }
 
+// Subscription tier limits
+const TIER_LIMITS: Record<string, number> = {
+  pro: 30,
+  team: 100
+};
+
 export const load: PageServerLoad = async ({ cookies }) => {
   const sessionCookie = cookies.get('session');
   if (!sessionCookie) throw redirect(302, '/');
@@ -27,9 +33,23 @@ export const load: PageServerLoad = async ({ cookies }) => {
     throw redirect(302, '/');
   }
 
+  // Fetch profile with subscription info
   const { data: profile } = await supabaseAdmin
     .from('profiles')
-    .select('*')
+    .select(
+      `
+      id,
+      email,
+      github_username,
+      github_token,
+      plan,
+      subscription_status,
+      subscription_tier,
+      repos_used_this_month,
+      current_period_end,
+      trial_ends_at
+    `
+    )
     .eq('id', userId)
     .single();
 
@@ -38,10 +58,12 @@ export const load: PageServerLoad = async ({ cookies }) => {
     throw redirect(302, '/');
   }
 
+  // Fetch connected repositories
   const { data: connectedRepos } = await supabaseAdmin
     .from('repositories')
     .select('*')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
 
   // Get documentation status for each connected repo
   const repoIds = (connectedRepos || []).map((r) => r.id);
@@ -57,6 +79,38 @@ export const load: PageServerLoad = async ({ cookies }) => {
     const reposWithDocs = new Set((docs || []).map((d) => d.repo_id));
     repoDocs = repoIds.map((id) => ({ repo_id: id, has_docs: reposWithDocs.has(id) }));
   }
+
+  // Fetch purchased repos (for single-repo customers)
+  const { data: purchasedRepos } = await supabaseAdmin
+    .from('purchased_repos')
+    .select('*')
+    .eq('user_id', userId)
+    .order('purchased_at', { ascending: false });
+
+  // Calculate usage info for subscribers
+  let usageInfo: {
+    used: number;
+    limit: number;
+    tier: string;
+    resetDate: string | null;
+  } | null = null;
+
+  if (
+    profile.subscription_tier &&
+    ['pro', 'team'].includes(profile.subscription_tier) &&
+    profile.subscription_status === 'active'
+  ) {
+    usageInfo = {
+      used: profile.repos_used_this_month || 0,
+      limit: TIER_LIMITS[profile.subscription_tier] || 30,
+      tier: profile.subscription_tier === 'pro' ? 'Pro' : 'Team',
+      resetDate: profile.current_period_end
+    };
+  }
+
+  // Check if in trial
+  const isTrialing = profile.subscription_status === 'trialing';
+  const trialEndsAt = profile.trial_ends_at;
 
   let availableRepos: Awaited<ReturnType<typeof fetchUserRepos>> = [];
   let githubError: string | null = null;
@@ -74,11 +128,17 @@ export const load: PageServerLoad = async ({ cookies }) => {
       id: profile.id,
       email: profile.email,
       github_username: profile.github_username,
-      plan: profile.plan
+      plan: profile.plan,
+      subscription_status: profile.subscription_status,
+      subscription_tier: profile.subscription_tier
     },
     connectedRepos: connectedRepos || [],
     availableRepos,
     githubError,
-    repoDocs
+    repoDocs,
+    purchasedRepos: purchasedRepos || [],
+    usageInfo,
+    isTrialing,
+    trialEndsAt
   };
 };

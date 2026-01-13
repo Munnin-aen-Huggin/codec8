@@ -68,7 +68,7 @@
 				<h1 class="text-2xl font-bold text-gray-900 mb-4">You're on the list!</h1>
 				<p class="text-gray-600 mb-6">
 					Thanks for joining our beta program. We'll send you an email with your access credentials
-					and a free Lifetime Deal as a thank you for being an early tester.
+					and a free Pro trial as a thank you for being an early tester.
 				</p>
 				<a href="/" class="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium">
 					<svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,7 +87,7 @@
 				</h1>
 				<p class="text-lg text-gray-600 max-w-lg mx-auto">
 					Get free access to CodeDoc AI and help shape the future of AI-powered documentation.
-					Beta testers receive a free Lifetime Deal!
+					Beta testers receive a free Pro trial!
 				</p>
 			</div>
 
@@ -167,12 +167,12 @@
 
 			<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
 				<div class="bg-white/50 rounded-lg p-4">
-					<div class="text-2xl font-bold text-indigo-600">Free</div>
-					<div class="text-sm text-gray-600">Lifetime Deal</div>
+					<div class="text-2xl font-bold text-indigo-600">7 Days</div>
+					<div class="text-sm text-gray-600">Free Pro trial</div>
 				</div>
 				<div class="bg-white/50 rounded-lg p-4">
-					<div class="text-2xl font-bold text-indigo-600">Unlimited</div>
-					<div class="text-sm text-gray-600">Repos during beta</div>
+					<div class="text-2xl font-bold text-indigo-600">30 Repos</div>
+					<div class="text-sm text-gray-600">During beta</div>
 				</div>
 				<div class="bg-white/50 rounded-lg p-4">
 					<div class="text-2xl font-bold text-indigo-600">Direct</div>

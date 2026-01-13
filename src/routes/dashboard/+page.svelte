@@ -17,10 +17,21 @@
   let generatingRepoId: string | null = null;
   let checkoutLoading = false;
 
+  // Extract usage data from page data
+  $: ({ usageInfo, isTrialing, trialEndsAt, purchasedRepos } = data);
+
+  // Format trial end date
+  $: trialEndFormatted = trialEndsAt
+    ? new Date(trialEndsAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : null;
+
+  // Calculate usage percentage
+  $: usagePercent = usageInfo ? Math.round((usageInfo.used / usageInfo.limit) * 100) : 0;
+
   // Handle checkout redirect from login
   onMount(async () => {
     const checkoutTier = $page.url.searchParams.get('checkout');
-    if (checkoutTier && ['ltd', 'pro', 'dfy'].includes(checkoutTier)) {
+    if (checkoutTier && ['single', 'pro', 'team'].includes(checkoutTier)) {
       // Clear the URL parameter
       goto('/dashboard', { replaceState: true });
       // Initiate checkout
@@ -52,6 +63,28 @@
     }
   }
 
+  async function handleRegenerate(repoId: string) {
+    checkoutLoading = true;
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'regenerate', repoId })
+      });
+      const result = await response.json();
+      if (result.success && result.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error(result.message || 'Failed to start checkout.');
+        checkoutLoading = false;
+      }
+    } catch (err) {
+      console.error('Regenerate checkout error:', err);
+      toast.error('Failed to start checkout.');
+      checkoutLoading = false;
+    }
+  }
+
   // Track which repos have documentation
   $: repoDocsMap = new Map(data.repoDocs?.map((rd) => [rd.repo_id, rd.has_docs]) || []);
 
@@ -62,6 +95,13 @@
 
   $: connectedIds = new Set(data.connectedRepos.map((r) => r.github_repo_id));
   $: availableNotConnected = data.availableRepos.filter((r) => !connectedIds.has(r.id));
+
+  // Determine if user is a subscriber with usage tracking
+  $: hasSubscription = usageInfo !== null;
+  // Determine if user has purchased repos (single-repo customers)
+  $: hasPurchasedRepos = purchasedRepos && purchasedRepos.length > 0;
+  // Free users have no subscription and no purchased repos
+  $: isFreeUser = !hasSubscription && !hasPurchasedRepos && !isTrialing;
 
   $: repoLimit = data.user.plan === 'free' ? 1 : Infinity;
   $: canConnectMore = data.connectedRepos.length < repoLimit;
@@ -171,31 +211,35 @@
   <title>Dashboard - CodeDoc AI</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50">
-  <header class="bg-white border-b">
+<div class="min-h-screen bg-[#09090b]">
+  <header class="bg-zinc-900 border-b border-zinc-800">
     <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="/" class="text-xl font-bold text-gray-900">CodeDoc AI</a>
+      <a href="/" class="text-xl font-bold text-white">CodeDoc AI</a>
       <div class="flex items-center gap-4">
-        {#if data.user.plan === 'free'}
+        {#if isFreeUser}
           <button
-            on:click={() => initiateCheckout('ltd')}
+            on:click={() => initiateCheckout('pro')}
             disabled={checkoutLoading}
-            class="px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 disabled:opacity-50"
+            class="px-3 py-1.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-500 disabled:opacity-50"
           >
             {checkoutLoading ? 'Loading...' : 'Upgrade'}
           </button>
-        {:else}
-          <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-            {data.user.plan.toUpperCase()}
+        {:else if hasSubscription}
+          <span class="px-3 py-1 bg-emerald-900/50 text-emerald-400 text-sm font-medium rounded-full border border-emerald-500/50">
+            {usageInfo?.tier}
+          </span>
+        {:else if hasPurchasedRepos}
+          <span class="px-3 py-1 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-full">
+            Single Repo
           </span>
         {/if}
-        <span class="text-gray-600">
+        <span class="text-zinc-400">
           {data.user.github_username}
         </span>
         <form action="/auth/logout" method="POST" class="inline">
           <button
             type="submit"
-            class="text-gray-500 hover:text-gray-700"
+            class="text-zinc-500 hover:text-zinc-300"
             data-testid="logout-button"
           >
             Logout
@@ -206,70 +250,165 @@
   </header>
 
   <main class="container mx-auto px-6 py-8">
-    <div class="flex justify-between items-center mb-8">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Your Repositories</h1>
-        <p class="text-sm text-gray-500 mt-1">
-          {data.connectedRepos.length}
-          {#if data.user.plan === 'free'}
-            / {repoLimit} repository connected
-          {:else}
-            repositories connected
-          {/if}
-        </p>
-      </div>
-      <button
-        on:click={() => (showConnectModal = true)}
-        disabled={!canConnectMore}
-        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        + Connect Repo
-      </button>
-    </div>
+    <h1 class="text-3xl font-bold text-white mb-8">Dashboard</h1>
 
-    {#if data.githubError}
-      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-        <p class="font-medium">Failed to fetch GitHub repositories</p>
-        <p class="text-sm mt-1">{data.githubError}</p>
+    <!-- Trial Banner -->
+    {#if isTrialing}
+      <div class="bg-emerald-900/30 border border-emerald-500/50 rounded-lg p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-emerald-400 font-medium">Free Trial</span>
+            <span class="text-zinc-400 ml-2">Ends {trialEndFormatted}</span>
+          </div>
+          <a href="/pricing" class="text-emerald-400 hover:text-emerald-300 text-sm">
+            Upgrade now &rarr;
+          </a>
+        </div>
       </div>
     {/if}
 
-    {#if !canConnectMore && data.user.plan === 'free'}
-      <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-        <p class="text-amber-800 font-medium">Free plan limit reached</p>
-        <p class="text-sm text-amber-700 mt-1">
-          Upgrade to the Lifetime Deal for unlimited repositories.
-        </p>
+    <!-- Usage Stats (for subscribers) -->
+    {#if usageInfo}
+      <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-white">{usageInfo.tier} Plan Usage</h2>
+          <span class="text-zinc-400 text-sm">
+            {usageInfo.used} / {usageInfo.limit} repos this month
+          </span>
+        </div>
+        <div class="w-full bg-zinc-800 rounded-full h-2">
+          <div
+            class="h-2 rounded-full transition-all {usagePercent > 80 ? 'bg-amber-500' : 'bg-emerald-500'}"
+            style="width: {usagePercent}%"
+          ></div>
+        </div>
+        {#if usagePercent > 80}
+          <p class="text-amber-400 text-sm mt-2">
+            Approaching limit. <a href="/pricing" class="underline hover:no-underline">Upgrade for more</a>
+          </p>
+        {/if}
+      </div>
+    {/if}
+
+    <!-- Purchased Repos Section (for single-repo customers) -->
+    {#if hasPurchasedRepos}
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-white mb-4">Purchased Repositories</h2>
+        <div class="grid gap-4">
+          {#each purchasedRepos as repo}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+              <div>
+                <h3 class="text-white font-medium">{repo.repo_name || repo.repo_url}</h3>
+                <p class="text-zinc-500 text-sm">
+                  Purchased {new Date(repo.purchased_at).toLocaleDateString()}
+                </p>
+              </div>
+              <div class="flex gap-3">
+                <a
+                  href="/dashboard/{repo.repository_id || repo.id}"
+                  class="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700"
+                >
+                  View Docs
+                </a>
+                <button
+                  on:click={() => handleRegenerate(repo.repository_id || repo.id)}
+                  disabled={checkoutLoading}
+                  class="px-4 py-2 border border-zinc-700 text-zinc-300 rounded hover:border-zinc-600 disabled:opacity-50"
+                >
+                  Regenerate ($9)
+                </button>
+              </div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/if}
+
+    <!-- Connected Repos Section -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h2 class="text-xl font-semibold text-white">Connected Repositories</h2>
+          <p class="text-sm text-zinc-500 mt-1">
+            {data.connectedRepos.length}
+            {#if data.user.plan === 'free' && !hasSubscription}
+              / {repoLimit} repository connected
+            {:else}
+              repositories connected
+            {/if}
+          </p>
+        </div>
         <button
-          on:click={() => initiateCheckout('ltd')}
-          disabled={checkoutLoading}
-          class="inline-block mt-2 text-sm font-medium text-amber-800 underline hover:no-underline disabled:opacity-50"
+          on:click={() => (showConnectModal = true)}
+          disabled={!canConnectMore}
+          class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {checkoutLoading ? 'Loading...' : 'Upgrade now — $299'}
+          Connect Repo
         </button>
       </div>
-    {/if}
 
-    {#if data.connectedRepos.length > 0}
-      <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {#each data.connectedRepos as repo (repo.id)}
-          <a href="/dashboard/{repo.id}" class="block">
-            <RepoCard
-              connectedRepo={repo}
-              isConnected={true}
-              onDisconnect={() => disconnectRepo(repo.id)}
-              onGenerate={() => generateDocs(repo.id)}
-              loading={disconnectingRepoId === repo.id}
-              generating={generatingRepoId === repo.id}
-              hasDocumentation={repoDocsMap.get(repo.id) || false}
-            />
+      {#if data.githubError}
+        <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg text-red-400">
+          <p class="font-medium">Failed to fetch GitHub repositories</p>
+          <p class="text-sm mt-1">{data.githubError}</p>
+        </div>
+      {/if}
+
+      {#if !canConnectMore && data.user.plan === 'free' && !hasSubscription}
+        <div class="mb-6 p-4 bg-amber-900/30 border border-amber-500/50 rounded-lg">
+          <p class="text-amber-400 font-medium">Free plan limit reached</p>
+          <p class="text-sm text-amber-300/70 mt-1">
+            Upgrade to Pro for unlimited repositories.
+          </p>
+          <button
+            on:click={() => initiateCheckout('pro')}
+            disabled={checkoutLoading}
+            class="inline-block mt-2 text-sm font-medium text-amber-400 underline hover:no-underline disabled:opacity-50"
+          >
+            {checkoutLoading ? 'Loading...' : 'Start 7-day trial'}
+          </button>
+        </div>
+      {/if}
+
+      {#if data.connectedRepos.length > 0}
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {#each data.connectedRepos as repo (repo.id)}
+            <a href="/dashboard/{repo.id}" class="block">
+              <RepoCard
+                connectedRepo={repo}
+                isConnected={true}
+                onDisconnect={() => disconnectRepo(repo.id)}
+                onGenerate={() => generateDocs(repo.id)}
+                loading={disconnectingRepoId === repo.id}
+                generating={generatingRepoId === repo.id}
+                hasDocumentation={repoDocsMap.get(repo.id) || false}
+              />
+            </a>
+          {/each}
+        </div>
+      {:else}
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center text-zinc-400">
+          <p class="mb-4">No repositories connected yet</p>
+          <a href="/dashboard/connect" class="text-emerald-400 hover:text-emerald-300 text-sm">
+            Connect your first repository &rarr;
           </a>
-        {/each}
-      </div>
-    {:else}
-      <div class="bg-white rounded-xl border p-8 text-center text-gray-500">
-        <p class="mb-4">No repositories connected yet.</p>
-        <p class="text-sm">Click "Connect Repo" to get started.</p>
+        </div>
+      {/if}
+    </div>
+
+    <!-- Upgrade CTA (for free users) -->
+    {#if isFreeUser}
+      <div class="mt-8 bg-gradient-to-r from-emerald-900/30 to-zinc-900 border border-emerald-500/30 rounded-lg p-6 text-center">
+        <h3 class="text-xl font-semibold text-white mb-2">Unlock All Features</h3>
+        <p class="text-zinc-400 mb-4">
+          Get all 4 documentation types, private repos, and unlimited generations.
+        </p>
+        <a
+          href="/pricing"
+          class="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500"
+        >
+          View Plans &rarr;
+        </a>
       </div>
     {/if}
   </main>
@@ -277,19 +416,19 @@
 
 {#if showConnectModal}
   <div
-    class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+    class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
     on:click|self={() => (showConnectModal = false)}
     on:keydown={(e) => e.key === 'Escape' && (showConnectModal = false)}
     role="dialog"
     aria-modal="true"
     tabindex="-1"
   >
-    <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-      <div class="p-6 border-b flex justify-between items-center">
-        <h2 class="text-xl font-bold text-gray-900">Connect a Repository</h2>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+      <div class="p-6 border-b border-zinc-800 flex justify-between items-center">
+        <h2 class="text-xl font-bold text-white">Connect a Repository</h2>
         <button
           on:click={() => (showConnectModal = false)}
-          class="text-gray-400 hover:text-gray-600"
+          class="text-zinc-500 hover:text-zinc-300"
         >
           <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
@@ -314,9 +453,9 @@
             {/each}
           </div>
         {:else}
-          <div class="text-center text-gray-500 py-8">
+          <div class="text-center text-zinc-400 py-8">
             <p>No more repositories available to connect.</p>
-            <p class="text-sm mt-2">
+            <p class="text-sm mt-2 text-zinc-500">
               All your GitHub repositories are already connected.
             </p>
           </div>

@@ -1,6 +1,6 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { createCheckoutSession, type PriceTier } from '$lib/server/stripe';
+import { createCheckoutSession, createRegenerateCheckout, type ProductType } from '$lib/server/stripe';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { trackCheckoutStarted } from '$lib/utils/analytics';
 import { PUBLIC_APP_URL } from '$env/static/public';
@@ -20,18 +20,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     throw error(401, 'Invalid session');
   }
 
-  // Get request body
-  const { tier } = await request.json() as { tier: string };
-
-  // Validate tier
-  if (!tier || !['ltd', 'pro', 'dfy'].includes(tier)) {
-    throw error(400, 'Invalid tier. Must be: ltd, pro, or dfy');
-  }
-
   // Get user profile
   const { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
-    .select('id, email, plan')
+    .select('id, email')
     .eq('id', userId)
     .single();
 
@@ -39,29 +31,60 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     throw error(404, 'User profile not found');
   }
 
-  // Check if user already has a paid plan
-  if (profile.plan !== 'free') {
-    throw error(400, `You already have a ${profile.plan.toUpperCase()} plan`);
+  // Get request body
+  const body = await request.json() as {
+    product?: string;
+    repoUrl?: string;
+    repoId?: string;
+    type?: string;
+  };
+
+  const { product, repoUrl, repoId, type } = body;
+
+  // Handle regeneration checkout separately
+  if (type === 'regenerate' && repoId) {
+    try {
+      trackCheckoutStarted(profile.id, 'regenerate');
+
+      const url = await createRegenerateCheckout({
+        userId: profile.id,
+        repoId,
+        successUrl: `${PUBLIC_APP_URL}/dashboard/${repoId}?regenerated=true`,
+        cancelUrl: `${PUBLIC_APP_URL}/dashboard/${repoId}`
+      });
+
+      return json({ success: true, url });
+    } catch (err) {
+      console.error('Regenerate checkout error:', err);
+      throw error(500, 'Failed to create regeneration checkout');
+    }
+  }
+
+  // Validate product type for standard checkout
+  if (!product || !['single', 'pro', 'team'].includes(product)) {
+    throw error(400, 'Invalid product type. Must be: single, pro, or team');
+  }
+
+  // For single repo purchase, require repoUrl
+  if (product === 'single' && !repoUrl) {
+    throw error(400, 'Repository URL required for single repo purchase');
   }
 
   try {
     // Track checkout started event
-    trackCheckoutStarted(profile.id, tier);
+    trackCheckoutStarted(profile.id, product);
 
     // Create Stripe checkout session
-    const checkoutSession = await createCheckoutSession({
+    const url = await createCheckoutSession({
       userId: profile.id,
       userEmail: profile.email,
-      tier: tier as PriceTier,
+      product: product as ProductType,
+      repoUrl,
       successUrl: `${PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${PUBLIC_APP_URL}/#pricing`
+      cancelUrl: `${PUBLIC_APP_URL}/pricing`
     });
 
-    return json({
-      success: true,
-      url: checkoutSession.url,
-      sessionId: checkoutSession.id
-    });
+    return json({ success: true, url });
   } catch (err) {
     console.error('Checkout session error:', err);
 

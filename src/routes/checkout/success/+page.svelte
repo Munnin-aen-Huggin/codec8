@@ -4,9 +4,10 @@
   export let data: PageData;
 
   const tierNames: Record<string, string> = {
-    ltd: 'Lifetime Deal',
-    pro: 'Pro Setup',
-    dfy: 'Done-For-You'
+    single: 'Single Repo',
+    pro: 'Pro',
+    team: 'Team',
+    ltd: 'Pro' // Legacy LTD mapped to Pro
   };
 
   function copyLicenseKey() {

@@ -1,10 +1,10 @@
 <svelte:head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>CodeDoc AI — Documentation That Writes Itself</title>
+	<title>CodeDoc AI - Complete docs in 60 seconds</title>
 	<meta
 		name="description"
-		content="Connect your GitHub repo, get production-ready documentation in 2 minutes. README, API docs, architecture diagrams — automatically."
+		content="README, API docs, architecture diagrams, and setup guides - generated automatically from your GitHub repo. Try it once free."
 	/>
 
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -18,10 +18,10 @@
 <!-- Sticky Header (appears on scroll) -->
 <header class="sticky-header" id="stickyHeader">
 	<div class="container">
-		<div class="logo">📄 CodeDoc AI</div>
+		<div class="logo">CodeDoc AI</div>
 		<div class="header-actions">
 			<a href="/auth/login" class="header-link">Sign In</a>
-			<a href="#pricing" class="cta-small">Get Lifetime Access — $299</a>
+			<a href="#pricing" class="cta-small">View Pricing</a>
 		</div>
 	</div>
 </header>
@@ -29,240 +29,141 @@
 <!-- Top Navigation -->
 <nav class="top-nav">
 	<div class="container">
-		<div class="logo">📄 CodeDoc AI</div>
+		<div class="logo">CodeDoc AI</div>
 		<div class="nav-actions">
 			<a href="#pricing" class="nav-link">Pricing</a>
 			<a href="/auth/login" class="nav-link">Sign In</a>
-			<a href="/auth/login" class="nav-cta">Start Free</a>
+			<button class="nav-cta" on:click={scrollToHero}>Try Demo</button>
 		</div>
 	</div>
 </nav>
 
 <!-- Hero Section -->
-<section class="hero">
+<section class="hero" id="hero">
 	<div class="container">
 		<div class="hero-content">
-			<!-- Urgency Badge -->
-			<div class="urgency-badge">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<circle cx="12" cy="12" r="10"></circle>
-					<path d="M12 6v6l4 2"></path>
-				</svg>
-				Launch pricing ends in 3 days — 47 spots left
+			<!-- Trust Badge -->
+			<div class="trust-badge">
+				Beta - try free, no signup
 			</div>
 
-			<!-- Headline: Specific outcome, clear benefit -->
+			<!-- Headline -->
 			<h1>
-				Stop writing docs.<br /><span>Ship 10x faster.</span>
+				Complete docs in <span>60 seconds</span>
 			</h1>
 
-			<!-- Subheadline: What + How + Timeframe -->
+			<!-- Subheadline -->
 			<p class="hero-subtitle">
-				Connect your GitHub repo → Get README, API docs, and architecture diagrams automatically. Takes 2 minutes, not 2
-				hours.
+				README, API docs, architecture diagrams, and setup guides - generated automatically from your GitHub repo. Try it once free.
 			</p>
 
-			<!-- CTA: Single field form -->
-			<div class="hero-cta-section">
-				{#if heroFormState === 'success'}
-					<div class="success-message">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-							<polyline points="22 4 12 14.01 9 11.01"></polyline>
-						</svg>
-						<span>You're in! Check your email for next steps.</span>
-					</div>
-				{:else}
-					<form class="email-form" id="heroForm" on:submit={handleHeroSubmit}>
-						<input
-							type="email"
-							placeholder="Enter your email"
-							bind:value={heroEmail}
-							disabled={heroFormState === 'loading'}
-							required
-						/>
-						<button type="submit" class="cta-primary" disabled={heroFormState === 'loading'}>
-							{#if heroFormState === 'loading'}
-								<span class="spinner"></span> Subscribing...
-							{:else}
-								Get Early Access →
-							{/if}
-						</button>
-					</form>
-					{#if heroFormState === 'error' && heroErrorMessage}
-						<div class="error-message">{heroErrorMessage}</div>
-					{/if}
-				{/if}
-
-				<!-- Or Try Free CTA -->
-				<div class="or-divider">
-					<span>or</span>
+			<!-- Doc Type Icons -->
+			<div class="doc-types">
+				<div class="doc-type">
+					<span class="doc-icon">README</span>
 				</div>
-				<a href="/auth/login" class="cta-secondary">
-					<svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-						<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-					</svg>
-					Try Free with GitHub
-				</a>
-
-				<!-- Risk Reversal -->
-				<div class="risk-reversal">
-					<span>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-							<polyline points="22 4 12 14.01 9 11.01"></polyline>
-						</svg>
-						Free to try
-					</span>
-					<span>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-							<polyline points="22 4 12 14.01 9 11.01"></polyline>
-						</svg>
-						No credit card required
-					</span>
-					<span>
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-							<polyline points="22 4 12 14.01 9 11.01"></polyline>
-						</svg>
-						14-day money-back
-					</span>
+				<div class="doc-type">
+					<span class="doc-icon">API Docs</span>
+				</div>
+				<div class="doc-type">
+					<span class="doc-icon">Architecture</span>
+				</div>
+				<div class="doc-type">
+					<span class="doc-icon">Setup Guide</span>
 				</div>
 			</div>
 
-			<!-- Social Proof Bar: Specific numbers -->
-			<div class="social-proof-bar">
-				<div class="proof-item">
-					<div class="proof-number">847</div>
-					<div class="proof-label">Developers</div>
-				</div>
-				<div class="proof-item">
-					<div class="proof-number">12,400+</div>
-					<div class="proof-label">Repos Documented</div>
-				</div>
-				<div class="proof-item">
-					<div class="proof-number">4.9/5</div>
-					<div class="proof-label">Rating</div>
-				</div>
+			<!-- Demo Input Box -->
+			<form class="demo-form" on:submit={handleDemoSubmit}>
+				<input
+					type="text"
+					placeholder="https://github.com/owner/repo"
+					bind:value={repoUrl}
+					class="demo-input"
+				/>
+				<button type="submit" class="cta-primary">
+					Generate
+				</button>
+			</form>
+			{#if urlError}
+				<div class="error-message">{urlError}</div>
+			{/if}
+
+			<!-- Demo Details -->
+			<div class="demo-details">
+				<span>1 free demo per day</span>
+				<span class="separator">|</span>
+				<span>README preview</span>
+				<span class="separator">|</span>
+				<span>No signup</span>
 			</div>
 		</div>
 	</div>
 </section>
 
-<!-- Demo Section: Show the product -->
-<section class="demo-section">
-	<div class="container">
-		<div class="demo-window">
-			<div class="demo-header">
-				<div class="demo-dot"></div>
-				<div class="demo-dot"></div>
-				<div class="demo-dot"></div>
-			</div>
-
-			<div class="demo-content">
-				<div class="demo-input">
-					<div class="demo-label">Your Code</div>
-
-					<!-- IMPORTANT:
-             In Svelte, we must NOT render raw "<span ...>" as real tags inside a code block.
-             We render it as text. -->
-					<pre><code>{`// api/users.ts
-export async function getUser(id: string) {
-  const user = await db.users.findUnique({
-    where: { id }
-  });
-  if (!user) throw new NotFoundError();
-  return user;
-}`}</code></pre>
-				</div>
-
-				<div class="demo-output">
-					<div class="demo-label">Generated Documentation</div>
-					<h4>📚 GET /api/users/:id</h4>
-					<p>Retrieves a user by their unique identifier.</p>
-					<h4 style="margin-top: 16px">Parameters</h4>
-					<ul>
-						<li><code>id</code> (string, required) — User ID</li>
-					</ul>
-					<h4 style="margin-top: 16px">Response</h4>
-					<ul>
-						<li><code>200</code> — User object</li>
-						<li><code>404</code> — Not found</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!-- Problem Section: Agitate the pain -->
-<section class="problem-section">
-	<div class="container">
-		<h2>Documentation debt is <span style="color: var(--danger)">costing you</span></h2>
-		<div class="problem-grid">
-			<div class="problem-card">
-				<div class="icon">⏱️</div>
-				<h3>Slow Onboarding</h3>
-				<p>
-					New hires take <span class="stat">3-6 weeks</span> to understand your codebase without docs. That's $15K+ in lost
-					productivity per hire.
-				</p>
-			</div>
-			<div class="problem-card">
-				<div class="icon">😰</div>
-				<h3>Deployment Anxiety</h3>
-				<p><span class="stat">67% of developers</span> fear breaking production because they don't understand the code they're changing.</p>
-			</div>
-			<div class="problem-card">
-				<div class="icon">🚪</div>
-				<h3>Talent Loss</h3>
-				<p>
-					Top engineers <span class="stat">reject offers</span> when they see messy repos. Poor docs signal poor engineering culture.
-				</p>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!-- Features Section -->
-<section class="features-section">
+<!-- What You Get Section -->
+<section class="what-you-get">
 	<div class="container">
 		<div class="section-header">
-			<h2>Everything your codebase needs</h2>
-			<p>Professional documentation in minutes, not hours</p>
+			<h2>What You Get</h2>
+			<p>Four documentation types, automatically generated</p>
 		</div>
 
-		<div class="features-grid">
-			<div class="feature-card">
-				<div class="icon">📖</div>
-				<h3>README Generation</h3>
-				<p>Project overview, installation, usage examples, and contributing guidelines — all from your code.</p>
+		<div class="get-grid">
+			<div class="get-card">
+				<div class="get-icon">README</div>
+				<h3>README.md</h3>
+				<p>Project overview, badges, installation, usage, and configuration - ready to merge.</p>
 			</div>
-			<div class="feature-card">
-				<div class="icon">🔌</div>
+			<div class="get-card">
+				<div class="get-icon">API</div>
 				<h3>API Documentation</h3>
-				<p>Auto-detect endpoints, generate OpenAPI specs, and create request/response examples.</p>
+				<p>Auto-detected endpoints, request/response examples, authentication docs.</p>
 			</div>
-			<div class="feature-card">
-				<div class="icon">🏗️</div>
-				<h3>Architecture Diagrams</h3>
-				<p>Visual component diagrams and data flow charts in editable Mermaid format.</p>
+			<div class="get-card">
+				<div class="get-icon">ARCH</div>
+				<h3>Architecture Diagram</h3>
+				<p>Component relationships and data flow in editable Mermaid.js format.</p>
 			</div>
-			<div class="feature-card">
-				<div class="icon">⚡</div>
-				<h3>One-Click PR</h3>
-				<p>Export to markdown or create a pull request directly. Merge-ready in seconds.</p>
+			<div class="get-card">
+				<div class="get-icon">SETUP</div>
+				<h3>Setup Guide</h3>
+				<p>Environment setup, dependencies, and deployment instructions.</p>
 			</div>
-			<div class="feature-card">
-				<div class="icon">🔒</div>
-				<h3>Private Repos</h3>
-				<p>Your code stays private. We never store it after processing. SOC 2 compliant.</p>
+		</div>
+	</div>
+</section>
+
+<!-- Free vs Paid Comparison -->
+<section class="comparison">
+	<div class="container">
+		<div class="section-header">
+			<h2>Free vs Paid</h2>
+			<p>See what you get with each option</p>
+		</div>
+
+		<div class="comparison-grid">
+			<div class="comparison-card free">
+				<h3>FREE DEMO</h3>
+				<ul>
+					<li class="included">README generation</li>
+					<li class="locked">API docs</li>
+					<li class="locked">Architecture diagram</li>
+					<li class="locked">Setup guide</li>
+					<li class="included">Public repos only</li>
+					<li class="included">1 demo per day</li>
+					<li class="locked">No export</li>
+				</ul>
 			</div>
-			<div class="feature-card">
-				<div class="icon">🔄</div>
-				<h3>Auto-Sync</h3>
-				<p>Docs update automatically when you push. Never out of date again.</p>
+			<div class="comparison-card paid">
+				<h3>SINGLE REPO - $39 once</h3>
+				<ul>
+					<li class="included">All 4 documentation types</li>
+					<li class="included">Private repos</li>
+					<li class="included">Keep forever</li>
+					<li class="included">Export & PR creation</li>
+					<li class="included">Regenerate: $9</li>
+				</ul>
 			</div>
 		</div>
 	</div>
@@ -272,211 +173,128 @@ export async function getUser(id: string) {
 <section class="how-section">
 	<div class="container">
 		<div class="section-header">
-			<h2>Get started in 60 seconds</h2>
-			<p>No complex setup. No configuration files.</p>
+			<h2>How It Works</h2>
+			<p>Three simple steps to complete documentation</p>
 		</div>
 
 		<div class="steps">
 			<div class="step">
 				<div class="step-number">1</div>
-				<h3>Connect GitHub</h3>
-				<p>One-click OAuth. Works with public and private repos.</p>
+				<h3>Paste your repo URL</h3>
+				<p>Enter any GitHub repository URL - public or private.</p>
 			</div>
 			<div class="step">
 				<div class="step-number">2</div>
-				<h3>Select Repo</h3>
-				<p>Choose which repository to document. We analyze your code structure.</p>
+				<h3>AI generates docs</h3>
+				<p>Claude AI analyzes your code and creates documentation.</p>
 			</div>
 			<div class="step">
 				<div class="step-number">3</div>
-				<h3>Get Docs</h3>
-				<p>AI generates complete documentation. Edit, export, or merge directly.</p>
+				<h3>Export or sync</h3>
+				<p>Download as markdown or create a pull request directly.</p>
 			</div>
 		</div>
 	</div>
 </section>
 
-<!-- Testimonials -->
-<section class="testimonials-section">
-	<div class="container">
-		<div class="section-header">
-			<h2>Developers love it</h2>
-			<p>Join 800+ teams shipping better documentation</p>
-		</div>
-
-		<div class="testimonials-grid">
-			<div class="testimonial-card">
-				<div class="testimonial-stars">★★★★★</div>
-				<p class="testimonial-text">
-					"We went from an <strong>embarrassing README to full documentation in 15 minutes</strong>. Our onboarding time dropped by 70%."
-				</p>
-				<div class="testimonial-author">
-					<div class="testimonial-avatar">JK</div>
-					<div>
-						<div class="testimonial-name">Jake K.</div>
-						<div class="testimonial-role">CTO, Series A Startup</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="testimonial-card">
-				<div class="testimonial-stars">★★★★★</div>
-				<p class="testimonial-text">
-					"I've tried other doc generators. CodeDoc <strong>actually understands my code</strong> and produces docs that make sense."
-				</p>
-				<div class="testimonial-author">
-					<div class="testimonial-avatar">SR</div>
-					<div>
-						<div class="testimonial-name">Sarah R.</div>
-						<div class="testimonial-role">Senior Engineer, Google</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="testimonial-card">
-				<div class="testimonial-stars">★★★★★</div>
-				<p class="testimonial-text">
-					"The <strong>architecture diagrams alone</strong> are worth it. My team can finally see how everything connects."
-				</p>
-				<div class="testimonial-author">
-					<div class="testimonial-avatar">MT</div>
-					<div>
-						<div class="testimonial-name">Marcus T.</div>
-						<div class="testimonial-role">Engineering Lead</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</section>
-
-<!-- Pricing -->
+<!-- Pricing Section -->
 <section class="pricing-section" id="pricing">
 	<div class="container">
 		<div class="section-header">
-			<h2>Simple pricing. No surprises.</h2>
-			<p>One payment. Use forever.</p>
+			<h2>Simple Pricing</h2>
+			<p>7-day free trial on Pro & Team | $9 to regenerate Single Repo | Cancel anytime</p>
 		</div>
 
-		<div class="pricing-card">
-			<div class="pricing-badge">LAUNCH DEAL</div>
-
-			<!-- Countdown Timer -->
-			<div class="countdown">
-				<div class="countdown-label">⏰ Price increases in:</div>
-				<div class="countdown-timer" id="countdown">
-					<div class="countdown-unit">
-						<div class="countdown-number" id="days">02</div>
-						<div class="countdown-unit-label">Days</div>
-					</div>
-					<div class="countdown-unit">
-						<div class="countdown-number" id="hours">14</div>
-						<div class="countdown-unit-label">Hours</div>
-					</div>
-					<div class="countdown-unit">
-						<div class="countdown-number" id="minutes">37</div>
-						<div class="countdown-unit-label">Min</div>
-					</div>
-					<div class="countdown-unit">
-						<div class="countdown-number" id="seconds">52</div>
-						<div class="countdown-unit-label">Sec</div>
-					</div>
+		<div class="pricing-grid">
+			<!-- Free Demo -->
+			<div class="pricing-card">
+				<h3>FREE DEMO</h3>
+				<div class="price">
+					<span class="amount">$0</span>
 				</div>
+				<ul class="features">
+					<li>README only</li>
+					<li>1/day limit</li>
+					<li>Public repos</li>
+					<li>No signup</li>
+				</ul>
+				<button class="pricing-cta" on:click={scrollToHero}>Try Demo</button>
 			</div>
 
-			<h3>Lifetime Access</h3>
-			<p class="pricing-subtitle">Pay once, use forever. All future updates included.</p>
-
-			<div class="pricing-price">
-				<span class="currency">$</span>
-				<span class="amount">299</span>
-				<!-- keeping "original" visual slot, but since you're now $299,
-             you can either remove this OR set a higher crossed-out price -->
-				<span class="original">$499</span>
+			<!-- Single Repo -->
+			<div class="pricing-card">
+				<h3>SINGLE REPO</h3>
+				<div class="price">
+					<span class="amount">$39</span>
+					<span class="period">one-time</span>
+				</div>
+				<ul class="features">
+					<li>All 4 doc types</li>
+					<li>Private repos</li>
+					<li>Export & PRs</li>
+					<li>Regenerate: $9</li>
+					<li>No subscription</li>
+				</ul>
+				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta">Buy Once - $39</a>
 			</div>
-			<p class="pricing-period">One-time payment • Save $200</p>
 
-			<ul class="pricing-features">
-				<li>Unlimited repositories</li>
-				<li>All documentation types (README, API, Architecture)</li>
-				<li>Architecture diagrams</li>
-				<li>Export to Markdown & PR</li>
-				<li>Auto-sync on push</li>
-				<li>Private repo support</li>
-				<li>Priority email support</li>
-				<li>All future features included</li>
-			</ul>
+			<!-- Pro -->
+			<div class="pricing-card featured">
+				<div class="featured-badge">POPULAR</div>
+				<h3>PRO</h3>
+				<div class="price">
+					<span class="amount">$99</span>
+					<span class="period">/mo</span>
+				</div>
+				<ul class="features">
+					<li>30 repos/month</li>
+					<li>All features</li>
+					<li>Auto-sync on push</li>
+					<li>Priority support</li>
+				</ul>
+				<a href="/auth/login?intent=trial&tier=pro" class="pricing-cta primary">Start 7-Day Trial</a>
+			</div>
 
-			<button
-				class="pricing-cta"
-				id="pricingCTA"
-				on:click={() => handleCheckout('ltd')}
-				disabled={checkoutLoading}
-			>
-				{#if checkoutLoading}
-					<span class="spinner"></span> Processing...
-				{:else}
-					Get Lifetime Access — $299 →
-				{/if}
-			</button>
-
-			<div class="pricing-guarantee">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-				</svg>
-				14-day money-back guarantee. No questions asked.
+			<!-- Team -->
+			<div class="pricing-card">
+				<h3>TEAM</h3>
+				<div class="price">
+					<span class="amount">$249</span>
+					<span class="period">/mo</span>
+				</div>
+				<ul class="features">
+					<li>100 repos/month</li>
+					<li>5 team members</li>
+					<li>Custom templates</li>
+					<li>Slack integration</li>
+				</ul>
+				<a href="/auth/login?intent=trial&tier=team" class="pricing-cta">Start 7-Day Trial</a>
 			</div>
 		</div>
 	</div>
 </section>
 
-<!-- FAQ -->
+<!-- FAQ Section -->
 <section class="faq-section">
 	<div class="container">
 		<div class="section-header">
-			<h2>Questions? Answers.</h2>
+			<h2>Frequently Asked Questions</h2>
 		</div>
 
-		<div class="faq-grid">
-			<div class="faq-item">
-				<div class="faq-question">What languages/frameworks do you support?</div>
-				<p class="faq-answer">
-					JavaScript, TypeScript, Python, Go, Rust, Java, Ruby, PHP, and more. We support all major frameworks including React,
-					Next.js, Express, Django, FastAPI, Rails, and Laravel.
-				</p>
-			</div>
-			<div class="faq-item">
-				<div class="faq-question">Is my code secure?</div>
-				<p class="faq-answer">
-					Yes. We never store your code after processing. All analysis happens in isolated environments. We're SOC 2 compliant and happy
-					to sign NDAs for enterprise customers.
-				</p>
-			</div>
-			<div class="faq-item">
-				<div class="faq-question">How is this different from ChatGPT?</div>
-				<p class="faq-answer">
-					We're purpose-built for documentation. We connect directly to GitHub, understand your project structure, generate consistent
-					formats, and integrate with your workflow. No copy-pasting required.
-				</p>
-			</div>
-			<div class="faq-item">
-				<div class="faq-question">What if I'm not satisfied?</div>
-				<p class="faq-answer">
-					Full refund within 14 days, no questions asked. Email us and we'll process it within 24 hours.
-				</p>
-			</div>
-			<div class="faq-item">
-				<div class="faq-question">Do you support private repositories?</div>
-				<p class="faq-answer">
-					Absolutely. We support both public and private repos. Your code stays private — we use GitHub's official API with encrypted tokens.
-				</p>
-			</div>
-			<div class="faq-item">
-				<div class="faq-question">How long does generation take?</div>
-				<p class="faq-answer">
-					Most repos are documented in 2-5 minutes. Larger codebases (100K+ lines) may take up to 15 minutes.
-				</p>
-			</div>
+		<div class="faq-list">
+			{#each faqs as faq, index}
+				<div class="faq-item" class:open={openFaq === index}>
+					<button class="faq-question" on:click={() => toggleFaq(index)}>
+						<span>{faq.question}</span>
+						<span class="faq-icon">{openFaq === index ? '-' : '+'}</span>
+					</button>
+					{#if openFaq === index}
+						<div class="faq-answer">
+							<p>{faq.answer}</p>
+						</div>
+					{/if}
+				</div>
+			{/each}
 		</div>
 	</div>
 </section>
@@ -484,53 +302,20 @@ export async function getUser(id: string) {
 <!-- Final CTA -->
 <section class="final-cta">
 	<div class="container">
-		<h2>Stop writing docs manually</h2>
-		<p>Join 800+ developers who've automated their documentation.</p>
+		<h2>See it work. Free.</h2>
+		<p>One demo. Full README. Decide later.</p>
 
-		{#if finalFormState === 'success'}
-			<div class="success-message">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-					<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-					<polyline points="22 4 12 14.01 9 11.01"></polyline>
-				</svg>
-				<span>You're in! Check your email for next steps.</span>
-			</div>
-		{:else}
-			<form class="email-form" id="finalForm" on:submit={handleFinalSubmit}>
-				<input
-					type="email"
-					placeholder="Enter your email"
-					bind:value={finalEmail}
-					disabled={finalFormState === 'loading'}
-					required
-				/>
-				<button type="submit" class="cta-primary" disabled={finalFormState === 'loading'}>
-					{#if finalFormState === 'loading'}
-						<span class="spinner"></span> Subscribing...
-					{:else}
-						Get Lifetime Access — $299 →
-					{/if}
-				</button>
-			</form>
-			{#if finalFormState === 'error' && finalErrorMessage}
-				<div class="error-message">{finalErrorMessage}</div>
-			{/if}
-		{/if}
-
-		<div class="risk-reversal" style="margin-top: 16px">
-			<span>
-				<svg
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					style="width: 16px; height: 16px; color: var(--accent)"
-				>
-					<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-				</svg>
-				14-day money-back guarantee
-			</span>
-		</div>
+		<form class="demo-form" on:submit={handleDemoSubmit}>
+			<input
+				type="text"
+				placeholder="https://github.com/owner/repo"
+				bind:value={repoUrl}
+				class="demo-input"
+			/>
+			<button type="submit" class="cta-primary">
+				Generate
+			</button>
+		</form>
 	</div>
 </section>
 
@@ -541,127 +326,85 @@ export async function getUser(id: string) {
 			<a href="/privacy">Privacy</a>
 			<a href="/terms">Terms</a>
 			<a href="mailto:support@codedoc.ai">Contact</a>
-			<a href="https://twitter.com/codedocai" target="_blank" rel="noopener noreferrer">Twitter</a>
 		</div>
-		<p class="footer-copy">© 2026 CodeDoc AI. All rights reserved.</p>
+		<p class="footer-copy">2026 CodeDoc AI</p>
 	</div>
 </footer>
 
-<!-- Real-time Activity Ticker (FOMO) -->
-<div class="activity-ticker" id="activityTicker">
-	<div class="avatar">MK</div>
-	<div class="info">
-		<div class="name">Mike from Austin</div>
-		<div class="action">just got lifetime access</div>
-	</div>
-	<button class="close" id="tickerClose">✕</button>
-</div>
-
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { auth } from '$lib/stores/auth';
 
-	let heroEmail = '';
-	let finalEmail = '';
-	let heroFormState: 'idle' | 'loading' | 'success' | 'error' = 'idle';
-	let finalFormState: 'idle' | 'loading' | 'success' | 'error' = 'idle';
-	let heroErrorMessage = '';
-	let finalErrorMessage = '';
-	let checkoutLoading = false;
+	let repoUrl = '';
+	let urlError = '';
+	let openFaq: number | null = null;
 
-	async function handleCheckout(tier: string = 'ltd') {
-		// Check if user is logged in
-		const user = $auth.user;
+	const faqs = [
+		{
+			question: 'What languages do you support?',
+			answer: 'JavaScript, TypeScript, Python, Go, Rust, Java, Ruby, PHP, and more. We support all major frameworks including React, Next.js, Express, Django, FastAPI, Rails, and Laravel.'
+		},
+		{
+			question: 'Is my code secure?',
+			answer: 'Yes. We never store your code after processing. All analysis happens in isolated environments. Your code is transmitted securely and deleted immediately after documentation generation.'
+		},
+		{
+			question: 'Why only README in the free demo?',
+			answer: 'The free demo lets you experience the quality of our AI-generated documentation without commitment. README is the most essential doc type. Purchase Single Repo or subscribe to Pro/Team for all 4 documentation types.'
+		},
+		{
+			question: 'Can I edit the generated docs?',
+			answer: 'Absolutely. All generated documentation is editable before export. You can refine, add sections, or modify anything. Paid tiers include a full markdown editor with live preview.'
+		},
+		{
+			question: 'What if I\'m not satisfied?',
+			answer: 'Pro and Team subscriptions include a 7-day free trial. For Single Repo purchases, contact us within 7 days for a full refund if the documentation doesn\'t meet your expectations.'
+		},
+		{
+			question: 'Why 1 demo per day?',
+			answer: 'This limit prevents abuse while letting everyone try the service. It ensures our AI resources remain available for all users. Need more? The Single Repo option at $39 gives you unlimited access to one repository.'
+		}
+	];
 
-		if (!user) {
-			// Redirect to login with return URL
-			window.location.href = '/auth/login?redirect=checkout&tier=' + tier;
+	function validateGitHubUrl(url: string): boolean {
+		const githubPattern = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/?$/;
+		return githubPattern.test(url.trim());
+	}
+
+	function handleDemoSubmit(e: Event) {
+		e.preventDefault();
+		urlError = '';
+
+		if (!repoUrl.trim()) {
+			urlError = 'Please enter a GitHub repository URL';
 			return;
 		}
 
-		checkoutLoading = true;
-
-		try {
-			const response = await fetch('/api/stripe/checkout', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ tier })
-			});
-
-			const data = await response.json();
-
-			if (data.success && data.url) {
-				// Redirect to Stripe checkout
-				window.location.href = data.url;
-			} else {
-				alert(data.message || 'Failed to start checkout. Please try again.');
-				checkoutLoading = false;
-			}
-		} catch (err) {
-			console.error('Checkout error:', err);
-			alert('Failed to start checkout. Please try again.');
-			checkoutLoading = false;
-		}
-	}
-
-	async function handleSubscribe(
-		email: string,
-		setFormState: (state: 'idle' | 'loading' | 'success' | 'error') => void,
-		setErrorMessage: (msg: string) => void
-	) {
-		if (!email) {
-			setFormState('error');
-			setErrorMessage('Please enter your email');
+		if (!validateGitHubUrl(repoUrl)) {
+			urlError = 'Please enter a valid GitHub URL (https://github.com/owner/repo)';
 			return;
 		}
 
-		setFormState('loading');
-		setErrorMessage('');
+		// Redirect to try page with encoded URL
+		const encodedUrl = encodeURIComponent(repoUrl.trim());
+		window.location.href = `/try?url=${encodedUrl}`;
+	}
 
-		try {
-			const response = await fetch('/api/subscribe', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email })
-			});
-
-			const data = await response.json();
-
-			if (data.success) {
-				setFormState('success');
-			} else {
-				setFormState('error');
-				setErrorMessage(data.message || 'Something went wrong');
-			}
-		} catch {
-			setFormState('error');
-			setErrorMessage('Network error. Please try again.');
+	function scrollToHero() {
+		const hero = document.getElementById('hero');
+		if (hero) {
+			hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
 		}
 	}
 
-	function handleHeroSubmit(e: Event) {
-		e.preventDefault();
-		handleSubscribe(
-			heroEmail,
-			(state) => (heroFormState = state),
-			(msg) => (heroErrorMessage = msg)
-		);
-	}
-
-	function handleFinalSubmit(e: Event) {
-		e.preventDefault();
-		handleSubscribe(
-			finalEmail,
-			(state) => (finalFormState = state),
-			(msg) => (finalErrorMessage = msg)
-		);
+	function toggleFaq(index: number) {
+		openFaq = openFaq === index ? null : index;
 	}
 
 	onMount(() => {
 		// Sticky header on scroll
 		const stickyHeader = document.getElementById('stickyHeader');
 
-		window.addEventListener('scroll', () => {
+		const handleScroll = () => {
 			const currentScroll = window.pageYOffset;
 
 			if (currentScroll > 400) {
@@ -669,80 +412,9 @@ export async function getUser(id: string) {
 			} else {
 				stickyHeader?.classList.remove('visible');
 			}
-		});
+		};
 
-		// Countdown timer
-		function updateCountdown() {
-			// Set end date to 3 days from now
-			const endDate = new Date();
-			endDate.setDate(endDate.getDate() + 3);
-
-			const now = new Date();
-			const diff = endDate.getTime() - now.getTime();
-
-			const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-			const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-			const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-			const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-			const d = document.getElementById('days');
-			const h = document.getElementById('hours');
-			const m = document.getElementById('minutes');
-			const s = document.getElementById('seconds');
-
-			if (d) d.textContent = String(Math.max(days, 0)).padStart(2, '0');
-			if (h) h.textContent = String(Math.max(hours, 0)).padStart(2, '0');
-			if (m) m.textContent = String(Math.max(minutes, 0)).padStart(2, '0');
-			if (s) s.textContent = String(Math.max(seconds, 0)).padStart(2, '0');
-		}
-
-		updateCountdown();
-		const countdownInterval = window.setInterval(updateCountdown, 1000);
-
-		// Activity ticker rotation
-		const activities = [
-			{ initials: 'MK', name: 'Mike from Austin', action: 'just got lifetime access' },
-			{ initials: 'SL', name: 'Sarah from London', action: 'documented 3 repos' },
-			{ initials: 'JT', name: 'John from NYC', action: 'just signed up' },
-			{ initials: 'AP', name: 'Alex from Berlin', action: 'just got lifetime access' },
-			{ initials: 'RK', name: 'Rachel from Toronto', action: 'documented 5 repos' }
-		];
-
-		let activityIndex = 0;
-		const ticker = document.getElementById('activityTicker');
-
-		function rotateActivity() {
-			if (!ticker) return;
-
-			// restart animation
-			(ticker as HTMLElement).style.animation = 'none';
-			void (ticker as HTMLElement).offsetHeight;
-			(ticker as HTMLElement).style.animation = 'slideIn 0.5s ease';
-
-			const activity = activities[activityIndex];
-
-			const avatar = ticker.querySelector('.avatar');
-			const name = ticker.querySelector('.name');
-			const action = ticker.querySelector('.action');
-
-			if (avatar) avatar.textContent = activity.initials;
-			if (name) name.textContent = activity.name;
-			if (action) action.textContent = activity.action;
-
-			activityIndex = (activityIndex + 1) % activities.length;
-		}
-
-		const rotateTimer = window.setTimeout(() => {
-			window.setInterval(rotateActivity, 8000);
-		}, 5000);
-
-		// Close ticker
-		const tickerClose = document.getElementById('tickerClose');
-		tickerClose?.addEventListener('click', () => {
-			const el = document.getElementById('activityTicker');
-			if (el) (el as HTMLElement).style.display = 'none';
-		});
-
+		window.addEventListener('scroll', handleScroll);
 
 		// Smooth scroll for anchor links
 		document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -755,55 +427,24 @@ export async function getUser(id: string) {
 			});
 		});
 
-		// cleanup
 		return () => {
-			window.clearInterval(countdownInterval);
-			window.clearTimeout(rotateTimer);
+			window.removeEventListener('scroll', handleScroll);
 		};
 	});
 </script>
 
 <style>
-	/* 
-        ============================================
-        CRO-OPTIMIZED LANDING PAGE
-        Target: 20-30% conversion rate
-        ============================================
-        
-        PSYCHOLOGICAL TRIGGERS IMPLEMENTED:
-        1. Social Proof (numbers, testimonials, logos)
-        2. Scarcity (limited spots, countdown)
-        3. Urgency (time-sensitive offer)
-        4. Authority (trust badges, specifics)
-        5. Risk Reversal (guarantee, free trial)
-        6. Cognitive Ease (simple layout, clear hierarchy)
-        7. Loss Aversion (what you're losing without it)
-        8. FOMO (real-time activity)
-        
-        CONVERSION BEST PRACTICES:
-        - Single clear CTA
-        - Above-the-fold value prop
-        - Minimal form fields (email only)
-        - Mobile-first design
-        - Fast load time (minimal assets)
-        - Clear visual hierarchy
-        - Benefit-driven headlines
-        - Specific numbers (not vague claims)
-        */
-
 	:root {
-		--bg: #0a0a0b;
+		--bg: #09090b;
 		--bg-elevated: #111113;
 		--bg-hover: #1a1a1c;
 		--border: #262628;
 		--text: #ffffff;
 		--text-secondary: #a1a1a6;
 		--text-muted: #6b6b70;
-		--accent: #22c55e;
-		--accent-hover: #16a34a;
-		--accent-glow: rgba(34, 197, 94, 0.3);
-		--warning: #f59e0b;
-		--danger: #ef4444;
+		--accent: #10b981;
+		--accent-hover: #059669;
+		--accent-glow: rgba(16, 185, 129, 0.3);
 	}
 
 	* {
@@ -817,9 +458,6 @@ export async function getUser(id: string) {
 		font-size: 16px;
 	}
 
-	/* NOTE:
-     This is a page component, so we style globally-ish via :global()
-     to match your original behavior. */
 	:global(body) {
 		font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 		background: var(--bg);
@@ -835,16 +473,14 @@ export async function getUser(id: string) {
 		padding: 0 20px;
 	}
 
-	/* ==========================================
-           STICKY HEADER - Always visible CTA
-           ========================================== */
+	/* Sticky Header */
 	.sticky-header {
 		position: fixed;
 		top: 0;
 		left: 0;
 		right: 0;
 		z-index: 1000;
-		background: rgba(10, 10, 11, 0.95);
+		background: rgba(9, 9, 11, 0.95);
 		backdrop-filter: blur(10px);
 		border-bottom: 1px solid var(--border);
 		padding: 12px 0;
@@ -900,9 +536,7 @@ export async function getUser(id: string) {
 		color: var(--text);
 	}
 
-	/* ==========================================
-	   TOP NAVIGATION - Always visible
-	   ========================================== */
+	/* Top Navigation */
 	.top-nav {
 		position: absolute;
 		top: 0;
@@ -950,6 +584,8 @@ export async function getUser(id: string) {
 		font-size: 0.95rem;
 		text-decoration: none;
 		transition: all 0.2s;
+		border: none;
+		cursor: pointer;
 	}
 
 	.nav-cta:hover {
@@ -957,82 +593,17 @@ export async function getUser(id: string) {
 		transform: translateY(-1px);
 	}
 
-	/* Or Divider */
-	.or-divider {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin: 16px 0;
-		color: var(--text-muted);
-		font-size: 0.85rem;
-	}
-
-	.or-divider span {
-		padding: 0 16px;
-		position: relative;
-	}
-
-	.or-divider span::before,
-	.or-divider span::after {
-		content: '';
-		position: absolute;
-		top: 50%;
-		width: 80px;
-		height: 1px;
-		background: var(--border);
-	}
-
-	.or-divider span::before {
-		right: 100%;
-	}
-
-	.or-divider span::after {
-		left: 100%;
-	}
-
-	/* Secondary CTA (GitHub login) */
-	.cta-secondary {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 10px;
-		background: transparent;
-		color: var(--text);
-		padding: 14px 28px;
-		border: 1px solid var(--border);
-		border-radius: 10px;
-		font-size: 1rem;
-		font-weight: 600;
-		text-decoration: none;
-		transition: all 0.2s;
-		cursor: pointer;
-	}
-
-	.cta-secondary:hover {
-		background: var(--bg-hover);
-		border-color: var(--text-muted);
-	}
-
-	.cta-secondary svg {
-		width: 20px;
-		height: 20px;
-	}
-
-	/* ==========================================
-           HERO SECTION - Above the fold
-           Must contain: Value prop, CTA, Social proof
-           ========================================== */
+	/* Hero Section */
 	.hero {
 		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
-		padding: 60px 0 40px;
+		padding: 100px 0 60px;
 		position: relative;
 		overflow: hidden;
 	}
 
-	/* Subtle gradient background */
 	.hero::before {
 		content: '';
 		position: absolute;
@@ -1041,7 +612,7 @@ export async function getUser(id: string) {
 		transform: translateX(-50%);
 		width: 800px;
 		height: 800px;
-		background: radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, transparent 70%);
+		background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
 		pointer-events: none;
 	}
 
@@ -1053,38 +624,22 @@ export async function getUser(id: string) {
 		margin: 0 auto;
 	}
 
-	/* URGENCY BADGE - Creates FOMO */
-	.urgency-badge {
+	/* Trust Badge */
+	.trust-badge {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		background: rgba(245, 158, 11, 0.1);
-		border: 1px solid rgba(245, 158, 11, 0.3);
-		color: var(--warning);
+		background: rgba(16, 185, 129, 0.1);
+		border: 1px solid rgba(16, 185, 129, 0.3);
+		color: var(--accent);
 		padding: 8px 16px;
 		border-radius: 100px;
 		font-size: 0.85rem;
 		font-weight: 600;
 		margin-bottom: 24px;
-		animation: pulse-border 2s infinite;
 	}
 
-	@keyframes pulse-border {
-		0%,
-		100% {
-			border-color: rgba(245, 158, 11, 0.3);
-		}
-		50% {
-			border-color: rgba(245, 158, 11, 0.6);
-		}
-	}
-
-	.urgency-badge svg {
-		width: 16px;
-		height: 16px;
-	}
-
-	/* HEADLINE - Clear benefit, specific outcome */
+	/* Headline */
 	.hero h1 {
 		font-size: clamp(2.5rem, 6vw, 4rem);
 		font-weight: 800;
@@ -1094,13 +649,13 @@ export async function getUser(id: string) {
 	}
 
 	.hero h1 span {
-		background: linear-gradient(135deg, var(--accent) 0%, #4ade80 100%);
+		background: linear-gradient(135deg, var(--accent) 0%, #34d399 100%);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		background-clip: text;
 	}
 
-	/* SUBHEADLINE - What, how, timeframe */
+	/* Subheadline */
 	.hero-subtitle {
 		font-size: 1.25rem;
 		color: var(--text-secondary);
@@ -1110,20 +665,39 @@ export async function getUser(id: string) {
 		margin-right: auto;
 	}
 
-	/* CTA SECTION - Single clear action */
-	.hero-cta-section {
-		margin-bottom: 40px;
+	/* Doc Types */
+	.doc-types {
+		display: flex;
+		justify-content: center;
+		gap: 16px;
+		margin-bottom: 32px;
+		flex-wrap: wrap;
 	}
 
-	/* EMAIL FORM - Single field for minimal friction */
-	.email-form {
+	.doc-type {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.doc-icon {
+		background: var(--bg-elevated);
+		border: 1px solid var(--border);
+		padding: 8px 12px;
+		border-radius: 6px;
+		font-size: 0.85rem;
+		color: var(--text-secondary);
+	}
+
+	/* Demo Form */
+	.demo-form {
 		display: flex;
 		gap: 12px;
-		max-width: 480px;
+		max-width: 560px;
 		margin: 0 auto 16px;
 	}
 
-	.email-form input {
+	.demo-input {
 		flex: 1;
 		padding: 16px 20px;
 		border: 1px solid var(--border);
@@ -1135,11 +709,11 @@ export async function getUser(id: string) {
 		transition: border-color 0.2s;
 	}
 
-	.email-form input:focus {
+	.demo-input:focus {
 		border-color: var(--accent);
 	}
 
-	.email-form input::placeholder {
+	.demo-input::placeholder {
 		color: var(--text-muted);
 	}
 
@@ -1162,370 +736,29 @@ export async function getUser(id: string) {
 		box-shadow: 0 8px 30px var(--accent-glow);
 	}
 
-	.cta-primary:disabled {
-		opacity: 0.7;
-		cursor: not-allowed;
-		transform: none;
-	}
-
-	.cta-primary:disabled:hover {
-		background: var(--accent);
-		box-shadow: none;
-	}
-
-	.email-form input:disabled {
-		opacity: 0.7;
-		cursor: not-allowed;
-	}
-
-	/* Success/Error Messages */
-	.success-message {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 12px;
-		background: rgba(34, 197, 94, 0.1);
-		border: 1px solid rgba(34, 197, 94, 0.3);
-		color: var(--accent);
-		padding: 16px 24px;
-		border-radius: 10px;
-		font-size: 1rem;
-		font-weight: 600;
-		max-width: 480px;
-		margin: 0 auto 16px;
-	}
-
-	.success-message svg {
-		width: 24px;
-		height: 24px;
-		flex-shrink: 0;
-	}
-
 	.error-message {
-		color: var(--danger);
+		color: #ef4444;
 		font-size: 0.9rem;
-		margin-top: 8px;
-		text-align: center;
-	}
-
-	/* Spinner Animation */
-	.spinner {
-		display: inline-block;
-		width: 16px;
-		height: 16px;
-		border: 2px solid rgba(0, 0, 0, 0.3);
-		border-top-color: #000;
-		border-radius: 50%;
-		animation: spin 0.8s linear infinite;
-		vertical-align: middle;
-		margin-right: 4px;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
-	}
-
-	/* RISK REVERSAL - Remove objections */
-	.risk-reversal {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 20px;
-		font-size: 0.85rem;
-		color: var(--text-muted);
-	}
-
-	.risk-reversal span {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-	}
-
-	.risk-reversal svg {
-		width: 16px;
-		height: 16px;
-		color: var(--accent);
-	}
-
-	/* SOCIAL PROOF BAR - Specific numbers */
-	.social-proof-bar {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 40px;
-		padding: 24px 0;
-		border-top: 1px solid var(--border);
-		margin-top: 40px;
-	}
-
-	.proof-item {
-		text-align: center;
-	}
-
-	.proof-number {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--text);
-	}
-
-	.proof-label {
-		font-size: 0.8rem;
-		color: var(--text-muted);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	/* REAL-TIME ACTIVITY - FOMO trigger */
-	.activity-ticker {
-		position: fixed;
-		bottom: 20px;
-		left: 20px;
-		background: var(--bg-elevated);
-		border: 1px solid var(--border);
-		border-radius: 10px;
-		padding: 12px 16px;
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		font-size: 0.85rem;
-		z-index: 100;
-		animation: slideIn 0.5s ease;
-		max-width: 320px;
-	}
-
-	@keyframes slideIn {
-		from {
-			transform: translateX(-120%);
-			opacity: 0;
-		}
-		to {
-			transform: translateX(0);
-			opacity: 1;
-		}
-	}
-
-	.activity-ticker .avatar {
-		width: 36px;
-		height: 36px;
-		background: var(--accent);
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 600;
-		color: #000;
-		font-size: 0.8rem;
-	}
-
-	.activity-ticker .info {
-		flex: 1;
-	}
-
-	.activity-ticker .name {
-		font-weight: 600;
-		color: var(--text);
-	}
-
-	.activity-ticker .action {
-		color: var(--text-muted);
-	}
-
-	.activity-ticker .close {
-		background: none;
-		border: none;
-		color: var(--text-muted);
-		cursor: pointer;
-		padding: 4px;
-	}
-
-	/* ==========================================
-           DEMO SECTION - Show the product
-           ========================================== */
-	.demo-section {
-		padding: 80px 0;
-	}
-
-	.demo-window {
-		background: var(--bg-elevated);
-		border: 1px solid var(--border);
-		border-radius: 16px;
-		overflow: hidden;
-		max-width: 900px;
-		margin: 0 auto;
-		box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.5);
-	}
-
-	.demo-header {
-		background: #0d0d0e;
-		padding: 12px 16px;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		border-bottom: 1px solid var(--border);
-	}
-
-	.demo-dot {
-		width: 12px;
-		height: 12px;
-		border-radius: 50%;
-	}
-
-	.demo-dot:nth-child(1) {
-		background: #ff5f57;
-	}
-	.demo-dot:nth-child(2) {
-		background: #febc2e;
-	}
-	.demo-dot:nth-child(3) {
-		background: #28c840;
-	}
-
-	.demo-content {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		min-height: 350px;
-	}
-
-	@media (max-width: 768px) {
-		.demo-content {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.demo-input,
-	.demo-output {
-		padding: 24px;
-	}
-
-	.demo-input {
-		background: #0d0d0e;
-		border-right: 1px solid var(--border);
-		font-family: 'Monaco', 'Menlo', monospace;
-		font-size: 0.85rem;
-		color: var(--text-secondary);
-		line-height: 1.8;
-	}
-
-	.demo-input pre {
-		white-space: pre;
-		overflow: auto;
-		margin: 0;
-	}
-
-	.demo-label {
-		font-family: 'Inter', sans-serif;
-		font-size: 0.7rem;
-		text-transform: uppercase;
-		letter-spacing: 0.1em;
-		color: var(--text-muted);
 		margin-bottom: 16px;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.demo-label::before {
-		content: '';
-		width: 8px;
-		height: 8px;
-		background: var(--accent);
-		border-radius: 2px;
-	}
-
-	.demo-output {
-		font-size: 0.9rem;
-	}
-
-	.demo-output h4 {
-		color: var(--text);
-		margin-bottom: 8px;
-		font-size: 1rem;
-	}
-
-	.demo-output p,
-	.demo-output li {
-		color: var(--text-secondary);
-		margin-bottom: 6px;
-	}
-
-	.demo-output ul {
-		list-style: none;
-		padding-left: 16px;
-	}
-
-	.demo-output li::before {
-		content: '→';
-		color: var(--accent);
-		margin-right: 8px;
-	}
-
-	/* ==========================================
-           PROBLEM-AGITATION SECTION
-           ========================================== */
-	.problem-section {
-		padding: 80px 0;
 		text-align: center;
 	}
 
-	.problem-section h2 {
-		font-size: 2rem;
-		font-weight: 700;
-		margin-bottom: 40px;
-	}
-
-	.problem-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-		gap: 24px;
-		max-width: 900px;
-		margin: 0 auto;
-	}
-
-	.problem-card {
-		background: var(--bg-elevated);
-		border: 1px solid var(--border);
-		border-radius: 12px;
-		padding: 24px;
-		text-align: left;
-	}
-
-	.problem-card .icon {
-		width: 40px;
-		height: 40px;
-		background: rgba(239, 68, 68, 0.1);
-		border-radius: 10px;
+	/* Demo Details */
+	.demo-details {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin-bottom: 16px;
-		font-size: 20px;
+		gap: 8px;
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		flex-wrap: wrap;
 	}
 
-	.problem-card h3 {
-		font-size: 1.1rem;
-		margin-bottom: 8px;
+	.demo-details .separator {
+		color: var(--border);
 	}
 
-	.problem-card p {
-		color: var(--text-secondary);
-		font-size: 0.9rem;
-	}
-
-	.problem-card .stat {
-		color: var(--danger);
-		font-weight: 600;
-	}
-
-	/* ==========================================
-           FEATURES/BENEFITS SECTION
-           ========================================== */
-	.features-section {
-		padding: 80px 0;
-		background: linear-gradient(180deg, transparent 0%, var(--bg-elevated) 50%, transparent 100%);
-	}
-
+	/* Section Styles */
 	.section-header {
 		text-align: center;
 		margin-bottom: 48px;
@@ -1542,50 +775,115 @@ export async function getUser(id: string) {
 		font-size: 1.1rem;
 	}
 
-	.features-grid {
+	/* What You Get Section */
+	.what-you-get {
+		padding: 80px 0;
+	}
+
+	.get-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 		gap: 24px;
 	}
 
-	.feature-card {
-		background: var(--bg);
+	.get-card {
+		background: var(--bg-elevated);
 		border: 1px solid var(--border);
 		border-radius: 12px;
 		padding: 28px;
 		transition: all 0.3s;
 	}
 
-	.feature-card:hover {
+	.get-card:hover {
 		border-color: var(--accent);
 		transform: translateY(-4px);
 	}
 
-	.feature-card .icon {
-		width: 48px;
-		height: 48px;
-		background: rgba(34, 197, 94, 0.1);
-		border-radius: 12px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 20px;
-		font-size: 24px;
+	.get-icon {
+		display: inline-block;
+		background: rgba(16, 185, 129, 0.1);
+		color: var(--accent);
+		padding: 8px 12px;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 700;
+		margin-bottom: 16px;
 	}
 
-	.feature-card h3 {
+	.get-card h3 {
 		font-size: 1.15rem;
 		margin-bottom: 8px;
 	}
 
-	.feature-card p {
+	.get-card p {
 		color: var(--text-secondary);
 		font-size: 0.95rem;
 	}
 
-	/* ==========================================
-           HOW IT WORKS - 3-step process
-           ========================================== */
+	/* Comparison Section */
+	.comparison {
+		padding: 80px 0;
+		background: linear-gradient(180deg, transparent 0%, var(--bg-elevated) 50%, transparent 100%);
+	}
+
+	.comparison-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 24px;
+		max-width: 700px;
+		margin: 0 auto;
+	}
+
+	.comparison-card {
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		padding: 28px;
+	}
+
+	.comparison-card.paid {
+		border-color: var(--accent);
+	}
+
+	.comparison-card h3 {
+		font-size: 1.1rem;
+		margin-bottom: 20px;
+		text-align: center;
+	}
+
+	.comparison-card ul {
+		list-style: none;
+	}
+
+	.comparison-card li {
+		padding: 10px 0;
+		border-bottom: 1px solid var(--border);
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		font-size: 0.95rem;
+	}
+
+	.comparison-card li:last-child {
+		border-bottom: none;
+	}
+
+	.comparison-card li.included::before {
+		content: '\2713';
+		color: var(--accent);
+		font-weight: 700;
+	}
+
+	.comparison-card li.locked {
+		color: var(--text-muted);
+	}
+
+	.comparison-card li.locked::before {
+		content: '\1F512';
+		font-size: 0.85rem;
+	}
+
+	/* How It Works */
 	.how-section {
 		padding: 80px 0;
 	}
@@ -1611,7 +909,7 @@ export async function getUser(id: string) {
 	}
 
 	.step:not(:last-child)::after {
-		content: '→';
+		content: '\2192';
 		position: absolute;
 		right: -28px;
 		top: 24px;
@@ -1621,7 +919,7 @@ export async function getUser(id: string) {
 
 	@media (max-width: 768px) {
 		.step:not(:last-child)::after {
-			content: '↓';
+			content: '\2193';
 			position: static;
 			display: block;
 			margin-top: 20px;
@@ -1652,277 +950,177 @@ export async function getUser(id: string) {
 		font-size: 0.9rem;
 	}
 
-	/* ==========================================
-           SOCIAL PROOF - Testimonials
-           ========================================== */
-	.testimonials-section {
-		padding: 80px 0;
-	}
-
-	.testimonials-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-		gap: 24px;
-	}
-
-	.testimonial-card {
-		background: var(--bg-elevated);
-		border: 1px solid var(--border);
-		border-radius: 12px;
-		padding: 28px;
-	}
-
-	.testimonial-stars {
-		color: var(--warning);
-		margin-bottom: 16px;
-		font-size: 1.1rem;
-	}
-
-	.testimonial-text {
-		font-size: 1rem;
-		color: var(--text-secondary);
-		margin-bottom: 20px;
-		font-style: italic;
-		line-height: 1.7;
-	}
-
-	.testimonial-text strong {
-		color: var(--text);
-		font-style: normal;
-	}
-
-	.testimonial-author {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	.testimonial-avatar {
-		width: 44px;
-		height: 44px;
-		background: linear-gradient(135deg, var(--accent) 0%, #4ade80 100%);
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 700;
-		color: #000;
-	}
-
-	.testimonial-name {
-		font-weight: 600;
-	}
-
-	.testimonial-role {
-		font-size: 0.85rem;
-		color: var(--text-muted);
-	}
-
-	/* ==========================================
-           PRICING SECTION - Single clear offer
-           ========================================== */
+	/* Pricing Section */
 	.pricing-section {
 		padding: 80px 0;
 	}
 
-	.pricing-card {
-		max-width: 500px;
-		margin: 0 auto;
-		background: var(--bg-elevated);
-		border: 2px solid var(--accent);
-		border-radius: 20px;
-		padding: 40px;
-		text-align: center;
-		position: relative;
-		overflow: hidden;
+	.pricing-grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 20px;
 	}
 
-	.pricing-badge {
+	@media (max-width: 1024px) {
+		.pricing-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.pricing-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.pricing-card {
+		background: var(--bg-elevated);
+		border: 1px solid var(--border);
+		border-radius: 16px;
+		padding: 28px;
+		text-align: center;
+		position: relative;
+	}
+
+	.pricing-card.featured {
+		border: 2px solid var(--accent);
+	}
+
+	.featured-badge {
 		position: absolute;
-		top: 20px;
-		right: -35px;
+		top: -12px;
+		left: 50%;
+		transform: translateX(-50%);
 		background: var(--accent);
 		color: #000;
-		padding: 6px 40px;
-		font-size: 0.75rem;
+		padding: 4px 12px;
+		border-radius: 100px;
+		font-size: 0.7rem;
 		font-weight: 700;
-		transform: rotate(45deg);
 	}
 
 	.pricing-card h3 {
-		font-size: 1.5rem;
-		margin-bottom: 8px;
-	}
-
-	.pricing-subtitle {
-		color: var(--text-muted);
-		margin-bottom: 24px;
-	}
-
-	.pricing-price {
-		display: flex;
-		align-items: baseline;
-		justify-content: center;
-		gap: 4px;
-		margin-bottom: 8px;
-	}
-
-	.pricing-price .currency {
-		font-size: 1.5rem;
+		font-size: 1rem;
+		margin-bottom: 16px;
 		color: var(--text-secondary);
 	}
 
-	.pricing-price .amount {
-		font-size: 4rem;
-		font-weight: 800;
-		line-height: 1;
-	}
-
-	.pricing-price .original {
-		font-size: 1.5rem;
-		color: var(--text-muted);
-		text-decoration: line-through;
-		margin-left: 12px;
-	}
-
-	.pricing-period {
-		color: var(--text-muted);
+	.price {
 		margin-bottom: 24px;
 	}
 
-	.pricing-features {
+	.price .amount {
+		font-size: 2.5rem;
+		font-weight: 800;
+	}
+
+	.price .period {
+		color: var(--text-muted);
+		font-size: 0.9rem;
+	}
+
+	.features {
 		list-style: none;
 		text-align: left;
-		margin-bottom: 32px;
+		margin-bottom: 24px;
 	}
 
-	.pricing-features li {
-		padding: 12px 0;
-		border-bottom: 1px solid var(--border);
+	.features li {
+		padding: 8px 0;
+		font-size: 0.9rem;
+		color: var(--text-secondary);
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 8px;
 	}
 
-	.pricing-features li:last-child {
-		border-bottom: none;
-	}
-
-	.pricing-features li::before {
-		content: '✓';
+	.features li::before {
+		content: '\2713';
 		color: var(--accent);
 		font-weight: 700;
 	}
 
 	.pricing-cta {
+		display: block;
 		width: 100%;
-		background: var(--accent);
-		color: #000;
-		padding: 18px 32px;
-		border: none;
-		border-radius: 12px;
-		font-size: 1.1rem;
-		font-weight: 700;
+		background: transparent;
+		color: var(--text);
+		padding: 12px 20px;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		font-size: 0.95rem;
+		font-weight: 600;
 		cursor: pointer;
 		transition: all 0.2s;
-		margin-bottom: 16px;
-	}
-
-	.pricing-cta:hover {
-		background: var(--accent-hover);
-		transform: translateY(-2px);
-		box-shadow: 0 8px 30px var(--accent-glow);
-	}
-
-	.pricing-guarantee {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 8px;
-		font-size: 0.9rem;
-		color: var(--text-muted);
-	}
-
-	.pricing-guarantee svg {
-		width: 18px;
-		height: 18px;
-		color: var(--accent);
-	}
-
-	/* COUNTDOWN TIMER - Urgency */
-	.countdown {
-		background: rgba(245, 158, 11, 0.1);
-		border: 1px solid rgba(245, 158, 11, 0.3);
-		border-radius: 10px;
-		padding: 16px;
-		margin-bottom: 24px;
-	}
-
-	.countdown-label {
-		font-size: 0.85rem;
-		color: var(--warning);
-		margin-bottom: 8px;
-		font-weight: 600;
-	}
-
-	.countdown-timer {
-		display: flex;
-		justify-content: center;
-		gap: 16px;
-	}
-
-	.countdown-unit {
+		text-decoration: none;
 		text-align: center;
 	}
 
-	.countdown-number {
-		font-size: 1.8rem;
-		font-weight: 700;
-		color: var(--text);
+	.pricing-cta:hover {
+		background: var(--bg-hover);
+		border-color: var(--text-muted);
 	}
 
-	.countdown-unit-label {
-		font-size: 0.7rem;
-		color: var(--text-muted);
-		text-transform: uppercase;
+	.pricing-cta.primary {
+		background: var(--accent);
+		color: #000;
+		border-color: var(--accent);
 	}
 
-	/* ==========================================
-           FAQ SECTION
-           ========================================== */
+	.pricing-cta.primary:hover {
+		background: var(--accent-hover);
+		border-color: var(--accent-hover);
+	}
+
+	/* FAQ Section */
 	.faq-section {
 		padding: 80px 0;
 	}
 
-	.faq-grid {
+	.faq-list {
 		max-width: 700px;
 		margin: 0 auto;
 	}
 
 	.faq-item {
 		border-bottom: 1px solid var(--border);
-		padding: 24px 0;
 	}
 
 	.faq-question {
-		font-size: 1.1rem;
-		font-weight: 600;
-		margin-bottom: 12px;
-		cursor: pointer;
+		width: 100%;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		padding: 20px 0;
+		background: none;
+		border: none;
+		color: var(--text);
+		font-size: 1rem;
+		font-weight: 600;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.faq-question:hover {
+		color: var(--accent);
+	}
+
+	.faq-icon {
+		font-size: 1.5rem;
+		color: var(--text-muted);
 	}
 
 	.faq-answer {
+		padding: 0 0 20px;
+	}
+
+	.faq-answer p {
 		color: var(--text-secondary);
 		font-size: 0.95rem;
 		line-height: 1.7;
 	}
 
-	/* ==========================================
-           FINAL CTA SECTION
-           ========================================== */
+	/* Final CTA */
 	.final-cta {
 		padding: 100px 0;
 		text-align: center;
@@ -1937,7 +1135,7 @@ export async function getUser(id: string) {
 		transform: translateX(-50%);
 		width: 600px;
 		height: 600px;
-		background: radial-gradient(circle, rgba(34, 197, 94, 0.1) 0%, transparent 70%);
+		background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
 		pointer-events: none;
 	}
 
@@ -1957,14 +1155,12 @@ export async function getUser(id: string) {
 		z-index: 1;
 	}
 
-	.final-cta .email-form {
+	.final-cta .demo-form {
 		position: relative;
 		z-index: 1;
 	}
 
-	/* ==========================================
-           FOOTER
-           ========================================== */
+	/* Footer */
 	footer {
 		padding: 40px 0;
 		border-top: 1px solid var(--border);
@@ -1994,9 +1190,7 @@ export async function getUser(id: string) {
 		font-size: 0.85rem;
 	}
 
-	/* ==========================================
-           MOBILE RESPONSIVE
-           ========================================== */
+	/* Mobile Responsive */
 	@media (max-width: 640px) {
 		.hero h1 {
 			font-size: 2rem;
@@ -2006,41 +1200,35 @@ export async function getUser(id: string) {
 			font-size: 1.1rem;
 		}
 
-		.email-form {
+		.demo-form {
 			flex-direction: column;
 		}
 
-		.email-form input,
+		.demo-input,
 		.cta-primary {
 			width: 100%;
 		}
 
-		.social-proof-bar {
-			flex-wrap: wrap;
-			gap: 24px;
-		}
-
-		.risk-reversal {
+		.demo-details {
 			flex-direction: column;
-			gap: 8px;
+			gap: 4px;
 		}
 
-		.activity-ticker {
+		.demo-details .separator {
 			display: none;
 		}
 
-		.pricing-card {
-			padding: 28px;
+		.doc-types {
+			gap: 8px;
 		}
 
-		.pricing-price .amount {
-			font-size: 3rem;
+		.doc-icon {
+			padding: 6px 10px;
+			font-size: 0.75rem;
 		}
 	}
 
-	/* ==========================================
-           ANIMATIONS
-           ========================================== */
+	/* Animations */
 	@keyframes fadeInUp {
 		from {
 			opacity: 0;
@@ -2070,5 +1258,11 @@ export async function getUser(id: string) {
 	}
 	.hero-content > *:nth-child(5) {
 		animation-delay: 0.4s;
+	}
+	.hero-content > *:nth-child(6) {
+		animation-delay: 0.5s;
+	}
+	.hero-content > *:nth-child(7) {
+		animation-delay: 0.6s;
 	}
 </style>

@@ -146,6 +146,73 @@
 
 ---
 
+### Phase 7: SaaS Transformation - Hybrid Pricing & Try Without Signup
+
+**Status:** Complete (7/7 plans complete)
+
+**Goal:** Transform from LTD pricing to hybrid subscription model with try-without-signup activation
+
+**Depends on:** Phase 6
+**Plans:** 7 plans (6 complete)
+
+**Sub-Phases:**
+- Phase 7.1: Rate Limiting & Bot Detection
+- Phase 7.2: Demo API Endpoint & Usage Tracking
+- Phase 7.3: Demo Page UI
+- Phase 7.4: Hybrid Pricing Implementation
+- Phase 7.5: Landing Page CRO Update
+- Phase 7.6: Analytics & Event Tracking
+- Phase 7.7: Final Testing & Polish
+
+**New Pricing Model:**
+| Tier | Price | Type | Limits |
+|------|-------|------|--------|
+| Free Demo | $0 | - | 1 README/day, public repos |
+| Single Repo | $39 | One-time | Full suite, 1 repo, forever |
+| Pro | $99/mo | Subscription | 30 repos/mo, all features |
+| Team | $249/mo | Subscription | 100 repos/mo, 5 seats |
+
+**Key Files Created:**
+- `src/routes/try/+page.svelte` - Demo page
+- `src/routes/api/try/+server.ts` - Demo API endpoint
+- `src/lib/server/ratelimit.ts` - Rate limiting utilities
+- `src/lib/server/botdetect.ts` - Bot detection
+- `src/lib/server/usage.ts` - Usage tracking
+- `src/lib/components/LockedDocPreview.svelte` - Upsell component
+- `src/lib/server/analytics.ts` - Server-side event tracking
+- `src/lib/stores/analytics.ts` - Client-side anonymous ID store
+
+**Key Files Modified:**
+- `src/lib/server/stripe.ts` - Hybrid pricing
+- `src/routes/api/stripe/webhook/+server.ts` - Handle both payment types, event tracking
+- `src/routes/+page.svelte` - CRO-optimized landing page
+- `src/routes/dashboard/+page.svelte` - Usage display, dark theme, upgrade CTAs
+- `src/routes/dashboard/+page.server.ts` - Fetch subscription/usage data
+- `src/routes/auth/callback/+server.ts` - Auth event tracking
+- `src/routes/api/docs/generate/+server.ts` - Doc generation tracking
+
+**Success Criteria:**
+- [x] Try without signup works (1/day per IP)
+- [x] Hybrid pricing active ($39 one-time + $99/$249 subscriptions)
+- [x] No fake social proof anywhere
+- [x] Events tracked for conversion funnel
+- [x] Dashboard shows usage stats and purchased repos
+- [x] Upgrade CTAs for free users
+
+**Completed Plans:**
+- [x] 07-01: Rate Limiting Utilities (ratelimit.ts, botdetect.ts)
+- [x] 07-02: Demo API Endpoint & Usage Tracking (api/try/+server.ts, usage.ts)
+- [x] 07-03: Demo Page UI (routes/try/+page.svelte, LockedDocPreview.svelte)
+- [x] 07-04: Hybrid Pricing Implementation (stripe.ts, webhook, checkout)
+- [x] 07-05: Landing Page CRO Update (complete rewrite, removed fake social proof)
+- [x] 07-06: Analytics & Event Tracking (server/analytics.ts, stores/analytics.ts)
+- [x] 07-07: Dashboard Usage Display (dashboard loader, usage UI, dark theme)
+
+**Details:**
+See `.planning/phases/07-saas-transformation/` for detailed implementation plans.
+
+---
+
 ## Future Milestones
 
 ### Milestone 2: Growth Features
