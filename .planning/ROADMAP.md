@@ -213,6 +213,52 @@ See `.planning/phases/07-saas-transformation/` for detailed implementation plans
 
 ---
 
+### Phase 8: Comprehensive Test Coverage
+
+**Status:** In Progress (0/5 plans complete)
+
+**Goal:** Achieve comprehensive test coverage across the codebase using TDD methodology.
+
+**Plans:**
+- Phase 8.1: Bot Detection & Parser Utility Tests (TDD)
+- Phase 8.2: Prompt Builder & Analytics Tests (TDD)
+- Phase 8.3: Svelte Store Tests
+- Phase 8.4: Rate Limiting Tests with Mocks (TDD)
+- Phase 8.5: E2E Tests for Critical Flows
+
+**Test Categories:**
+| Category | Files | Expected Tests |
+|----------|-------|----------------|
+| Pure Utils | botdetect.ts, parser.ts | 35+ |
+| Prompts | prompts.ts | 15+ |
+| Stores | auth.ts, repos.ts, analytics.ts | 20+ |
+| Rate Limiting | ratelimit.ts | 25+ |
+| E2E | landing, demo pages | 18+ |
+| **Total** | | **113+ new tests** |
+
+**Key Files to Create:**
+- `src/lib/server/botdetect.test.ts`
+- `src/lib/utils/parser.test.ts`
+- `src/lib/utils/prompts.test.ts`
+- `src/lib/stores/auth.test.ts`
+- `src/lib/stores/repos.test.ts`
+- `src/lib/stores/analytics.test.ts`
+- `src/lib/server/ratelimit.test.ts`
+- `e2e/landing.test.ts`
+- `e2e/try.test.ts`
+
+**Success Criteria:**
+- [ ] 100+ new tests passing
+- [ ] All pure functions have unit tests
+- [ ] All stores have unit tests
+- [ ] Critical E2E flows covered
+- [ ] Test suite runs in <60 seconds
+
+**Details:**
+See `.planning/phases/08-comprehensive-testing/` for detailed test plans.
+
+---
+
 ## Future Milestones
 
 ### Milestone 2: Growth Features
