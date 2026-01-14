@@ -50,6 +50,7 @@
 		"@supabase/supabase-js": "^2.90.1",
 		"dompurify": "^3.3.1",
 		"marked": "^17.0.1",
+		"mermaid": "^11.12.2",
 		"stripe": "^20.1.2"
 	}
 }

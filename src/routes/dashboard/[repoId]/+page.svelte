@@ -1,11 +1,83 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onMount, afterUpdate } from 'svelte';
+	import { browser } from '$app/environment';
 	import { marked } from 'marked';
 	import { toast } from '$lib/stores/toast';
 	import UpgradePrompt from '$lib/components/UpgradePrompt.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+	// Initialize Mermaid for diagram rendering
+	let mermaidInitialized = false;
+
+	async function initMermaid() {
+		if (!browser || mermaidInitialized) return;
+
+		const mermaid = (await import('mermaid')).default;
+		mermaid.initialize({
+			startOnLoad: false,
+			theme: 'dark',
+			themeVariables: {
+				primaryColor: '#10b981',
+				primaryTextColor: '#fafafa',
+				primaryBorderColor: '#3f3f46',
+				lineColor: '#71717a',
+				secondaryColor: '#27272a',
+				tertiaryColor: '#18181b',
+				background: '#18181b',
+				mainBkg: '#27272a',
+				nodeBorder: '#3f3f46',
+				clusterBkg: '#27272a',
+				clusterBorder: '#3f3f46',
+				titleColor: '#fafafa',
+				edgeLabelBackground: '#27272a'
+			},
+			flowchart: {
+				htmlLabels: true,
+				curve: 'basis'
+			}
+		});
+		mermaidInitialized = true;
+	}
+
+	async function renderMermaidDiagrams() {
+		if (!browser) return;
+
+		await initMermaid();
+		const mermaid = (await import('mermaid')).default;
+
+		// Find all mermaid code blocks and render them
+		const mermaidBlocks = document.querySelectorAll('pre code.language-mermaid');
+
+		for (const block of mermaidBlocks) {
+			const pre = block.parentElement;
+			if (!pre || pre.dataset.mermaidRendered) continue;
+
+			const code = block.textContent || '';
+			const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+
+			try {
+				const { svg } = await mermaid.render(id, code);
+				const container = document.createElement('div');
+				container.className = 'mermaid-diagram';
+				container.innerHTML = svg;
+				pre.replaceWith(container);
+			} catch (err) {
+				console.error('Mermaid rendering error:', err);
+				// Keep the code block visible if rendering fails
+			}
+		}
+	}
+
+	onMount(() => {
+		renderMermaidDiagrams();
+	});
+
+	afterUpdate(() => {
+		renderMermaidDiagrams();
+	});
 
 	// Check if user is on free tier and only has README
 	$: hasOnlyReadme = data.hasAnyDocs &&
@@ -464,12 +536,34 @@
 	}
 
 	/* Mermaid diagram styling - dark theme */
-	:global(.prose-invert .mermaid) {
+	:global(.prose-invert .mermaid),
+	:global(.mermaid-diagram) {
 		background-color: #18181b;
-		padding: 1rem;
-		border-radius: 0.5rem;
+		padding: 1.5rem;
+		border-radius: 0.75rem;
 		border: 1px solid #3f3f46;
 		text-align: center;
+		margin: 1.5rem 0;
+		overflow-x: auto;
+	}
+
+	:global(.mermaid-diagram svg) {
+		max-width: 100%;
+		height: auto;
+	}
+
+	/* Mermaid text colors for dark theme */
+	:global(.mermaid-diagram .nodeLabel),
+	:global(.mermaid-diagram .edgeLabel),
+	:global(.mermaid-diagram text) {
+		fill: #e4e4e7 !important;
+		color: #e4e4e7 !important;
+	}
+
+	:global(.mermaid-diagram .node rect),
+	:global(.mermaid-diagram .node circle),
+	:global(.mermaid-diagram .node polygon) {
+		stroke: #3f3f46 !important;
 	}
 
 	/* Prose headings and links */
