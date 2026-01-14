@@ -27,7 +27,7 @@ export async function trackEvent(
   anonymousId?: string
 ): Promise<void> {
   try {
-    await supabaseAdmin.from('events').insert({
+    await supabaseAdmin.from('analytics_events').insert({
       event_name: eventName,
       properties: properties || {},
       user_id: userId || null,
