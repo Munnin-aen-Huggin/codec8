@@ -35,17 +35,51 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 
 ---
 
+## Current Milestone: v1.1 Growth
+
+### Phase 9: CRO Landing Page Rebuild
+
+**Goal:** Rebuild landing page for $90K revenue target with conversion-optimized design
+
+**Depends on:** v1.0 shipped
+**Plans:** 6 plans
+- [x] 09-01: Post-Demo Upsell Enhancement
+- [x] 09-02: Hero Section Redesign
+- [x] 09-03: Urgency Banner + Social Proof
+- [x] 09-04: Value Comparison + Pricing
+- [x] 09-05: Exit Intent + Enterprise
+- [x] 09-06: Analytics + Mobile Optimization
+
+**Target Metrics:**
+- Revenue: $90K in 30 days
+- Visitor → Demo: 20%+
+- Demo → Purchase: 30%+
+- 500+ Single Repo purchases
+- 150+ Pro subscribers
+
+**Key Features:**
+- [ ] Post-demo upsell with locked previews
+- [ ] Value anchor ($600 → $99)
+- [ ] Urgency banner with countdown
+- [ ] Social proof section
+- [ ] Bulk purchase option
+- [ ] Enterprise/Calendly section
+- [ ] Exit intent email capture
+- [ ] Retargeting pixel
+
+**Details:**
+Complete landing page rewrite following AIDA framework (Attention → Interest → Desire → Action).
+See phase directory for full specification.
+
+---
+
 ## Future Milestones
 
-### v1.1 Growth Features
+### v1.1 Growth Features (Continued)
 
-**Status:** Planned
-
-**Goal:** Add features requested by early users to increase retention and MRR.
-
-**Potential Phases:**
-- Phase 9: Auto-sync on git push
-- Phase 10: Team collaboration features
+**Remaining Phases:**
+- Phase 10: Auto-sync on git push
+- Phase 11: Team collaboration features
 
 **Features:**
 - [ ] Webhook integration for auto-sync
@@ -75,5 +109,5 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 | Milestone | Phases | Status | Shipped |
 |-----------|--------|--------|---------|
 | v1.0 MVP | 1-8 | Complete | 2026-01-14 |
-| v1.1 Growth | 9-10 | Planned | - |
-| v2.0 Enterprise | 11+ | Future | - |
+| v1.1 Growth | 9-11 | In Progress | - |
+| v2.0 Enterprise | 12+ | Future | - |

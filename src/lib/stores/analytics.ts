@@ -69,3 +69,89 @@ export function getAnonymousId(): string {
   }
   return '';
 }
+
+// Track which events have been fired to prevent duplicates
+const firedEvents = new Set<string>();
+
+/**
+ * Track an analytics event from the client side
+ * Fire-and-forget - errors are swallowed
+ */
+export async function trackClientEvent(
+  eventName: string,
+  properties?: Record<string, string | number | boolean | null>
+): Promise<void> {
+  if (!browser) return;
+
+  try {
+    await fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: eventName, ...properties })
+    });
+  } catch {
+    // Silently fail - analytics should never break UX
+  }
+}
+
+/**
+ * Track an event only once per session
+ * Useful for impression tracking (upsell_viewed, pricing_viewed)
+ */
+export async function trackEventOnce(
+  eventName: string,
+  properties?: Record<string, string | number | boolean | null>
+): Promise<void> {
+  if (firedEvents.has(eventName)) return;
+  firedEvents.add(eventName);
+  await trackClientEvent(eventName, properties);
+}
+
+/**
+ * Create an IntersectionObserver that tracks when an element enters the viewport
+ * Automatically cleans up after the element is observed once
+ */
+export function trackOnVisible(
+  element: HTMLElement | null,
+  eventName: string,
+  properties?: Record<string, string | number | boolean | null>,
+  threshold = 0.5
+): () => void {
+  if (!browser || !element) return () => {};
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          trackEventOnce(eventName, properties);
+          observer.disconnect();
+        }
+      });
+    },
+    { threshold }
+  );
+
+  observer.observe(element);
+
+  // Return cleanup function
+  return () => observer.disconnect();
+}
+
+/**
+ * Track page view with UTM parameters
+ */
+export function trackPageView(): void {
+  if (!browser) return;
+
+  const url = new URL(window.location.href);
+  const source = url.searchParams.get('utm_source') || 'direct';
+  const medium = url.searchParams.get('utm_medium') || 'none';
+  const campaign = url.searchParams.get('utm_campaign') || '';
+
+  trackEventOnce('page_view', {
+    source,
+    medium,
+    campaign,
+    path: url.pathname
+  });
+}

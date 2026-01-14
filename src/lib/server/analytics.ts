@@ -68,11 +68,22 @@ export async function trackTimedEvent(
 
 // Event name constants for consistency
 export const EVENTS = {
+  // Page engagement
+  PAGE_VIEW: 'page_view',
+  DEMO_INPUT_FOCUSED: 'demo_input_focused',
+  UPSELL_VIEWED: 'upsell_viewed',
+  PRICING_VIEWED: 'pricing_viewed',
+
   // Demo flow
   DEMO_STARTED: 'demo_started',
+  DEMO_SUBMITTED: 'demo_submitted',
   DEMO_COMPLETED: 'demo_completed',
   DEMO_FAILED: 'demo_failed',
   DEMO_LIMIT_REACHED: 'demo_limit_reached',
+
+  // Exit intent & lead capture
+  EXIT_INTENT_SHOWN: 'exit_intent_shown',
+  EMAIL_CAPTURED: 'email_captured',
 
   // Auth flow
   SIGNUP_STARTED: 'signup_started',
@@ -81,6 +92,7 @@ export const EVENTS = {
 
   // Conversion flow
   CHECKOUT_STARTED: 'checkout_started',
+  CHECKOUT_COMPLETED: 'checkout_completed',
   PURCHASE_COMPLETED: 'purchase_completed',
   TRIAL_STARTED: 'trial_started',
   SUBSCRIPTION_CREATED: 'subscription_created',

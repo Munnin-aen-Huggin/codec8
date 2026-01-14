@@ -1,15 +1,40 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { marked } from 'marked';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import DOMPurify from 'dompurify';
 	import LockedDocPreview from '$lib/components/LockedDocPreview.svelte';
 	import { toast } from '$lib/stores/toast';
 
 	// Initialize DOMPurify on mount (only works in browser)
 	let purify: typeof DOMPurify | null = null;
+
+	// Rotating tips for generating state
+	const tips = [
+		{ icon: '💡', text: 'Did you know? The average developer spends 6-8 hours writing documentation.' },
+		{ icon: '⚡', text: 'CodeDoc AI analyzes your entire codebase in under 60 seconds.' },
+		{ icon: '💰', text: 'Professional technical writers charge $50-100/hour.' },
+		{ icon: '🚀', text: 'Great documentation increases developer adoption by 3x.' },
+		{ icon: '✨', text: 'We use Claude AI to understand your code context deeply.' }
+	];
+	let currentTipIndex = 0;
+	let tipInterval: ReturnType<typeof setInterval> | null = null;
+
+	// Progress stages
+	const stages = [
+		{ id: 1, label: 'Reading file structure', icon: '📂' },
+		{ id: 2, label: 'Analyzing code patterns', icon: '🔍' },
+		{ id: 3, label: 'Generating documentation', icon: '✍️' }
+	];
+	let currentStage = 0;
+	let progress = 0;
+
 	onMount(() => {
 		purify = DOMPurify;
+	});
+
+	onDestroy(() => {
+		if (tipInterval) clearInterval(tipInterval);
 	});
 
 	/**
@@ -34,6 +59,20 @@
 		return rawHtml;
 	}
 
+	function startTipRotation() {
+		currentTipIndex = 0;
+		tipInterval = setInterval(() => {
+			currentTipIndex = (currentTipIndex + 1) % tips.length;
+		}, 4000);
+	}
+
+	function stopTipRotation() {
+		if (tipInterval) {
+			clearInterval(tipInterval);
+			tipInterval = null;
+		}
+	}
+
 	// Auto-populate from URL param if present
 	let githubUrl = $page.url.searchParams.get('url') || '';
 	let isLoading = false;
@@ -51,14 +90,23 @@
 		limitReached = false;
 		isLoading = true;
 		copied = false;
+		currentStage = 0;
+		progress = 0;
+
+		// Start tip rotation
+		startTipRotation();
 
 		try {
-			// Stage 1: Validating
-			loadingStage = 'Validating repository...';
-			await new Promise(r => setTimeout(r, 500));
+			// Stage 1: Reading file structure
+			currentStage = 1;
+			loadingStage = 'Reading file structure...';
+			progress = 15;
+			await new Promise(r => setTimeout(r, 800));
 
-			// Stage 2: Analyzing
-			loadingStage = 'Analyzing codebase...';
+			// Stage 2: Analyzing code patterns
+			currentStage = 2;
+			loadingStage = 'Analyzing code patterns...';
+			progress = 35;
 
 			const response = await fetch('/api/try', {
 				method: 'POST',
@@ -78,9 +126,13 @@
 				return;
 			}
 
-			// Stage 3: Generating
-			loadingStage = 'Generating README...';
-			await new Promise(r => setTimeout(r, 300));
+			// Stage 3: Generating documentation
+			currentStage = 3;
+			loadingStage = 'Generating documentation...';
+			progress = 85;
+			await new Promise(r => setTimeout(r, 500));
+
+			progress = 100;
 
 			generatedReadme = data.readme;
 			repoName = data.repoName;
@@ -92,6 +144,7 @@
 		} finally {
 			isLoading = false;
 			loadingStage = '';
+			stopTipRotation();
 		}
 	}
 
@@ -107,6 +160,7 @@
 	}
 
 	$: renderedMarkdown = generatedReadme ? renderMarkdown(generatedReadme) : '';
+	$: currentTip = tips[currentTipIndex];
 </script>
 
 <svelte:head>
@@ -170,18 +224,46 @@
 			</div>
 		</form>
 
-		<!-- Loading State -->
+		<!-- Loading State - Enhanced with stages and tips -->
 		{#if isLoading}
 			<div class="bg-zinc-900/50 border border-zinc-800 rounded-lg p-8 mb-8">
-				<div class="flex flex-col items-center gap-4">
-					<!-- Progress Indicator -->
+				<div class="flex flex-col items-center gap-6">
+					<!-- Progress Bar -->
 					<div class="w-full max-w-md">
 						<div class="h-2 bg-zinc-800 rounded-full overflow-hidden">
-							<div class="h-full bg-emerald-500 rounded-full animate-pulse" style="width: 60%;"></div>
+							<div
+								class="h-full bg-emerald-500 rounded-full transition-all duration-500 ease-out"
+								style="width: {progress}%;"
+							></div>
+						</div>
+						<p class="text-xs text-zinc-500 text-right mt-1">{progress}%</p>
+					</div>
+
+					<!-- Stage Indicators -->
+					<div class="flex items-center gap-4 text-sm">
+						{#each stages as stage}
+							<div class="flex items-center gap-2 {currentStage >= stage.id ? 'text-emerald-400' : 'text-zinc-600'}">
+								<span class="text-lg">{currentStage > stage.id ? '✓' : stage.icon}</span>
+								<span class="hidden sm:inline">{stage.label}</span>
+							</div>
+							{#if stage.id < stages.length}
+								<div class="w-8 h-px {currentStage > stage.id ? 'bg-emerald-500' : 'bg-zinc-700'}"></div>
+							{/if}
+						{/each}
+					</div>
+
+					<!-- Current Stage Label -->
+					<p class="text-lg text-emerald-400 font-medium">{loadingStage}</p>
+
+					<!-- Rotating Tips -->
+					<div class="bg-zinc-800/50 border border-zinc-700 rounded-lg p-4 max-w-md w-full">
+						<div class="flex items-start gap-3 min-h-[48px]">
+							<span class="text-2xl flex-shrink-0">{currentTip.icon}</span>
+							<p class="text-zinc-300 text-sm leading-relaxed">{currentTip.text}</p>
 						</div>
 					</div>
-					<p class="text-lg text-emerald-400 font-medium">{loadingStage}</p>
-					<p class="text-sm text-zinc-500">This usually takes 15-30 seconds</p>
+
+					<p class="text-xs text-zinc-500">This usually takes 15-30 seconds</p>
 				</div>
 			</div>
 		{/if}
@@ -279,31 +361,108 @@
 				</div>
 			</div>
 
-			<!-- Upsell Section -->
+			<!-- Upsell Section with Value Anchor -->
 			<div class="mb-12">
+				<!-- Section Header -->
 				<div class="text-center mb-8">
-					<h2 class="text-2xl font-bold text-white mb-2">Get the complete documentation suite</h2>
-					<p class="text-zinc-400">Unlock all 4 documentation types for your repositories</p>
+					<h2 class="text-2xl font-bold text-white mb-2">Unlock the complete documentation suite</h2>
+					<p class="text-zinc-400">
+						<span class="text-zinc-500 line-through">$400-800</span>
+						<span class="text-emerald-400 font-semibold ml-2">$99 one-time</span>
+					</p>
 				</div>
 
+				<!-- Locked Doc Previews -->
 				<div class="grid md:grid-cols-3 gap-4 mb-8">
-					<LockedDocPreview docType="api" />
-					<LockedDocPreview docType="architecture" />
-					<LockedDocPreview docType="setup" />
+					<LockedDocPreview
+						docType="api"
+						ctaText="Included in $99 package"
+						ctaHref="/auth/login?intent=purchase&product=single"
+					/>
+					<LockedDocPreview
+						docType="architecture"
+						ctaText="Included in $99 package"
+						ctaHref="/auth/login?intent=purchase&product=single"
+					/>
+					<LockedDocPreview
+						docType="setup"
+						ctaText="Included in $99 package"
+						ctaHref="/auth/login?intent=purchase&product=single"
+					/>
 				</div>
 
+				<!-- Value Anchor Box -->
+				<div class="bg-zinc-900/80 border border-zinc-700 rounded-lg p-6 mb-8 max-w-2xl mx-auto">
+					<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+						<div>
+							<p class="text-zinc-300 mb-2">
+								Technical writers charge <span class="text-white font-semibold">$50-100/hr × 6-8 hours</span> = <span class="text-zinc-500 line-through">$400-800</span>
+							</p>
+							<p class="text-lg">
+								You pay <span class="text-emerald-400 font-bold text-xl">$99</span>. <span class="text-white font-semibold">Once.</span>
+							</p>
+						</div>
+					</div>
+
+					<!-- What's Included Checklist -->
+					<div class="mt-4 pt-4 border-t border-zinc-700">
+						<div class="grid grid-cols-2 gap-2 text-sm">
+							<div class="flex items-center gap-2 text-zinc-300">
+								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+								README.md
+							</div>
+							<div class="flex items-center gap-2 text-zinc-300">
+								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+								API Documentation
+							</div>
+							<div class="flex items-center gap-2 text-zinc-300">
+								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+								Architecture Diagram
+							</div>
+							<div class="flex items-center gap-2 text-zinc-300">
+								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+								Setup Guide
+							</div>
+							<div class="flex items-center gap-2 text-zinc-300">
+								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+								Private repos
+							</div>
+							<div class="flex items-center gap-2 text-zinc-300">
+								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+								</svg>
+								Regenerate: $19
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Primary CTA -->
 				<div class="text-center space-y-4">
 					<a
 						href="/auth/login?intent=purchase&product=single"
-						class="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-lg transition-all text-lg"
+						class="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-lg transition-all text-lg shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30"
 					>
-						Get All 4 Docs — $99
+						Get Complete Docs — $99
 						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
 						</svg>
 					</a>
+					<p class="text-sm text-zinc-500">
+						30-day refund guarantee
+					</p>
 					<p class="text-sm text-zinc-400">
-						Or <a href="/auth/login?intent=trial&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">start Pro trial for unlimited</a>
+						Or <a href="/auth/login?intent=trial&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">start Pro trial for unlimited repos</a>
 					</p>
 				</div>
 			</div>

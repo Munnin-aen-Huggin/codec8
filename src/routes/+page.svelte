@@ -1,10 +1,10 @@
 <svelte:head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>CodeDoc AI - Complete docs in 60 seconds</title>
+	<title>CodeDoc AI - Documentation that writes itself</title>
 	<meta
 		name="description"
-		content="README, API docs, architecture diagrams, and setup guides - generated automatically from your GitHub repo. Try it once free."
+		content="Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. In 60 seconds. Not 6 hours."
 	/>
 
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,31 +44,36 @@
 		<div class="hero-content">
 			<!-- Trust Badge -->
 			<div class="trust-badge">
-				Beta - try free, no signup
+				Try free, no signup required
 			</div>
 
 			<!-- Headline -->
 			<h1>
-				Complete docs in <span>60 seconds</span>
+				Documentation that <span>writes itself</span>
 			</h1>
 
 			<!-- Subheadline -->
 			<p class="hero-subtitle">
-				README, API docs, architecture diagrams, and setup guides - generated automatically from your GitHub repo. Try it once free.
+				Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. <strong class="contrast-text">In 60 seconds. Not 6 hours.</strong>
 			</p>
 
-			<!-- Doc Type Icons -->
+			<!-- Doc Type Badges - Free vs Locked -->
 			<div class="doc-types">
-				<div class="doc-type">
+				<div class="doc-type doc-free">
+					<span class="doc-badge-icon">✓</span>
 					<span class="doc-icon">README</span>
+					<span class="doc-status free">free</span>
 				</div>
-				<div class="doc-type">
+				<div class="doc-type doc-locked">
+					<span class="doc-badge-icon">🔒</span>
 					<span class="doc-icon">API Docs</span>
 				</div>
-				<div class="doc-type">
+				<div class="doc-type doc-locked">
+					<span class="doc-badge-icon">🔒</span>
 					<span class="doc-icon">Architecture</span>
 				</div>
-				<div class="doc-type">
+				<div class="doc-type doc-locked">
+					<span class="doc-badge-icon">🔒</span>
 					<span class="doc-icon">Setup Guide</span>
 				</div>
 			</div>
@@ -79,7 +84,10 @@
 					type="text"
 					placeholder="https://github.com/owner/repo"
 					bind:value={repoUrl}
+					bind:this={demoInput}
+					on:focus={handleDemoFocus}
 					class="demo-input"
+					aria-label="GitHub repository URL"
 				/>
 				<button type="submit" class="cta-primary">
 					Generate
@@ -89,12 +97,12 @@
 				<div class="error-message">{urlError}</div>
 			{/if}
 
-			<!-- Demo Details -->
+			<!-- Demo Details - Updated microcopy -->
 			<div class="demo-details">
 				<span>1 free demo per day</span>
-				<span class="separator">|</span>
+				<span class="separator">•</span>
 				<span>README preview</span>
-				<span class="separator">|</span>
+				<span class="separator">•</span>
 				<span>No signup</span>
 			</div>
 		</div>
@@ -197,12 +205,17 @@
 	</div>
 </section>
 
+<!-- Value Comparison Section -->
+<div bind:this={valueSection}>
+	<ValueComparison />
+</div>
+
 <!-- Pricing Section -->
-<section class="pricing-section" id="pricing">
+<section class="pricing-section" id="pricing" bind:this={pricingSection}>
 	<div class="container">
 		<div class="section-header">
 			<h2>Simple Pricing</h2>
-			<p>7-day free trial on Pro & Team | $19 to regenerate Single Repo | Cancel anytime</p>
+			<p>One repo? Pay once. Multiple repos? Subscribe.</p>
 		</div>
 
 		<div class="pricing-grid">
@@ -221,7 +234,7 @@
 				<button class="pricing-cta" on:click={scrollToHero}>Try Demo</button>
 			</div>
 
-			<!-- Single Repo -->
+			<!-- Single Repo - POPULAR -->
 			<div class="pricing-card featured">
 				<div class="featured-badge">POPULAR</div>
 				<h3>SINGLE REPO</h3>
@@ -237,6 +250,7 @@
 					<li>Regenerate: $19</li>
 				</ul>
 				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta primary">Get Docs — $99</a>
+				<p class="refund-note">30-day refund guarantee</p>
 			</div>
 
 			<!-- Pro -->
@@ -276,6 +290,36 @@
 	</div>
 </section>
 
+<!-- Bulk Purchase Section -->
+<section class="bulk-purchase">
+	<div class="container">
+		<div class="bulk-content">
+			<h3>Need multiple repos?</h3>
+			<div class="bulk-options">
+				<div class="bulk-option">
+					<span class="bulk-deal">Buy 5 repos, get 1 free</span>
+					<span class="bulk-price">$495</span>
+					<span class="bulk-savings">(save $99)</span>
+				</div>
+				<div class="bulk-option">
+					<span class="bulk-deal">Buy 10 repos, get 3 free</span>
+					<span class="bulk-price">$990</span>
+					<span class="bulk-savings">(save $297)</span>
+				</div>
+			</div>
+			<a href="/auth/login?intent=purchase&product=bulk5" class="bulk-cta">
+				Unlock 5 Repos — $495
+			</a>
+		</div>
+	</div>
+</section>
+
+<!-- Social Proof Section -->
+<SocialProof />
+
+<!-- Enterprise Section -->
+<EnterpriseSection />
+
 <!-- FAQ Section -->
 <section class="faq-section">
 	<div class="container">
@@ -312,6 +356,7 @@
 				type="text"
 				placeholder="https://github.com/owner/repo"
 				bind:value={repoUrl}
+				on:focus={handleDemoFocus}
 				class="demo-input"
 			/>
 			<button type="submit" class="cta-primary">
@@ -333,12 +378,29 @@
 	</div>
 </footer>
 
+<!-- Urgency Banner - Sticky at bottom -->
+<UrgencyBanner />
+
+<!-- Exit Intent Popup -->
+<ExitIntent />
+
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
+	import UrgencyBanner from '$lib/components/UrgencyBanner.svelte';
+	import SocialProof from '$lib/components/SocialProof.svelte';
+	import ValueComparison from '$lib/components/ValueComparison.svelte';
+	import EnterpriseSection from '$lib/components/EnterpriseSection.svelte';
+	import ExitIntent from '$lib/components/ExitIntent.svelte';
+	import { trackPageView, trackOnVisible, trackClientEvent } from '$lib/stores/analytics';
 
 	let repoUrl = '';
 	let urlError = '';
 	let openFaq: number | null = null;
+	let demoInput: HTMLInputElement;
+	let pricingSection: HTMLElement;
+	let valueSection: HTMLElement;
+	let cleanupFns: (() => void)[] = [];
 
 	const faqs = [
 		{
@@ -429,10 +491,34 @@
 			});
 		});
 
+		// Auto-focus demo input on desktop only (not mobile - would open keyboard)
+		if (browser && window.innerWidth > 768 && demoInput) {
+			// Small delay to ensure page is fully loaded
+			setTimeout(() => {
+				demoInput?.focus();
+			}, 500);
+		}
+
+		// Analytics: Track page view
+		trackPageView();
+
+		// Analytics: Track section views
+		cleanupFns.push(trackOnVisible(pricingSection, 'pricing_viewed'));
+		cleanupFns.push(trackOnVisible(valueSection, 'upsell_viewed'));
+
 		return () => {
 			window.removeEventListener('scroll', handleScroll);
 		};
 	});
+
+	onDestroy(() => {
+		cleanupFns.forEach((fn) => fn());
+	});
+
+	// Track demo input focus
+	function handleDemoFocus() {
+		trackClientEvent('demo_input_focused');
+	}
 </script>
 
 <style>
@@ -667,11 +753,17 @@
 		margin-right: auto;
 	}
 
-	/* Doc Types */
+	/* Contrast text for subhead */
+	.contrast-text {
+		color: var(--accent);
+		font-weight: 700;
+	}
+
+	/* Doc Types - Free vs Locked */
 	.doc-types {
 		display: flex;
 		justify-content: center;
-		gap: 16px;
+		gap: 12px;
 		margin-bottom: 32px;
 		flex-wrap: wrap;
 	}
@@ -679,16 +771,60 @@
 	.doc-type {
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		gap: 6px;
+		background: var(--bg-elevated);
+		border: 1px solid var(--border);
+		padding: 8px 14px;
+		border-radius: 100px;
+		font-size: 0.85rem;
+		transition: all 0.2s;
+	}
+
+	.doc-type:hover {
+		transform: translateY(-2px);
+		border-color: var(--text-muted);
+	}
+
+	.doc-type.doc-free {
+		border-color: var(--accent);
+		background: rgba(16, 185, 129, 0.1);
+	}
+
+	.doc-type.doc-free:hover {
+		border-color: var(--accent);
+		box-shadow: 0 4px 12px var(--accent-glow);
+	}
+
+	.doc-type.doc-locked {
+		opacity: 0.7;
+	}
+
+	.doc-type.doc-locked:hover {
+		opacity: 1;
+	}
+
+	.doc-badge-icon {
+		font-size: 0.75rem;
 	}
 
 	.doc-icon {
-		background: var(--bg-elevated);
-		border: 1px solid var(--border);
-		padding: 8px 12px;
-		border-radius: 6px;
-		font-size: 0.85rem;
 		color: var(--text-secondary);
+		font-weight: 500;
+	}
+
+	.doc-type.doc-free .doc-icon {
+		color: var(--accent);
+	}
+
+	.doc-status {
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.doc-status.free {
+		color: var(--accent);
 	}
 
 	/* Demo Form */
@@ -713,6 +849,7 @@
 
 	.demo-input:focus {
 		border-color: var(--accent);
+		box-shadow: 0 0 0 3px var(--accent-glow);
 	}
 
 	.demo-input::placeholder {
@@ -986,6 +1123,19 @@
 
 	.pricing-card.featured {
 		border: 2px solid var(--accent);
+		transform: scale(1.05);
+		box-shadow: 0 0 40px var(--accent-glow);
+		z-index: 1;
+	}
+
+	.pricing-card.featured:hover {
+		box-shadow: 0 0 60px var(--accent-glow);
+	}
+
+	.refund-note {
+		margin-top: 12px;
+		font-size: 0.8rem;
+		color: var(--text-muted);
 	}
 
 	.featured-badge {
@@ -1072,6 +1222,74 @@
 	.pricing-cta.primary:hover {
 		background: var(--accent-hover);
 		border-color: var(--accent-hover);
+	}
+
+	/* Bulk Purchase Section */
+	.bulk-purchase {
+		padding: 40px 0;
+		background: linear-gradient(180deg, transparent 0%, var(--bg-elevated) 50%, transparent 100%);
+	}
+
+	.bulk-content {
+		text-align: center;
+		max-width: 600px;
+		margin: 0 auto;
+	}
+
+	.bulk-content h3 {
+		font-size: 1.25rem;
+		font-weight: 600;
+		margin-bottom: 24px;
+		color: var(--text);
+	}
+
+	.bulk-options {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		margin-bottom: 24px;
+	}
+
+	.bulk-option {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	.bulk-deal {
+		color: var(--text-secondary);
+	}
+
+	.bulk-price {
+		font-weight: 700;
+		color: var(--accent);
+	}
+
+	.bulk-savings {
+		color: var(--text-muted);
+		font-size: 0.9rem;
+	}
+
+	.bulk-cta {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: var(--bg-elevated);
+		color: var(--text);
+		padding: 14px 28px;
+		border: 1px solid var(--accent);
+		border-radius: 10px;
+		font-size: 1rem;
+		font-weight: 600;
+		text-decoration: none;
+		transition: all 0.2s;
+	}
+
+	.bulk-cta:hover {
+		background: var(--accent);
+		color: #000;
 	}
 
 	/* FAQ Section */
@@ -1196,6 +1414,7 @@
 	@media (max-width: 640px) {
 		.hero h1 {
 			font-size: 2rem;
+			line-height: 1.2;
 		}
 
 		.hero-subtitle {
@@ -1209,6 +1428,7 @@
 		.demo-input,
 		.cta-primary {
 			width: 100%;
+			min-height: 48px; /* 44px minimum touch target */
 		}
 
 		.demo-details {
@@ -1222,11 +1442,40 @@
 
 		.doc-types {
 			gap: 8px;
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+
+		.doc-type {
+			min-height: 44px; /* Touch target */
 		}
 
 		.doc-icon {
 			padding: 6px 10px;
 			font-size: 0.75rem;
+		}
+
+		/* Pricing adjustments for mobile */
+		.pricing-card.featured {
+			transform: none; /* Remove scale on mobile */
+		}
+
+		.pricing-card button,
+		.pricing-card a {
+			min-height: 48px; /* Touch target */
+			padding: 14px 20px;
+		}
+
+		/* Bulk purchase mobile */
+		.bulk-option {
+			flex-direction: column;
+			gap: 4px;
+		}
+
+		/* FAQ touch targets */
+		.faq-question {
+			min-height: 48px;
+			padding: 16px 0;
 		}
 	}
 
