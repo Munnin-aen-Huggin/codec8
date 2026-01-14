@@ -93,10 +93,10 @@ See phase directory for full specification.
 
 **Goal:** Enable team-based workflows for Pro and Team tier subscribers
 
-**Status:** In Progress (1/4 plans complete)
+**Status:** In Progress (2/4 plans complete)
 **Plans:** 4 plans
 - [x] 11-01: Database schema for teams
-- [ ] 11-02: Team invitation system
+- [x] 11-02: Team invitation system
 - [ ] 11-03: Usage analytics dashboard
 - [ ] 11-04: Custom documentation templates
 
