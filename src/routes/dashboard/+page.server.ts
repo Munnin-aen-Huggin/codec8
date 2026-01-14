@@ -38,24 +38,15 @@ export const load: PageServerLoad = async ({ cookies }) => {
   }
 
   // Fetch profile with subscription info
-  const { data: profile } = await supabaseAdmin
+  const { data: profile, error: profileError } = await supabaseAdmin
     .from('profiles')
-    .select(
-      `
-      id,
-      email,
-      github_username,
-      github_token,
-      plan,
-      subscription_status,
-      subscription_tier,
-      repos_used_this_month,
-      current_period_end,
-      trial_ends_at
-    `
-    )
+    .select('*')
     .eq('id', userId)
     .single();
+
+  if (profileError) {
+    console.error('[Dashboard] Profile fetch error:', profileError);
+  }
 
   if (!profile) {
     console.log('[Dashboard] Profile not found for userId:', userId);
@@ -110,13 +101,13 @@ export const load: PageServerLoad = async ({ cookies }) => {
       used: profile.repos_used_this_month || 0,
       limit: TIER_LIMITS[profile.subscription_tier] || 30,
       tier: profile.subscription_tier === 'pro' ? 'Pro' : 'Team',
-      resetDate: profile.current_period_end
+      resetDate: profile.current_period_end || null
     };
   }
 
   // Check if in trial
   const isTrialing = profile.subscription_status === 'trialing';
-  const trialEndsAt = profile.trial_ends_at;
+  const trialEndsAt = profile.trial_ends_at || null;
 
   let availableRepos: Awaited<ReturnType<typeof fetchUserRepos>> = [];
   let githubError: string | null = null;
@@ -135,8 +126,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
       email: profile.email,
       github_username: profile.github_username,
       plan: profile.plan,
-      subscription_status: profile.subscription_status,
-      subscription_tier: profile.subscription_tier
+      subscription_status: profile.subscription_status || null,
+      subscription_tier: profile.subscription_tier || null
     },
     connectedRepos: connectedRepos || [],
     availableRepos,
