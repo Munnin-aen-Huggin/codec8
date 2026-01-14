@@ -124,3 +124,83 @@ export function githubRepoToRepository(
     language: githubRepo.language || undefined
   };
 }
+
+// ============================================
+// WEBHOOK MANAGEMENT
+// ============================================
+
+export interface GitHubWebhook {
+  id: number;
+  name: string;
+  active: boolean;
+  events: string[];
+  config: {
+    url: string;
+    content_type: string;
+  };
+}
+
+/**
+ * Create a webhook on a GitHub repository
+ * Requires admin access to the repository
+ */
+export async function createRepoWebhook(
+  token: string,
+  owner: string,
+  repo: string,
+  webhookUrl: string,
+  secret: string
+): Promise<{ id: number }> {
+  const webhook = await githubFetch<GitHubWebhook>(
+    `/repos/${owner}/${repo}/hooks`,
+    token,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: 'web',
+        active: true,
+        events: ['push'],
+        config: {
+          url: webhookUrl,
+          content_type: 'json',
+          secret: secret,
+          insecure_ssl: '0'
+        }
+      })
+    }
+  );
+
+  return { id: webhook.id };
+}
+
+/**
+ * Delete a webhook from a GitHub repository
+ * Used when disabling auto-sync
+ */
+export async function deleteRepoWebhook(
+  token: string,
+  owner: string,
+  repo: string,
+  hookId: string
+): Promise<void> {
+  const response = await fetch(
+    `${GITHUB_API_URL}/repos/${owner}/${repo}/hooks/${hookId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github.v3+json',
+        'User-Agent': 'CodeDoc-AI'
+      }
+    }
+  );
+
+  // 204 No Content is success for DELETE
+  if (!response.ok && response.status !== 204) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || `GitHub API error: ${response.status}`);
+  }
+}
