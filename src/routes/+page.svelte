@@ -265,9 +265,9 @@
 					<li>All features</li>
 					<li>Auto-sync on push</li>
 					<li>Priority support</li>
-					<li>7-day free trial</li>
+					<li>Cancel anytime</li>
 				</ul>
-				<a href="/auth/login?intent=trial&tier=pro" class="pricing-cta">Start Free Trial</a>
+				<a href="/auth/login?intent=purchase&tier=pro" class="pricing-cta">Subscribe Now</a>
 			</div>
 
 			<!-- Team -->
@@ -282,9 +282,9 @@
 					<li>5 team members</li>
 					<li>Custom templates</li>
 					<li>Slack integration</li>
-					<li>7-day free trial</li>
+					<li>Cancel anytime</li>
 				</ul>
-				<a href="/auth/login?intent=trial&tier=team" class="pricing-cta">Start Free Trial</a>
+				<a href="/auth/login?intent=purchase&tier=team" class="pricing-cta">Subscribe Now</a>
 			</div>
 		</div>
 	</div>
@@ -425,7 +425,7 @@
 		},
 		{
 			question: 'What if I\'m not satisfied?',
-			answer: 'Pro and Team subscriptions include a 7-day free trial. For Single Repo purchases, contact us within 7 days for a full refund if the documentation doesn\'t meet your expectations.'
+			answer: 'All purchases include a 30-day refund guarantee. If the documentation doesn\'t meet your expectations, contact us for a full refund. Pro and Team subscriptions can be canceled anytime.'
 		}
 	];
 

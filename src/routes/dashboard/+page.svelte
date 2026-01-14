@@ -18,12 +18,7 @@
   let checkoutLoading = false;
 
   // Extract usage data from page data
-  $: ({ usageInfo, isTrialing, trialEndsAt, purchasedRepos } = data);
-
-  // Format trial end date
-  $: trialEndFormatted = trialEndsAt
-    ? new Date(trialEndsAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    : null;
+  $: ({ usageInfo, purchasedRepos } = data);
 
   // Calculate usage percentage
   $: usagePercent = usageInfo ? Math.round((usageInfo.used / usageInfo.limit) * 100) : 0;
@@ -101,7 +96,7 @@
   // Determine if user has purchased repos (single-repo customers)
   $: hasPurchasedRepos = purchasedRepos && purchasedRepos.length > 0;
   // Free users have no subscription and no purchased repos
-  $: isFreeUser = !hasSubscription && !hasPurchasedRepos && !isTrialing;
+  $: isFreeUser = !hasSubscription && !hasPurchasedRepos;
 
   $: repoLimit = data.user.plan === 'free' ? 1 : Infinity;
   $: canConnectMore = data.connectedRepos.length < repoLimit;
@@ -252,21 +247,6 @@
   <main class="container mx-auto px-6 py-8">
     <h1 class="text-3xl font-bold text-white mb-8">Dashboard</h1>
 
-    <!-- Trial Banner -->
-    {#if isTrialing}
-      <div class="bg-emerald-900/30 border border-emerald-500/50 rounded-lg p-4 mb-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <span class="text-emerald-400 font-medium">Free Trial</span>
-            <span class="text-zinc-400 ml-2">Ends {trialEndFormatted}</span>
-          </div>
-          <a href="/pricing" class="text-emerald-400 hover:text-emerald-300 text-sm">
-            Upgrade now &rarr;
-          </a>
-        </div>
-      </div>
-    {/if}
-
     <!-- Usage Stats (for subscribers) -->
     {#if usageInfo}
       <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
@@ -365,7 +345,7 @@
             disabled={checkoutLoading}
             class="inline-block mt-2 text-sm font-medium text-amber-400 underline hover:no-underline disabled:opacity-50"
           >
-            {checkoutLoading ? 'Loading...' : 'Start 7-day trial'}
+            {checkoutLoading ? 'Loading...' : 'Upgrade to Pro'}
           </button>
         </div>
       {/if}

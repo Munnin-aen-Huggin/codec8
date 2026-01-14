@@ -17,7 +17,6 @@ type PurchaseMode = 'payment' | 'subscription';
 interface ProductConfig {
   priceId: string;
   mode: PurchaseMode;
-  trialDays?: number;
 }
 
 const PRODUCTS: Record<ProductType, ProductConfig> = {
@@ -27,13 +26,11 @@ const PRODUCTS: Record<ProductType, ProductConfig> = {
   },
   pro: {
     priceId: STRIPE_PRICE_PRO || 'price_pro_placeholder',
-    mode: 'subscription',
-    trialDays: 7
+    mode: 'subscription'
   },
   team: {
     priceId: STRIPE_PRICE_TEAM || 'price_team_placeholder',
-    mode: 'subscription',
-    trialDays: 7
+    mode: 'subscription'
   }
 };
 
@@ -79,13 +76,6 @@ export async function createCheckoutSession({
     success_url: successUrl,
     cancel_url: cancelUrl
   };
-
-  // Add trial for subscriptions
-  if (config.mode === 'subscription' && config.trialDays) {
-    sessionParams.subscription_data = {
-      trial_period_days: config.trialDays
-    };
-  }
 
   const session = await stripe.checkout.sessions.create(sessionParams);
   return session.url || '';
@@ -181,7 +171,7 @@ export const PRICE_DETAILS = {
       'Private repo support',
       'Auto-sync on push',
       'Priority support',
-      '7-day free trial'
+      'Cancel anytime'
     ]
   },
   team: {
@@ -195,7 +185,7 @@ export const PRICE_DETAILS = {
       'Everything in Pro',
       'Custom templates',
       'Slack integration',
-      '7-day free trial'
+      'Cancel anytime'
     ]
   }
 } as const;

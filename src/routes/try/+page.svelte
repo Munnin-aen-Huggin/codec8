@@ -312,7 +312,7 @@
 						</svg>
 					</a>
 					<p class="text-sm text-zinc-400">
-						Or <a href="/auth/login?intent=trial&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">start Pro trial for unlimited</a>
+						Or <a href="/auth/login?intent=purchase&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">subscribe to Pro for unlimited</a>
 					</p>
 				</div>
 			</div>
@@ -462,7 +462,7 @@
 						30-day refund guarantee
 					</p>
 					<p class="text-sm text-zinc-400">
-						Or <a href="/auth/login?intent=trial&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">start Pro trial for unlimited repos</a>
+						Or <a href="/auth/login?intent=purchase&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">subscribe to Pro for unlimited repos</a>
 					</p>
 				</div>
 			</div>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let docType: 'api' | 'architecture' | 'setup';
-	export let ctaText: string = 'Unlock with free trial';
-	export let ctaHref: string = '/auth/login?intent=trial&tier=pro';
+	export let ctaText: string = 'Unlock All Docs — $99';
+	export let ctaHref: string = '/auth/login?intent=purchase&product=single';
 
 	const docConfig = {
 		api: {

@@ -48,8 +48,8 @@ Progress: [██████████] 6/6 plans in Phase 9 — COMPLETE
 |------|-------|------|----------|
 | Free Demo | $0 | - | README only, 1/day, public repos |
 | Single Repo | $99 | One-time | All 4 doc types, 1 repo forever |
-| Pro | $149/mo | Subscription | 30 repos/month, 7-day trial |
-| Team | $399/mo | Subscription | 100 repos/month, 5 seats, 7-day trial |
+| Pro | $149/mo | Subscription | 30 repos/month, cancel anytime |
+| Team | $399/mo | Subscription | 100 repos/month, 5 seats, cancel anytime |
 
 ## Test Coverage
 
