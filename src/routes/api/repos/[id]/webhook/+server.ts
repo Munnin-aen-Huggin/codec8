@@ -39,23 +39,15 @@ export const POST: RequestHandler = async ({ params, cookies }) => {
   const repoId = params.id;
 
   try {
-    // Fetch repository with user profile (need GitHub token)
+    // Fetch repository
     const { data: repo, error: repoError } = await supabaseAdmin
       .from('repositories')
-      .select(`
-        id,
-        full_name,
-        user_id,
-        webhook_id,
-        auto_sync_enabled,
-        profiles!inner (
-          github_token
-        )
-      `)
+      .select('id, full_name, user_id, webhook_id, auto_sync_enabled')
       .eq('id', repoId)
       .single();
 
     if (repoError || !repo) {
+      console.error('[Webhook Setup] Repo fetch error:', repoError);
       throw error(404, 'Repository not found');
     }
 
@@ -69,9 +61,15 @@ export const POST: RequestHandler = async ({ params, cookies }) => {
       return json({ success: true, enabled: true, message: 'Auto-sync already enabled' });
     }
 
-    // Get GitHub token from profile
-    const profile = repo.profiles as unknown as { github_token: string };
-    if (!profile?.github_token) {
+    // Fetch GitHub token from profile
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('github_token')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profile?.github_token) {
+      console.error('[Webhook Setup] Profile fetch error:', profileError);
       throw error(500, 'GitHub token not found');
     }
 
