@@ -20,7 +20,7 @@
 	<div class="container">
 		<div class="logo">CodeDoc AI</div>
 		<div class="header-actions">
-			<button class="header-link" on:click={() => window.location.href = '/auth/login'}>Sign In</button>
+			<a href="/auth/login" class="header-link" rel="external">Sign In</a>
 			<a href="#pricing" class="cta-small">View Pricing</a>
 		</div>
 	</div>
@@ -32,7 +32,7 @@
 		<div class="logo">CodeDoc AI</div>
 		<div class="nav-actions">
 			<a href="#pricing" class="nav-link">Pricing</a>
-			<button class="nav-link" on:click={() => window.location.href = '/auth/login'}>Sign In</button>
+			<a href="/auth/login" class="nav-link" rel="external">Sign In</a>
 			<button class="nav-cta" on:click={scrollToHero}>Try Demo</button>
 		</div>
 	</div>
@@ -249,7 +249,7 @@
 					<li>Keep forever</li>
 					<li>Regenerate: $19</li>
 				</ul>
-				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta primary" data-sveltekit-reload>Get Docs — $99</a>
+				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta primary" rel="external">Get Docs — $99</a>
 				<p class="refund-note">30-day refund guarantee</p>
 			</div>
 
@@ -267,7 +267,7 @@
 					<li>Priority support</li>
 					<li>Cancel anytime</li>
 				</ul>
-				<a href="/auth/login?intent=purchase&tier=pro" class="pricing-cta" data-sveltekit-reload>Subscribe Now</a>
+				<a href="/auth/login?intent=purchase&tier=pro" class="pricing-cta" rel="external">Subscribe Now</a>
 			</div>
 
 			<!-- Team -->
@@ -284,7 +284,7 @@
 					<li>Slack integration</li>
 					<li>Cancel anytime</li>
 				</ul>
-				<a href="/auth/login?intent=purchase&tier=team" class="pricing-cta" data-sveltekit-reload>Subscribe Now</a>
+				<a href="/auth/login?intent=purchase&tier=team" class="pricing-cta" rel="external">Subscribe Now</a>
 			</div>
 		</div>
 	</div>
@@ -307,7 +307,7 @@
 					<span class="bulk-savings">(save $297)</span>
 				</div>
 			</div>
-			<a href="/auth/login?intent=purchase&product=bulk5" class="bulk-cta" data-sveltekit-reload>
+			<a href="/auth/login?intent=purchase&product=bulk5" class="bulk-cta" rel="external">
 				Unlock 5 Repos — $495
 			</a>
 		</div>
