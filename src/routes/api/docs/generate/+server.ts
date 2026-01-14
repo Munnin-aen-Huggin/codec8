@@ -15,7 +15,7 @@ import { fetchRepoContext } from '$lib/utils/parser';
 import { generateMultipleDocs } from '$lib/server/claude';
 import { trackDocsGenerated } from '$lib/utils/analytics';
 import { trackEvent, EVENTS } from '$lib/server/analytics';
-import { canGenerateForRepo, incrementUsage } from '$lib/server/usage';
+import { canGenerateForRepo, incrementUsage, logUsage } from '$lib/server/usage';
 import type { DocType } from '$lib/utils/prompts';
 
 export const POST: RequestHandler = async ({ cookies, request }) => {
@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 	// Fetch user profile to get GitHub token and subscription info
 	const { data: profile, error: profileError } = await supabaseAdmin
 		.from('profiles')
-		.select('github_token, plan, subscription_status, subscription_tier, trial_ends_at, subscription_ends_at')
+		.select('github_token, plan, subscription_status, subscription_tier, trial_ends_at, subscription_ends_at, default_team_id')
 		.eq('id', userId)
 		.single();
 
@@ -135,6 +135,8 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 		console.log(`[Access Control] User ${userId} denied: ${canGenerate.reason}`);
 		throw error(403, canGenerate.reason || 'You do not have access to generate documentation for this repository. Please upgrade your plan.');
 	}
+
+	const startTime = Date.now();
 
 	try {
 		// Fetch repository context from GitHub
@@ -234,6 +236,23 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 			} catch (usageError) {
 				console.error('[Usage] Failed to increment usage:', usageError);
 				// Don't fail the request if usage tracking fails
+			}
+
+			// Log detailed usage for analytics
+			const generationTimeMs = Date.now() - startTime;
+			for (const doc of savedDocs) {
+				try {
+					await logUsage({
+						userId,
+						teamId: profile.default_team_id || null,
+						repoId,
+						docType: doc.type,
+						tokensUsed: 0, // TODO: get from Claude response
+						generationTimeMs
+					});
+				} catch (logError) {
+					console.error('[Usage] Failed to log usage:', logError);
+				}
 			}
 		}
 

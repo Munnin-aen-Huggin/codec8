@@ -346,3 +346,167 @@ export async function getUsageStats(userId: string): Promise<{
 		periodEnd: profile.current_period_end
 	};
 }
+
+/**
+ * Log usage entry to usage_logs table
+ */
+interface LogUsageParams {
+	userId: string;
+	teamId: string | null;
+	repoId: string;
+	docType: string;
+	tokensUsed: number;
+	generationTimeMs: number;
+}
+
+export async function logUsage(params: LogUsageParams): Promise<void> {
+	try {
+		await supabaseAdmin.from('usage_logs').insert({
+			user_id: params.userId,
+			team_id: params.teamId,
+			repo_id: params.repoId,
+			doc_type: params.docType,
+			tokens_used: params.tokensUsed,
+			generation_time_ms: params.generationTimeMs
+		});
+	} catch (err) {
+		console.error('Failed to log usage:', err);
+		// Don't throw - usage logging should not break generation
+	}
+}
+
+/**
+ * Detailed usage statistics interface
+ */
+export interface DetailedUsageStats {
+	totalDocs: number;
+	totalTokens: number;
+	avgGenerationTime: number;
+	docsByType: Record<string, number>;
+	dailyUsage: Array<{ date: string; count: number }>;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	recentDocs: any[];
+}
+
+/**
+ * Get detailed usage stats for analytics dashboard
+ */
+export async function getUserDetailedStats(
+	userId: string,
+	teamId: string | null,
+	days: number = 30
+): Promise<DetailedUsageStats> {
+	const startDate = new Date();
+	startDate.setDate(startDate.getDate() - days);
+
+	// Build query
+	let query = supabaseAdmin
+		.from('usage_logs')
+		.select('*')
+		.gte('created_at', startDate.toISOString());
+
+	if (teamId) {
+		query = query.eq('team_id', teamId);
+	} else {
+		query = query.eq('user_id', userId);
+	}
+
+	const { data: logs, error } = await query.order('created_at', { ascending: false });
+
+	if (error) {
+		console.error('Error fetching usage logs:', error);
+		throw error;
+	}
+
+	const logList = logs || [];
+
+	// Calculate stats
+	const totalDocs = logList.length;
+	const totalTokens = logList.reduce((sum, l) => sum + (l.tokens_used || 0), 0);
+	const avgGenerationTime = totalDocs > 0
+		? Math.round(logList.reduce((sum, l) => sum + (l.generation_time_ms || 0), 0) / totalDocs)
+		: 0;
+
+	// Group by doc type
+	const docsByType: Record<string, number> = {};
+	logList.forEach(l => {
+		docsByType[l.doc_type] = (docsByType[l.doc_type] || 0) + 1;
+	});
+
+	// Group by day
+	const dailyMap: Record<string, number> = {};
+	logList.forEach(l => {
+		const date = new Date(l.created_at).toISOString().split('T')[0];
+		dailyMap[date] = (dailyMap[date] || 0) + 1;
+	});
+
+	// Fill in missing days
+	const dailyUsage: Array<{ date: string; count: number }> = [];
+	for (let i = days - 1; i >= 0; i--) {
+		const d = new Date();
+		d.setDate(d.getDate() - i);
+		const dateStr = d.toISOString().split('T')[0];
+		dailyUsage.push({ date: dateStr, count: dailyMap[dateStr] || 0 });
+	}
+
+	return {
+		totalDocs,
+		totalTokens,
+		avgGenerationTime,
+		docsByType,
+		dailyUsage,
+		recentDocs: logList.slice(0, 10)
+	};
+}
+
+/**
+ * Get team usage stats with member breakdown
+ */
+export async function getTeamDetailedStats(teamId: string): Promise<{
+	stats: DetailedUsageStats;
+	memberUsage: Array<{ userId: string; username: string; count: number }>;
+	quotaUsed: number;
+	quotaLimit: number;
+}> {
+	const stats = await getUserDetailedStats('', teamId, 30);
+
+	// Get per-member breakdown
+	const { data: memberData } = await supabaseAdmin
+		.from('usage_logs')
+		.select(`
+			user_id,
+			profiles:user_id (github_username)
+		`)
+		.eq('team_id', teamId)
+		.gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+	const memberMap: Record<string, { count: number; username: string }> = {};
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	(memberData || []).forEach((m: any) => {
+		const id = m.user_id;
+		if (!memberMap[id]) {
+			memberMap[id] = { count: 0, username: m.profiles?.github_username || 'Unknown' };
+		}
+		memberMap[id].count++;
+	});
+
+	const memberUsage = Object.entries(memberMap).map(([userId, data]) => ({
+		userId,
+		username: data.username,
+		count: data.count
+	})).sort((a, b) => b.count - a.count);
+
+	// Get quota info
+	const { data: team } = await supabaseAdmin
+		.from('teams')
+		.select('repos_used_this_month, max_repos_per_month')
+		.eq('id', teamId)
+		.single();
+
+	return {
+		stats,
+		memberUsage,
+		quotaUsed: team?.repos_used_this_month || 0,
+		quotaLimit: team?.max_repos_per_month || 100
+	};
+}

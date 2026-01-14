@@ -1,262 +1,215 @@
 <script lang="ts">
-	export let used: number = 0;
-	export let limit: number = 30;
-	export let tier: string = 'pro';
-	export let periodEnd: string | null = null;
-	export let breakdown: { readme: number; api: number; architecture: number; setup: number } = {
-		readme: 0,
-		api: 0,
-		architecture: 0,
-		setup: 0
+	import { onMount } from 'svelte';
+
+	export let teamId: string | null = null;
+	export let compact: boolean = false;
+
+	interface Stats {
+		totalDocs: number;
+		totalTokens: number;
+		avgGenerationTime: number;
+		docsByType: Record<string, number>;
+		dailyUsage: Array<{ date: string; count: number }>;
+	}
+
+	let stats: Stats | null = null;
+	let quotaUsed = 0;
+	let quotaLimit = 30;
+	let memberUsage: Array<{ userId: string; username: string; count: number }> = [];
+	let loading = true;
+	let error = '';
+
+	const docTypeColors: Record<string, string> = {
+		readme: '#10b981',
+		api: '#3b82f6',
+		architecture: '#8b5cf6',
+		setup: '#f59e0b'
 	};
 
-	$: usagePercent = Math.round((used / limit) * 100);
-	$: isApproachingLimit = usagePercent >= 80;
-	$: totalDocs = breakdown.readme + breakdown.api + breakdown.architecture + breakdown.setup;
+	const docTypeLabels: Record<string, string> = {
+		readme: 'README',
+		api: 'API Docs',
+		architecture: 'Architecture',
+		setup: 'Setup Guide'
+	};
 
-	// Calculate days remaining in period
-	$: daysRemaining = periodEnd
-		? Math.max(0, Math.ceil((new Date(periodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-		: null;
+	onMount(async () => {
+		try {
+			const url = teamId ? `/api/analytics/usage?teamId=${teamId}` : '/api/analytics/usage';
+			const res = await fetch(url);
+			if (!res.ok) {
+				if (res.status === 403) {
+					error = 'Upgrade to Pro or Team for analytics';
+				} else {
+					throw new Error('Failed to load');
+				}
+				return;
+			}
 
-	// Calculate usage trend (docs per day average)
-	$: docsPerDay = daysRemaining && daysRemaining > 0
-		? Math.round((totalDocs / (30 - daysRemaining)) * 10) / 10
-		: 0;
+			const data = await res.json();
+			stats = data.stats;
+			quotaUsed = data.quotaUsed || 0;
+			quotaLimit = data.quotaLimit || 30;
+			memberUsage = data.memberUsage || [];
+		} catch (err) {
+			error = 'Unable to load usage data';
+		} finally {
+			loading = false;
+		}
+	});
 
-	const docTypes = [
-		{ key: 'readme', label: 'README', color: '#3b82f6' },
-		{ key: 'api', label: 'API Docs', color: '#10b981' },
-		{ key: 'architecture', label: 'Architecture', color: '#8b5cf6' },
-		{ key: 'setup', label: 'Setup Guide', color: '#f59e0b' }
-	] as const;
+	function getMaxDailyCount(): number {
+		if (!stats) return 10;
+		return Math.max(...stats.dailyUsage.map(d => d.count), 5);
+	}
+
+	function formatDate(dateStr: string): string {
+		const d = new Date(dateStr);
+		return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+	}
+
+	function formatMs(ms: number): string {
+		if (ms < 1000) return `${ms}ms`;
+		return `${(ms / 1000).toFixed(1)}s`;
+	}
+
+	$: quotaPercent = quotaLimit > 0 ? (quotaUsed / quotaLimit) * 100 : 0;
+	$: isNearLimit = quotaPercent >= 80;
 </script>
 
-<div class="usage-analytics">
-	<div class="analytics-header">
-		<h3>Usage Analytics</h3>
-		{#if daysRemaining !== null}
-			<div class="period-badge">
-				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-				</svg>
-				{daysRemaining} days left
-			</div>
-		{/if}
-	</div>
-
-	<!-- Main Usage Bar -->
-	<div class="usage-main">
-		<div class="usage-header">
-			<span class="usage-label">Repos Generated</span>
-			<span class="usage-value {isApproachingLimit ? 'warning' : ''}">{used} / {limit}</span>
-		</div>
-		<div class="usage-bar-container">
-			<div
-				class="usage-bar {isApproachingLimit ? 'warning' : ''}"
-				style="width: {Math.min(usagePercent, 100)}%"
-			></div>
-		</div>
-		{#if isApproachingLimit}
-			<p class="usage-warning">
-				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-				</svg>
-				Approaching limit - {limit - used} repos remaining
-			</p>
-		{/if}
-	</div>
-
-	<!-- Doc Type Breakdown -->
-	<div class="breakdown-section">
-		<h4>Documentation Breakdown</h4>
-		<div class="breakdown-grid">
-			{#each docTypes as docType}
-				<div class="breakdown-item">
-					<div class="breakdown-icon" style="background: {docType.color}20; color: {docType.color}">
-						{breakdown[docType.key]}
-					</div>
-					<span class="breakdown-label">{docType.label}</span>
+<div class="space-y-6">
+	{#if loading}
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+			{#each Array(4) as _}
+				<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+					<div class="h-4 w-20 bg-zinc-800 rounded mb-2 animate-pulse"></div>
+					<div class="h-8 w-16 bg-zinc-800 rounded animate-pulse"></div>
 				</div>
 			{/each}
 		</div>
-	</div>
+	{:else if error}
+		<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 text-center text-zinc-400">{error}</div>
+	{:else if stats}
+		<!-- Summary Cards -->
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+				<p class="text-zinc-500 text-sm">Total Docs Generated</p>
+				<p class="text-2xl font-bold text-white">{stats.totalDocs}</p>
+			</div>
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+				<p class="text-zinc-500 text-sm">Total Tokens Used</p>
+				<p class="text-2xl font-bold text-white">{(stats.totalTokens / 1000).toFixed(1)}K</p>
+			</div>
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+				<p class="text-zinc-500 text-sm">Avg Generation Time</p>
+				<p class="text-2xl font-bold text-white">{formatMs(stats.avgGenerationTime)}</p>
+			</div>
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+				<p class="text-zinc-500 text-sm">Quota Used</p>
+				<p class="text-2xl font-bold {isNearLimit ? 'text-amber-400' : 'text-white'}">
+					{quotaUsed}/{quotaLimit}
+				</p>
+			</div>
+		</div>
 
-	<!-- Stats Row -->
-	<div class="stats-row">
-		<div class="stat">
-			<span class="stat-value">{totalDocs}</span>
-			<span class="stat-label">Total Docs</span>
+		<!-- Quota Progress -->
+		<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+			<div class="flex justify-between items-center mb-2">
+				<span class="text-zinc-400">Monthly Quota</span>
+				<span class="text-sm {isNearLimit ? 'text-amber-400' : 'text-zinc-500'}">
+					{quotaPercent.toFixed(0)}% used
+				</span>
+			</div>
+			<div class="h-3 bg-zinc-800 rounded-full overflow-hidden">
+				<div
+					class="h-full transition-all duration-500 rounded-full {isNearLimit ? 'bg-amber-500' : 'bg-emerald-500'}"
+					style="width: {Math.min(quotaPercent, 100)}%"
+				></div>
+			</div>
 		</div>
-		<div class="stat">
-			<span class="stat-value">{docsPerDay || '-'}</span>
-			<span class="stat-label">Avg/Day</span>
-		</div>
-		<div class="stat">
-			<span class="stat-value">{usagePercent}%</span>
-			<span class="stat-label">Used</span>
-		</div>
-	</div>
+
+		{#if !compact}
+			<!-- Daily Usage Chart -->
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+				<h3 class="text-lg font-semibold text-white mb-4">Daily Usage (Last 30 Days)</h3>
+				<div class="h-40 flex items-end gap-1">
+					{#each stats.dailyUsage as day}
+						{@const height = getMaxDailyCount() > 0 ? (day.count / getMaxDailyCount()) * 100 : 0}
+						<div class="flex-1 flex flex-col items-center group relative">
+							<div
+								class="w-full bg-violet-500/80 rounded-t transition-all hover:bg-violet-500"
+								style="height: {Math.max(height, 2)}%"
+							></div>
+							<!-- Tooltip -->
+							<div class="absolute bottom-full mb-2 hidden group-hover:block z-10">
+								<div class="bg-zinc-700 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+									{formatDate(day.date)}: {day.count} docs
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+				<div class="flex justify-between mt-2 text-xs text-zinc-500">
+					<span>{formatDate(stats.dailyUsage[0]?.date || '')}</span>
+					<span>{formatDate(stats.dailyUsage[stats.dailyUsage.length - 1]?.date || '')}</span>
+				</div>
+			</div>
+
+			<!-- Doc Types Breakdown -->
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+				<h3 class="text-lg font-semibold text-white mb-4">By Document Type</h3>
+				<div class="space-y-3">
+					{#each Object.entries(stats.docsByType) as [type, count]}
+						{@const percent = stats.totalDocs > 0 ? (count / stats.totalDocs) * 100 : 0}
+						<div>
+							<div class="flex justify-between text-sm mb-1">
+								<span class="text-zinc-400">{docTypeLabels[type] || type}</span>
+								<span class="text-zinc-500">{count} ({percent.toFixed(0)}%)</span>
+							</div>
+							<div class="h-2 bg-zinc-800 rounded-full overflow-hidden">
+								<div
+									class="h-full rounded-full transition-all duration-500"
+									style="width: {percent}%; background-color: {docTypeColors[type] || '#6b7280'}"
+								></div>
+							</div>
+						</div>
+					{/each}
+					{#if Object.keys(stats.docsByType).length === 0}
+						<p class="text-zinc-500 text-sm">No documentation generated yet</p>
+					{/if}
+				</div>
+			</div>
+
+			<!-- Team Member Usage (if team) -->
+			{#if memberUsage.length > 0}
+				<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+					<h3 class="text-lg font-semibold text-white mb-4">Team Member Activity</h3>
+					<div class="space-y-2">
+						{#each memberUsage as member}
+							{@const percent = stats.totalDocs > 0 ? (member.count / stats.totalDocs) * 100 : 0}
+							<div class="flex items-center gap-3">
+								<div class="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center">
+									<span class="text-zinc-400 text-sm font-medium">
+										{member.username[0]?.toUpperCase() || '?'}
+									</span>
+								</div>
+								<div class="flex-1">
+									<div class="flex justify-between text-sm">
+										<span class="text-white">{member.username}</span>
+										<span class="text-zinc-500">{member.count} docs</span>
+									</div>
+									<div class="h-1.5 bg-zinc-800 rounded-full mt-1 overflow-hidden">
+										<div
+											class="h-full bg-violet-500 rounded-full"
+											style="width: {percent}%"
+										></div>
+									</div>
+								</div>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+		{/if}
+	{/if}
 </div>
-
-<style>
-	.usage-analytics {
-		background: #18181b;
-		border: 1px solid #27272a;
-		border-radius: 12px;
-		padding: 20px;
-	}
-
-	.analytics-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 20px;
-	}
-
-	.analytics-header h3 {
-		font-size: 1rem;
-		font-weight: 600;
-		color: #fff;
-		margin: 0;
-	}
-
-	.period-badge {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		padding: 4px 10px;
-		background: #27272a;
-		border-radius: 6px;
-		font-size: 0.8rem;
-		color: #a1a1aa;
-	}
-
-	.usage-main {
-		margin-bottom: 20px;
-	}
-
-	.usage-header {
-		display: flex;
-		justify-content: space-between;
-		margin-bottom: 8px;
-	}
-
-	.usage-label {
-		font-size: 0.875rem;
-		color: #a1a1aa;
-	}
-
-	.usage-value {
-		font-size: 0.875rem;
-		font-weight: 600;
-		color: #fff;
-	}
-
-	.usage-value.warning {
-		color: #fbbf24;
-	}
-
-	.usage-bar-container {
-		height: 8px;
-		background: #27272a;
-		border-radius: 4px;
-		overflow: hidden;
-	}
-
-	.usage-bar {
-		height: 100%;
-		background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
-		border-radius: 4px;
-		transition: width 0.3s ease;
-	}
-
-	.usage-bar.warning {
-		background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
-	}
-
-	.usage-warning {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		margin-top: 8px;
-		font-size: 0.8rem;
-		color: #fbbf24;
-	}
-
-	.breakdown-section {
-		margin-bottom: 20px;
-	}
-
-	.breakdown-section h4 {
-		font-size: 0.8rem;
-		font-weight: 500;
-		color: #71717a;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin: 0 0 12px 0;
-	}
-
-	.breakdown-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: 8px;
-	}
-
-	.breakdown-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 6px;
-	}
-
-	.breakdown-icon {
-		width: 40px;
-		height: 40px;
-		border-radius: 8px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 1rem;
-		font-weight: 600;
-	}
-
-	.breakdown-label {
-		font-size: 0.7rem;
-		color: #71717a;
-		text-align: center;
-	}
-
-	.stats-row {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: 12px;
-		padding-top: 16px;
-		border-top: 1px solid #27272a;
-	}
-
-	.stat {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 2px;
-	}
-
-	.stat-value {
-		font-size: 1.25rem;
-		font-weight: 700;
-		color: #fff;
-	}
-
-	.stat-label {
-		font-size: 0.7rem;
-		color: #71717a;
-		text-transform: uppercase;
-	}
-
-	@media (max-width: 480px) {
-		.breakdown-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-</style>
