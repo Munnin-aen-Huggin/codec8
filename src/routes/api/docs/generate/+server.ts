@@ -70,10 +70,10 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 		throw error(404, 'Repository not found');
 	}
 
-	// Fetch user profile to get GitHub token
+	// Fetch user profile to get GitHub token and subscription info
 	const { data: profile, error: profileError } = await supabaseAdmin
 		.from('profiles')
-		.select('github_token')
+		.select('github_token, plan, subscription_status, subscription_tier')
 		.eq('id', userId)
 		.single();
 
@@ -82,8 +82,33 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 		throw error(500, 'GitHub token not found. Please reconnect your GitHub account.');
 	}
 
-	// Check access control - can this user generate docs for this repo?
+	// Check if user has paid access (subscription or legacy plan)
+	const hasPaidAccess =
+		profile.subscription_status === 'active' ||
+		profile.subscription_status === 'trialing' ||
+		['ltd', 'pro', 'dfy'].includes(profile.plan || '');
+
+	// Check if user has purchased this specific repo
 	const repoUrl = repo.full_name; // e.g., "owner/repo"
+	const { data: purchasedRepo } = await supabaseAdmin
+		.from('purchased_repos')
+		.select('id')
+		.eq('user_id', userId)
+		.eq('repo_url', repoUrl)
+		.single();
+
+	const hasPurchasedThisRepo = !!purchasedRepo;
+
+	// Free users can only generate README
+	if (!hasPaidAccess && !hasPurchasedThisRepo) {
+		const nonReadmeTypes = types.filter((t: DocType) => t !== 'readme');
+		if (nonReadmeTypes.length > 0) {
+			console.log(`[Access Control] Free user ${userId} tried to generate: ${nonReadmeTypes.join(', ')}`);
+			throw error(403, 'Free users can only generate README documentation. Purchase this repository or subscribe to Pro/Team for full documentation.');
+		}
+	}
+
+	// Check access control - can this user generate docs for this repo?
 	const canGenerate = await canGenerateForRepo(userId, repoUrl);
 
 	if (!canGenerate.allowed) {
