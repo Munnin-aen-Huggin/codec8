@@ -71,6 +71,7 @@ export async function checkDemoLimit(ipHash: string): Promise<{ allowed: boolean
 	const ipHashShort = ipHash.substring(0, 8); // For logging
 
 	console.log(`[RateLimit] Checking demo limit for IP hash ${ipHashShort}... on ${today}`);
+	console.log(`[RateLimit] Supabase URL configured: ${!!process.env.PUBLIC_SUPABASE_URL}`);
 
 	const { data, error } = await supabaseAdmin
 		.from('demo_usage')
@@ -143,7 +144,7 @@ export async function incrementDemoUsage(
 		.select();
 
 	if (error) {
-		console.error(`[RateLimit] Upsert failed for ${ipHashShort}:`, error.code, error.message);
+		console.error(`[RateLimit] Upsert failed for ${ipHashShort}:`, error.code, error.message, JSON.stringify(error));
 		console.log(`[RateLimit] Attempting fallback update for ${ipHashShort}...`);
 
 		// If upsert failed, try to increment existing row
