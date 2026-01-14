@@ -20,7 +20,7 @@
 	<div class="container">
 		<div class="logo">CodeDoc AI</div>
 		<div class="header-actions">
-			<a href="/auth/login" class="header-link" data-sveltekit-reload>Sign In</a>
+			<button class="header-link" on:click={() => window.location.href = '/auth/login'}>Sign In</button>
 			<a href="#pricing" class="cta-small">View Pricing</a>
 		</div>
 	</div>
@@ -32,7 +32,7 @@
 		<div class="logo">CodeDoc AI</div>
 		<div class="nav-actions">
 			<a href="#pricing" class="nav-link">Pricing</a>
-			<a href="/auth/login" class="nav-link" data-sveltekit-reload>Sign In</a>
+			<button class="nav-link" on:click={() => window.location.href = '/auth/login'}>Sign In</button>
 			<button class="nav-cta" on:click={scrollToHero}>Try Demo</button>
 		</div>
 	</div>
@@ -618,6 +618,10 @@
 		text-decoration: none;
 		font-size: 0.9rem;
 		transition: color 0.2s;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-family: inherit;
 	}
 
 	.sticky-header .header-link:hover {
@@ -657,6 +661,10 @@
 		text-decoration: none;
 		font-size: 0.95rem;
 		transition: color 0.2s;
+		background: none;
+		border: none;
+		cursor: pointer;
+		font-family: inherit;
 	}
 
 	.nav-link:hover {
