@@ -1,7 +1,7 @@
 <svelte:head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>CodeDoc AI - Documentation that writes itself</title>
+	<title>CodeDoc AI - AI Documentation Generator</title>
 	<meta
 		name="description"
 		content="Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. In 60 seconds. Not 6 hours."
