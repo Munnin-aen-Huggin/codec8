@@ -15,6 +15,7 @@ import { fetchRepoContext } from '$lib/utils/parser';
 import { generateMultipleDocs } from '$lib/server/claude';
 import { trackDocsGenerated } from '$lib/utils/analytics';
 import { trackEvent, EVENTS } from '$lib/server/analytics';
+import { canGenerateForRepo, incrementUsage } from '$lib/server/usage';
 import type { DocType } from '$lib/utils/prompts';
 
 export const POST: RequestHandler = async ({ cookies, request }) => {
@@ -79,6 +80,15 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 	if (profileError || !profile?.github_token) {
 		console.error('Profile fetch error:', profileError);
 		throw error(500, 'GitHub token not found. Please reconnect your GitHub account.');
+	}
+
+	// Check access control - can this user generate docs for this repo?
+	const repoUrl = repo.full_name; // e.g., "owner/repo"
+	const canGenerate = await canGenerateForRepo(userId, repoUrl);
+
+	if (!canGenerate.allowed) {
+		console.log(`[Access Control] User ${userId} denied: ${canGenerate.reason}`);
+		throw error(403, canGenerate.reason || 'You do not have access to generate documentation for this repository. Please upgrade your plan.');
 	}
 
 	try {
@@ -171,6 +181,15 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 				doc_types: savedDocs.map(d => d.type).join(','),
 				doc_count: savedDocs.length
 			}, userId);
+
+			// Increment usage counter for subscription users
+			try {
+				await incrementUsage(userId);
+				console.log(`[Usage] Incremented usage for user ${userId}`);
+			} catch (usageError) {
+				console.error('[Usage] Failed to increment usage:', usageError);
+				// Don't fail the request if usage tracking fails
+			}
 		}
 
 		return json({
