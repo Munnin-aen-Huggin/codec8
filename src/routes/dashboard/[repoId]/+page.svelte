@@ -474,9 +474,17 @@
 
 	/* Dark theme prose styling for markdown rendering */
 
-	/* Base text color - THIS IS CRITICAL */
+	/* Base text color and emoji support - THIS IS CRITICAL */
 	:global(.prose-invert) {
 		color: #e4e4e7 !important;
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+	}
+
+	/* Ensure emojis display properly */
+	:global(.prose-invert h1),
+	:global(.prose-invert h2),
+	:global(.prose-invert h3) {
+		font-family: inherit;
 	}
 
 	:global(.prose-invert p) {
