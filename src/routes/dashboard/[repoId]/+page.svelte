@@ -248,6 +248,7 @@
 					<a
 						href="/dashboard"
 						class="w-10 h-10 rounded-xl bg-dark-700 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-dark-600 transition-colors"
+						aria-label="Back to dashboard"
 					>
 						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />

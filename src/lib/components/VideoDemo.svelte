@@ -74,9 +74,11 @@
   <div
     class="modal-overlay"
     on:click|self={closeVideo}
+    on:keydown={(e) => e.key === 'Escape' && closeVideo()}
     role="dialog"
     aria-modal="true"
     aria-label="Video demo"
+    tabindex="-1"
   >
     <div class="modal-content">
       <button class="close-button" on:click={closeVideo} aria-label="Close video">

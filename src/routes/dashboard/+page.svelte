@@ -548,6 +548,7 @@
         <button
           on:click={() => (showConnectModal = false)}
           class="w-8 h-8 rounded-lg bg-dark-600 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-dark-500 transition-colors"
+          aria-label="Close modal"
         >
           <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
