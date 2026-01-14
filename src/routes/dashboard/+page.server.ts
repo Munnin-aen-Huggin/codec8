@@ -16,7 +16,11 @@ const TIER_LIMITS: Record<string, number> = {
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const sessionCookie = cookies.get('session');
-  if (!sessionCookie) throw redirect(302, '/');
+  console.log('[Dashboard] Session cookie:', sessionCookie ? 'present' : 'missing');
+  if (!sessionCookie) {
+    console.log('[Dashboard] No session cookie, redirecting to /');
+    throw redirect(302, '/');
+  }
 
   let userId: string;
   try {
@@ -54,9 +58,11 @@ export const load: PageServerLoad = async ({ cookies }) => {
     .single();
 
   if (!profile) {
+    console.log('[Dashboard] Profile not found for userId:', userId);
     cookies.delete('session', { path: '/' });
     throw redirect(302, '/');
   }
+  console.log('[Dashboard] Profile found:', profile.github_username);
 
   // Fetch connected repositories
   const { data: connectedRepos } = await supabaseAdmin
