@@ -24,275 +24,141 @@
   function handleLogout() {
     dispatch('logout');
   }
+
+  // Plan badge styling
+  const planStyles: Record<string, { bg: string; text: string; border: string }> = {
+    free: { bg: 'bg-dark-600', text: 'text-text-secondary', border: 'border-dark-400' },
+    pro: { bg: 'bg-accent/20', text: 'text-accent', border: 'border-accent/30' },
+    team: { bg: 'bg-purple-500/20', text: 'text-purple-400', border: 'border-purple-500/30' },
+    single: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' },
+  };
+
+  $: planStyle = planStyles[plan] || planStyles.free;
 </script>
 
-<header class="header">
-  <div class="header-container">
-    <a href="/" class="logo">
-      <span class="logo-icon">📄</span>
-      <span class="logo-text">CodeDoc AI</span>
-    </a>
+<header class="glass-dark sticky top-0 z-50 border-b border-dark-500">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center gap-2.5 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center shadow-glow-sm group-hover:shadow-glow transition-shadow">
+          <svg class="w-5 h-5 text-dark-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <span class="font-bold text-lg text-text-primary hidden sm:block group-hover:text-accent transition-colors">
+          CodeDoc AI
+        </span>
+      </a>
 
-    <!-- Desktop Navigation -->
-    <nav class="nav-desktop">
-      <div class="nav-items">
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-4">
+        <!-- Plan Badge -->
+        <span class="badge {planStyle.bg} {planStyle.text} border {planStyle.border}">
+          {plan.toUpperCase()}
+        </span>
+
+        <!-- Username -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-700">
+          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-accent/50 to-accent-dark/50 flex items-center justify-center">
+            <span class="text-xs font-semibold text-text-primary">
+              {username.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <span class="text-sm text-text-secondary max-w-[120px] truncate">{username}</span>
+        </div>
+
         {#if showUpgrade}
           <button
-            class="upgrade-btn"
+            class="btn-primary btn-sm pulse-glow"
             on:click={handleUpgrade}
             disabled={upgradeLoading}
           >
-            {upgradeLoading ? 'Loading...' : 'Upgrade'}
+            {#if upgradeLoading}
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+            {:else}
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            {/if}
+            Upgrade
           </button>
-        {:else}
-          <span class="plan-badge">{plan.toUpperCase()}</span>
         {/if}
 
-        <span class="username">{username}</span>
-
-        <form action="/auth/logout" method="POST" class="logout-form">
-          <button type="submit" class="logout-btn">
-            <svg class="logout-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <!-- Logout -->
+        <form action="/auth/logout" method="POST">
+          <button type="submit" class="btn-ghost btn-sm text-text-muted hover:text-error">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            <span class="logout-text">Logout</span>
+            <span class="hidden lg:inline">Logout</span>
           </button>
         </form>
-      </div>
-    </nav>
+      </nav>
 
-    <!-- Mobile Menu Button -->
-    <button class="mobile-menu-btn" on:click={toggleMobileMenu} aria-label="Toggle menu">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        {#if mobileMenuOpen}
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        {:else}
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        {/if}
-      </svg>
-    </button>
+      <!-- Mobile Menu Button -->
+      <button
+        class="md:hidden p-2 rounded-lg bg-dark-700 text-text-secondary hover:text-text-primary touch-target"
+        on:click={toggleMobileMenu}
+        aria-label="Toggle menu"
+      >
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          {#if mobileMenuOpen}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          {:else}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          {/if}
+        </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Mobile Navigation -->
   {#if mobileMenuOpen}
-    <nav class="nav-mobile">
-      <div class="mobile-user">
-        <span class="username">{username}</span>
+    <nav class="md:hidden border-t border-dark-500 bg-dark-800 animate-slide-down">
+      <div class="px-4 py-4 space-y-4">
+        <!-- User Info -->
+        <div class="flex items-center justify-between p-3 rounded-xl bg-dark-700">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-accent/50 to-accent-dark/50 flex items-center justify-center">
+              <span class="text-sm font-semibold text-text-primary">
+                {username.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-text-primary">{username}</p>
+              <span class="badge {planStyle.bg} {planStyle.text} border {planStyle.border} text-[10px] py-0.5">
+                {plan.toUpperCase()}
+              </span>
+            </div>
+          </div>
+        </div>
+
         {#if showUpgrade}
-          <span class="plan-badge free">Free Plan</span>
-        {:else}
-          <span class="plan-badge">{plan.toUpperCase()}</span>
+          <button
+            class="btn-primary w-full touch-target"
+            on:click={() => { handleUpgrade(); mobileMenuOpen = false; }}
+            disabled={upgradeLoading}
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            {upgradeLoading ? 'Loading...' : 'Upgrade to Pro'}
+          </button>
         {/if}
+
+        <form action="/auth/logout" method="POST">
+          <button type="submit" class="btn-secondary w-full touch-target">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </button>
+        </form>
       </div>
-
-      {#if showUpgrade}
-        <button
-          class="mobile-upgrade-btn"
-          on:click={() => { handleUpgrade(); mobileMenuOpen = false; }}
-          disabled={upgradeLoading}
-        >
-          {upgradeLoading ? 'Loading...' : 'Upgrade to Pro'}
-        </button>
-      {/if}
-
-      <form action="/auth/logout" method="POST">
-        <button type="submit" class="mobile-logout-btn">
-          Logout
-        </button>
-      </form>
     </nav>
   {/if}
 </header>
-
-<style>
-  .header {
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-
-  .header-container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0.75rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    color: #111827;
-    font-weight: 700;
-    font-size: 1.25rem;
-  }
-
-  .logo-icon {
-    font-size: 1.5rem;
-  }
-
-  .nav-desktop {
-    display: flex;
-    align-items: center;
-  }
-
-  .nav-items {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .upgrade-btn {
-    padding: 0.375rem 0.75rem;
-    background: #16a34a;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .upgrade-btn:hover {
-    background: #15803d;
-  }
-
-  .upgrade-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .plan-badge {
-    padding: 0.25rem 0.75rem;
-    background: #dcfce7;
-    color: #166534;
-    font-size: 0.75rem;
-    font-weight: 600;
-    border-radius: 9999px;
-  }
-
-  .plan-badge.free {
-    background: #f3f4f6;
-    color: #6b7280;
-  }
-
-  .username {
-    color: #4b5563;
-    font-size: 0.875rem;
-  }
-
-  .logout-form {
-    display: inline;
-  }
-
-  .logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    background: transparent;
-    color: #6b7280;
-    font-size: 0.875rem;
-    border: none;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .logout-btn:hover {
-    background: #f3f4f6;
-    color: #374151;
-  }
-
-  .logout-icon {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .mobile-menu-btn {
-    display: none;
-    padding: 0.5rem;
-    background: transparent;
-    border: none;
-    color: #6b7280;
-    cursor: pointer;
-  }
-
-  .mobile-menu-btn svg {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  .nav-mobile {
-    display: none;
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-  }
-
-  .mobile-user {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .mobile-upgrade-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: #16a34a;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    margin-bottom: 0.75rem;
-  }
-
-  .mobile-upgrade-btn:disabled {
-    opacity: 0.5;
-  }
-
-  .mobile-logout-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: transparent;
-    color: #6b7280;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  @media (max-width: 768px) {
-    .nav-desktop {
-      display: none;
-    }
-
-    .mobile-menu-btn {
-      display: block;
-    }
-
-    .nav-mobile {
-      display: block;
-    }
-
-    .logo-text {
-      display: none;
-    }
-  }
-
-  @media (min-width: 769px) {
-    .nav-mobile {
-      display: none !important;
-    }
-  }
-</style>

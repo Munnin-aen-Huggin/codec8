@@ -20,98 +20,152 @@
   $: isPrivate = displayRepo?.private || false;
 
   const languageColors: Record<string, string> = {
-    TypeScript: 'bg-blue-500',
-    JavaScript: 'bg-yellow-400',
-    Python: 'bg-green-500',
-    Rust: 'bg-orange-500',
-    Go: 'bg-cyan-500',
-    Java: 'bg-red-500',
-    Ruby: 'bg-red-600',
-    PHP: 'bg-purple-500',
-    'C++': 'bg-pink-500',
-    C: 'bg-gray-500',
-    Swift: 'bg-orange-400',
-    Kotlin: 'bg-purple-400'
+    TypeScript: '#3178c6',
+    JavaScript: '#f7df1e',
+    Python: '#3776ab',
+    Rust: '#dea584',
+    Go: '#00add8',
+    Java: '#ed8b00',
+    Ruby: '#cc342d',
+    PHP: '#777bb4',
+    'C++': '#f34b7d',
+    C: '#555555',
+    Swift: '#fa7343',
+    Kotlin: '#a97bff',
+    Vue: '#42b883',
+    Svelte: '#ff3e00'
   };
 
-  $: langColor = language ? languageColors[language] || 'bg-gray-400' : '';
+  $: langColor = language ? languageColors[language] || '#6b7280' : '';
 </script>
 
 <div
-  class="bg-white border rounded-lg p-4 hover:border-indigo-300 hover:shadow-sm transition-all"
+  class="group card-hover p-5 cursor-pointer"
   data-testid="repo-card"
+  on:click={() => isConnected && onGenerate?.()}
+  on:keypress={(e) => e.key === 'Enter' && isConnected && onGenerate?.()}
+  role="button"
+  tabindex="0"
 >
   <div class="flex items-start justify-between gap-4">
+    <!-- Repo Info -->
     <div class="flex-1 min-w-0">
-      <div class="flex items-center gap-2 mb-1">
-        <h3 class="font-medium text-gray-900 truncate">
-          {repoName}
-        </h3>
+      <div class="flex items-center gap-2 mb-1.5">
+        <!-- Repo Icon -->
+        <div class="w-8 h-8 rounded-lg bg-dark-600 flex items-center justify-center flex-shrink-0">
+          <svg class="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+        </div>
+
+        <div class="min-w-0">
+          <h3 class="font-semibold text-text-primary truncate group-hover:text-accent transition-colors">
+            {repoName}
+          </h3>
+          <p class="text-xs text-text-muted truncate">
+            {fullName}
+          </p>
+        </div>
+
         {#if isPrivate}
-          <span
-            class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full"
-          >
+          <span class="badge-warning text-[10px] py-0.5 px-2">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
             Private
           </span>
         {/if}
       </div>
-      <p class="text-sm text-gray-500 truncate mb-2">
-        {fullName}
-      </p>
+
       {#if description}
-        <p class="text-sm text-gray-600 line-clamp-2 mb-3">
+        <p class="text-sm text-text-secondary truncate-2 mb-3 ml-10">
           {description}
         </p>
       {/if}
-      {#if language}
-        <div class="flex items-center gap-1.5">
-          <span class="w-3 h-3 rounded-full {langColor}"></span>
-          <span class="text-xs text-gray-600">{language}</span>
-        </div>
-      {/if}
+
+      <div class="flex items-center gap-3 ml-10">
+        {#if language}
+          <div class="flex items-center gap-1.5">
+            <span
+              class="w-2.5 h-2.5 rounded-full"
+              style="background-color: {langColor}"
+            ></span>
+            <span class="text-xs text-text-muted">{language}</span>
+          </div>
+        {/if}
+
+        {#if hasDocumentation}
+          <div class="badge-success text-[10px] py-0.5">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Docs Ready
+          </div>
+        {/if}
+      </div>
     </div>
+
+    <!-- Actions -->
     <div class="flex-shrink-0 flex flex-col gap-2">
       {#if isConnected}
         {#if onGenerate}
           <button
             on:click|stopPropagation={onGenerate}
             disabled={generating}
-            class="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-primary btn-sm touch-target"
           >
             {#if generating}
-              <span class="flex items-center gap-2">
-                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                </svg>
-                Generating...
-              </span>
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+              <span class="hidden sm:inline">Generating...</span>
             {:else}
-              Generate Docs
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span class="hidden sm:inline">Generate</span>
             {/if}
           </button>
         {/if}
-        {#if hasDocumentation}
-          <span class="px-3 py-1.5 text-xs font-medium text-green-600 bg-green-50 rounded-md text-center">
-            Docs Ready
-          </span>
-        {/if}
+
         {#if onDisconnect}
           <button
             on:click|stopPropagation={onDisconnect}
             disabled={loading}
-            class="px-3 py-1.5 text-sm font-medium text-red-600 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn-ghost btn-sm text-error hover:bg-error/10 touch-target"
           >
-            {loading ? 'Disconnecting...' : 'Disconnect'}
+            {#if loading}
+              <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+            {:else}
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            {/if}
+            <span class="sr-only sm:not-sr-only">Disconnect</span>
           </button>
         {/if}
       {:else if onConnect}
         <button
-          on:click={onConnect}
+          on:click|stopPropagation={onConnect}
           disabled={loading}
-          class="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="btn-primary btn-sm touch-target"
         >
-          {loading ? 'Connecting...' : 'Connect'}
+          {#if loading}
+            <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+            </svg>
+            <span class="hidden sm:inline">Connecting...</span>
+          {:else}
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span class="hidden sm:inline">Connect</span>
+          {/if}
         </button>
       {/if}
     </div>
