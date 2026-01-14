@@ -43,7 +43,12 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	}
 
 	try {
+		console.log('[Auth Callback] Starting token exchange...');
+
 		// Exchange code for access token
+		const baseUrl = PUBLIC_APP_URL.replace(/\/$/, '');
+		console.log('[Auth Callback] Using redirect_uri:', `${baseUrl}/auth/callback`);
+
 		const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
 			method: 'POST',
 			headers: {
@@ -54,7 +59,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				client_id: GITHUB_CLIENT_ID,
 				client_secret: GITHUB_CLIENT_SECRET,
 				code,
-				redirect_uri: `${PUBLIC_APP_URL}/auth/callback`
+				redirect_uri: `${baseUrl}/auth/callback`
 			})
 		});
 
@@ -65,8 +70,11 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		const tokenData: GitHubTokenResponse = await tokenResponse.json();
 
 		if (!tokenData.access_token) {
+			console.error('[Auth Callback] No access token in response:', tokenData);
 			throw error(500, 'No access token received from GitHub');
 		}
+
+		console.log('[Auth Callback] Got access token, fetching user...');
 
 		// Fetch user data from GitHub
 		const userResponse = await fetch('https://api.github.com/user', {
@@ -102,6 +110,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		if (!userEmail) {
 			throw error(400, 'Could not retrieve email from GitHub account');
 		}
+
+		console.log('[Auth Callback] Got user email:', userEmail);
 
 		// Check if user exists in profiles table
 		const { data: existingProfile } = await supabaseAdmin
@@ -157,6 +167,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		sessionExpiry.setDate(sessionExpiry.getDate() + 7); // 7 days
 
 		// Store session in cookie
+		console.log('[Auth Callback] Setting session cookie for userId:', userId);
 		cookies.set('session', JSON.stringify({ userId, token: sessionToken }), {
 			path: '/',
 			httpOnly: true,
@@ -164,6 +175,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			sameSite: 'lax',
 			expires: sessionExpiry
 		});
+		console.log('[Auth Callback] Session cookie set successfully');
 
 		// Clear intended plan cookie if it exists
 		cookies.delete('intended_plan', { path: '/' });
