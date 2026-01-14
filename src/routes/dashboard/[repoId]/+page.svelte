@@ -401,6 +401,24 @@
 	}
 
 	/* Dark theme prose styling for markdown rendering */
+
+	/* Base text color - THIS IS CRITICAL */
+	:global(.prose-invert) {
+		color: #e4e4e7 !important;
+	}
+
+	:global(.prose-invert p) {
+		color: #e4e4e7;
+	}
+
+	:global(.prose-invert li) {
+		color: #e4e4e7;
+	}
+
+	:global(.prose-invert td) {
+		color: #d4d4d8;
+	}
+
 	:global(.prose-invert pre) {
 		background-color: #18181b;
 		color: #e5e7eb;
@@ -458,12 +476,34 @@
 	:global(.prose-invert h1),
 	:global(.prose-invert h2),
 	:global(.prose-invert h3),
-	:global(.prose-invert h4) {
+	:global(.prose-invert h4),
+	:global(.prose-invert h5),
+	:global(.prose-invert h6) {
 		color: #fafafa;
+		font-weight: 600;
+		margin-top: 1.5em;
+		margin-bottom: 0.5em;
+	}
+
+	:global(.prose-invert h1) {
+		font-size: 2em;
+		border-bottom: 1px solid #3f3f46;
+		padding-bottom: 0.3em;
+	}
+
+	:global(.prose-invert h2) {
+		font-size: 1.5em;
+		border-bottom: 1px solid #3f3f46;
+		padding-bottom: 0.3em;
+	}
+
+	:global(.prose-invert h3) {
+		font-size: 1.25em;
 	}
 
 	:global(.prose-invert a) {
 		color: #34d399;
+		text-decoration: underline;
 	}
 
 	:global(.prose-invert a:hover) {
@@ -472,18 +512,46 @@
 
 	:global(.prose-invert strong) {
 		color: #fafafa;
+		font-weight: 600;
+	}
+
+	:global(.prose-invert em) {
+		color: #d4d4d8;
 	}
 
 	:global(.prose-invert blockquote) {
-		border-left-color: #10b981;
+		border-left: 4px solid #10b981;
+		padding-left: 1em;
+		margin-left: 0;
 		color: #a1a1aa;
+		font-style: italic;
 	}
 
 	:global(.prose-invert hr) {
 		border-color: #3f3f46;
+		margin: 2em 0;
+	}
+
+	:global(.prose-invert ul),
+	:global(.prose-invert ol) {
+		padding-left: 1.5em;
+		margin: 1em 0;
+	}
+
+	:global(.prose-invert li) {
+		margin: 0.5em 0;
 	}
 
 	:global(.prose-invert li::marker) {
 		color: #10b981;
+	}
+
+	/* Better spacing for content */
+	:global(.prose-invert > *:first-child) {
+		margin-top: 0;
+	}
+
+	:global(.prose-invert > *:last-child) {
+		margin-bottom: 0;
 	}
 </style>
