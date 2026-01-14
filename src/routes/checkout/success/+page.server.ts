@@ -51,7 +51,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 
     return {
       success: checkoutSession.payment_status === 'paid',
-      tier: checkoutSession.metadata?.tier || 'ltd',
+      tier: checkoutSession.metadata?.product || checkoutSession.metadata?.tier || 'pro',
       email: profile?.email,
       plan: profile?.plan,
       licenseKey: license?.license_key
