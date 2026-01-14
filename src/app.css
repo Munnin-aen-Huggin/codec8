@@ -114,11 +114,65 @@
     @apply w-full px-4 py-3 bg-dark-700 border border-dark-500 rounded-xl;
     @apply text-text-primary placeholder-text-muted;
     @apply transition-all duration-200;
-    @apply focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none;
+    @apply focus:border-accent focus:ring-2 focus:ring-accent/20 focus:outline-none;
+    @apply hover:border-dark-400;
   }
 
   .input-lg {
     @apply input py-4 text-lg rounded-2xl;
+  }
+
+  /* Input with icon */
+  .input-icon-left {
+    @apply input pl-12;
+  }
+
+  /* Input wrapper for icon positioning */
+  .input-wrapper {
+    @apply relative;
+  }
+
+  .input-wrapper .input-icon {
+    @apply absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none transition-colors;
+  }
+
+  .input-wrapper:focus-within .input-icon {
+    @apply text-accent;
+  }
+
+  /* Select styling */
+  .select {
+    @apply input appearance-none cursor-pointer;
+    @apply bg-[url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")];
+    @apply bg-[length:1.25rem] bg-[right_1rem_center] bg-no-repeat pr-10;
+  }
+
+  /* Checkbox styling */
+  .checkbox {
+    @apply w-5 h-5 rounded bg-dark-700 border border-dark-500 cursor-pointer;
+    @apply checked:bg-accent checked:border-accent;
+    @apply focus:ring-2 focus:ring-accent/20 focus:outline-none;
+    @apply transition-all duration-200;
+  }
+
+  /* Toggle switch */
+  .toggle {
+    @apply relative inline-flex h-6 w-11 items-center rounded-full cursor-pointer;
+    @apply bg-dark-600 transition-colors duration-200;
+    @apply focus:ring-2 focus:ring-accent/20 focus:outline-none;
+  }
+
+  .toggle[aria-checked="true"] {
+    @apply bg-accent;
+  }
+
+  .toggle-dot {
+    @apply inline-block h-4 w-4 transform rounded-full bg-white transition-transform;
+    @apply translate-x-1;
+  }
+
+  .toggle[aria-checked="true"] .toggle-dot {
+    @apply translate-x-6;
   }
 
   /* Badge Component */
@@ -158,6 +212,35 @@
   /* Glass effect card */
   .glass-card {
     @apply backdrop-blur-md bg-dark-800/80 border border-white/10 rounded-2xl;
+  }
+
+  /* Glass dark header */
+  .glass-dark {
+    @apply backdrop-blur-xl bg-dark-900/90;
+  }
+
+  /* Icon container */
+  .icon-box {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200;
+  }
+
+  .icon-box-sm {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200;
+  }
+
+  .icon-box-accent {
+    @apply icon-box bg-accent/20 text-accent;
+  }
+
+  .icon-box-muted {
+    @apply icon-box bg-dark-600 text-text-muted;
+  }
+
+  /* Link with hover underline */
+  .link-hover {
+    @apply text-text-secondary hover:text-accent transition-colors;
+    @apply relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-px after:bg-accent;
+    @apply after:transition-all hover:after:w-full;
   }
 }
 
@@ -260,6 +343,55 @@
   }
   50% {
     box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+}
+
+/* Subtle pulse for badges */
+.animate-pulse-subtle {
+  animation: pulseSoft 2s ease-in-out infinite;
+}
+
+@keyframes pulseSoft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Fade in up animation */
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Slide down animation */
+.animate-slide-down {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Float animation */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
   }
 }
 

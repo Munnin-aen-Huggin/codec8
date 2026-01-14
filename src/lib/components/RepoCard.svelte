@@ -40,20 +40,23 @@
 </script>
 
 <div
-  class="group card-hover p-5 cursor-pointer"
+  class="group relative card-hover p-5 cursor-pointer overflow-hidden"
   data-testid="repo-card"
   on:click={() => isConnected && onGenerate?.()}
   on:keypress={(e) => e.key === 'Enter' && isConnected && onGenerate?.()}
   role="button"
   tabindex="0"
 >
-  <div class="flex items-start justify-between gap-4">
+  <!-- Subtle gradient overlay on hover -->
+  <div class="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/0 group-hover:from-accent/5 group-hover:to-transparent transition-all duration-300 pointer-events-none"></div>
+
+  <div class="relative flex items-start justify-between gap-4">
     <!-- Repo Info -->
     <div class="flex-1 min-w-0">
       <div class="flex items-center gap-2 mb-1.5">
         <!-- Repo Icon -->
-        <div class="w-8 h-8 rounded-lg bg-dark-600 flex items-center justify-center flex-shrink-0">
-          <svg class="w-4 h-4 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div class="w-8 h-8 rounded-lg bg-dark-600 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 transition-colors">
+          <svg class="w-4 h-4 text-text-secondary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
           </svg>
         </div>
@@ -95,11 +98,18 @@
         {/if}
 
         {#if hasDocumentation}
-          <div class="badge-success text-[10px] py-0.5">
+          <div class="badge-success text-[10px] py-0.5 animate-pulse-subtle">
             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Docs Ready
+          </div>
+        {:else if isConnected}
+          <div class="badge bg-dark-600 text-text-muted text-[10px] py-0.5 border border-dark-500">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Generate Docs
           </div>
         {/if}
       </div>

@@ -338,23 +338,32 @@
 		{:else}
 			<div class="card overflow-hidden animate-fade-in">
 				<!-- Tabs -->
-				<div class="border-b border-dark-500 flex overflow-x-auto scrollbar-hide bg-dark-700/50">
+				<div class="border-b border-dark-500 flex overflow-x-auto scrollbar-hide bg-dark-700/30">
 					{#each docTypes as docType}
 						<button
 							on:click={() => selectTab(docType.key)}
-							class="flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 -mb-px transition-all touch-target {activeTab === docType.key
-								? 'border-accent text-accent bg-dark-800/50'
-								: 'border-transparent text-text-muted hover:text-text-secondary hover:bg-dark-700'}"
+							class="group relative flex items-center gap-2 px-5 py-4 text-sm font-medium transition-all touch-target {activeTab === docType.key
+								? 'text-accent'
+								: 'text-text-muted hover:text-text-secondary'}"
 						>
-							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={docType.icon} />
-							</svg>
-							<span class="hidden sm:inline">{docType.label}</span>
-							{#if !data.documentation[docType.key]}
-								<span class="w-2 h-2 rounded-full bg-dark-400"></span>
-							{:else}
-								<span class="w-2 h-2 rounded-full bg-success"></span>
+							<!-- Active indicator -->
+							{#if activeTab === docType.key}
+								<div class="absolute bottom-0 left-2 right-2 h-0.5 bg-accent rounded-t-full"></div>
+								<div class="absolute inset-0 bg-accent/5"></div>
 							{/if}
+							<div class="relative flex items-center gap-2">
+								<div class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors {activeTab === docType.key ? 'bg-accent/20' : 'bg-dark-600 group-hover:bg-dark-500'}">
+									<svg class="w-4 h-4 {activeTab === docType.key ? 'text-accent' : ''}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={docType.icon} />
+									</svg>
+								</div>
+								<span class="hidden sm:inline">{docType.label}</span>
+								{#if !data.documentation[docType.key]}
+									<span class="w-2 h-2 rounded-full bg-dark-400" title="Not generated"></span>
+								{:else}
+									<span class="w-2 h-2 rounded-full bg-success animate-pulse-subtle" title="Generated"></span>
+								{/if}
+							</div>
 						</button>
 					{/each}
 				</div>
@@ -383,12 +392,18 @@
 						<!-- Action Bar -->
 						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-dark-500">
 							<div class="flex items-center gap-3">
-								<span class="badge bg-dark-600 text-text-secondary border border-dark-400">
-									v{currentDoc.version}
-								</span>
-								<span class="text-body-sm text-text-muted">
-									Generated {new Date(currentDoc.generated_at).toLocaleDateString()}
-								</span>
+								<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-700 border border-dark-500">
+									<svg class="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+									</svg>
+									<span class="text-body-sm font-medium text-text-primary">v{currentDoc.version}</span>
+								</div>
+								<div class="flex items-center gap-2 text-body-sm text-text-muted">
+									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+									</svg>
+									<span>{new Date(currentDoc.generated_at).toLocaleDateString()}</span>
+								</div>
 							</div>
 							<div class="flex items-center gap-2 flex-wrap">
 								{#if isEditing}

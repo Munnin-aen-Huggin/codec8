@@ -44,6 +44,9 @@
 		<div class="hero-content">
 			<!-- Trust Badge -->
 			<div class="trust-badge">
+				<svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+				</svg>
 				Try free, no signup required
 			</div>
 
@@ -60,36 +63,52 @@
 			<!-- Doc Type Badges - Free vs Locked -->
 			<div class="doc-types">
 				<div class="doc-type doc-free">
-					<span class="doc-badge-icon">✓</span>
-					<span class="doc-icon">README</span>
+					<svg class="doc-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+						<path d="M5 13l4 4L19 7"/>
+					</svg>
+					<span class="doc-label">README</span>
 					<span class="doc-status free">free</span>
 				</div>
 				<div class="doc-type doc-locked">
-					<span class="doc-badge-icon">🔒</span>
-					<span class="doc-icon">API Docs</span>
+					<svg class="doc-lock" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M12 1a5 5 0 00-5 5v4H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm3 9H9V6a3 3 0 116 0v4z"/>
+					</svg>
+					<span class="doc-label">API Docs</span>
 				</div>
 				<div class="doc-type doc-locked">
-					<span class="doc-badge-icon">🔒</span>
-					<span class="doc-icon">Architecture</span>
+					<svg class="doc-lock" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M12 1a5 5 0 00-5 5v4H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm3 9H9V6a3 3 0 116 0v4z"/>
+					</svg>
+					<span class="doc-label">Architecture</span>
 				</div>
 				<div class="doc-type doc-locked">
-					<span class="doc-badge-icon">🔒</span>
-					<span class="doc-icon">Setup Guide</span>
+					<svg class="doc-lock" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M12 1a5 5 0 00-5 5v4H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm3 9H9V6a3 3 0 116 0v4z"/>
+					</svg>
+					<span class="doc-label">Setup Guide</span>
 				</div>
 			</div>
 
 			<!-- Demo Input Box -->
 			<form class="demo-form" on:submit={handleDemoSubmit}>
-				<input
-					type="text"
-					placeholder="https://github.com/owner/repo"
-					bind:value={repoUrl}
-					bind:this={demoInput}
-					on:focus={handleDemoFocus}
-					class="demo-input"
-					aria-label="GitHub repository URL"
-				/>
+				<div class="input-wrapper">
+					<svg class="input-icon" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+					</svg>
+					<input
+						type="text"
+						placeholder="https://github.com/owner/repo"
+						bind:value={repoUrl}
+						bind:this={demoInput}
+						on:focus={handleDemoFocus}
+						class="demo-input"
+						aria-label="GitHub repository URL"
+					/>
+				</div>
 				<button type="submit" class="cta-primary">
+					<svg class="cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+					</svg>
 					Generate
 				</button>
 			</form>
@@ -231,6 +250,11 @@
 		<div class="pricing-grid">
 			<!-- Free Demo -->
 			<div class="pricing-card">
+				<div class="pricing-icon free-icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+					</svg>
+				</div>
 				<h3>FREE DEMO</h3>
 				<div class="price">
 					<span class="amount">$0</span>
@@ -246,7 +270,12 @@
 
 			<!-- Single Repo - POPULAR -->
 			<div class="pricing-card featured">
-				<div class="featured-badge">POPULAR</div>
+				<div class="featured-badge">MOST POPULAR</div>
+				<div class="pricing-icon featured-icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+					</svg>
+				</div>
 				<h3>SINGLE REPO</h3>
 				<div class="price">
 					<span class="amount">$99</span>
@@ -259,12 +288,27 @@
 					<li>Keep forever</li>
 					<li>Regenerate: $19</li>
 				</ul>
-				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta primary" rel="external">Get Docs — $99</a>
-				<p class="refund-note">30-day refund guarantee</p>
+				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta primary" rel="external">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px">
+						<path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+					</svg>
+					Get Docs — $99
+				</a>
+				<p class="refund-note">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px">
+						<path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+					</svg>
+					30-day refund guarantee
+				</p>
 			</div>
 
 			<!-- Pro -->
 			<div class="pricing-card">
+				<div class="pricing-icon pro-icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+					</svg>
+				</div>
 				<h3>PRO</h3>
 				<div class="price">
 					<span class="amount">$149</span>
@@ -282,6 +326,11 @@
 
 			<!-- Team -->
 			<div class="pricing-card">
+				<div class="pricing-icon team-icon">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+					</svg>
+				</div>
 				<h3>TEAM</h3>
 				<div class="price">
 					<span class="amount">$399</span>
@@ -718,13 +767,30 @@
 	.hero::before {
 		content: '';
 		position: absolute;
-		top: -50%;
+		top: -30%;
 		left: 50%;
 		transform: translateX(-50%);
-		width: 800px;
-		height: 800px;
-		background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+		width: 1000px;
+		height: 1000px;
+		background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.04) 40%, transparent 70%);
 		pointer-events: none;
+		animation: pulse-bg 8s ease-in-out infinite;
+	}
+
+	.hero::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 200px;
+		background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+		pointer-events: none;
+	}
+
+	@keyframes pulse-bg {
+		0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+		50% { opacity: 0.7; transform: translateX(-50%) scale(1.1); }
 	}
 
 	.hero-content {
@@ -743,11 +809,28 @@
 		background: rgba(16, 185, 129, 0.1);
 		border: 1px solid rgba(16, 185, 129, 0.3);
 		color: var(--accent);
-		padding: 8px 16px;
+		padding: 10px 20px;
 		border-radius: 100px;
-		font-size: 0.85rem;
+		font-size: 0.9rem;
 		font-weight: 600;
-		margin-bottom: 24px;
+		margin-bottom: 28px;
+		animation: float 3s ease-in-out infinite;
+	}
+
+	.trust-icon {
+		width: 16px;
+		height: 16px;
+		animation: sparkle 2s ease-in-out infinite;
+	}
+
+	@keyframes sparkle {
+		0%, 100% { opacity: 1; transform: scale(1); }
+		50% { opacity: 0.6; transform: scale(0.9); }
+	}
+
+	@keyframes float {
+		0%, 100% { transform: translateY(0); }
+		50% { transform: translateY(-4px); }
 	}
 
 	/* Headline */
@@ -826,16 +909,24 @@
 		opacity: 1;
 	}
 
-	.doc-badge-icon {
-		font-size: 0.75rem;
+	.doc-check {
+		width: 14px;
+		height: 14px;
+		color: var(--accent);
 	}
 
-	.doc-icon {
+	.doc-lock {
+		width: 12px;
+		height: 12px;
+		color: var(--text-muted);
+	}
+
+	.doc-label {
 		color: var(--text-secondary);
 		font-weight: 500;
 	}
 
-	.doc-type.doc-free .doc-icon {
+	.doc-type.doc-free .doc-label {
 		color: var(--accent);
 	}
 
@@ -854,25 +945,47 @@
 	.demo-form {
 		display: flex;
 		gap: 12px;
-		max-width: 560px;
+		max-width: 600px;
 		margin: 0 auto 16px;
 	}
 
-	.demo-input {
+	.input-wrapper {
 		flex: 1;
-		padding: 16px 20px;
-		border: 1px solid var(--border);
-		border-radius: 10px;
+		position: relative;
+	}
+
+	.input-icon {
+		position: absolute;
+		left: 16px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 20px;
+		height: 20px;
+		color: var(--text-muted);
+		pointer-events: none;
+		transition: color 0.2s;
+	}
+
+	.input-wrapper:focus-within .input-icon {
+		color: var(--accent);
+	}
+
+	.demo-input {
+		width: 100%;
+		padding: 16px 20px 16px 48px;
+		border: 2px solid var(--border);
+		border-radius: 12px;
 		background: var(--bg-elevated);
 		color: var(--text);
 		font-size: 1rem;
 		outline: none;
-		transition: border-color 0.2s;
+		transition: all 0.3s;
 	}
 
 	.demo-input:focus {
 		border-color: var(--accent);
-		box-shadow: 0 0 0 3px var(--accent-glow);
+		box-shadow: 0 0 0 4px var(--accent-glow), 0 8px 32px rgba(16, 185, 129, 0.15);
+		background: var(--bg);
 	}
 
 	.demo-input::placeholder {
@@ -880,22 +993,35 @@
 	}
 
 	.cta-primary {
-		background: var(--accent);
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
 		color: #000;
 		padding: 16px 32px;
 		border: none;
-		border-radius: 10px;
+		border-radius: 12px;
 		font-size: 1rem;
 		font-weight: 700;
 		cursor: pointer;
-		transition: all 0.2s;
+		transition: all 0.3s;
 		white-space: nowrap;
+		box-shadow: 0 4px 20px var(--accent-glow);
+	}
+
+	.cta-icon {
+		width: 18px;
+		height: 18px;
 	}
 
 	.cta-primary:hover {
-		background: var(--accent-hover);
-		transform: translateY(-2px);
-		box-shadow: 0 8px 30px var(--accent-glow);
+		background: linear-gradient(135deg, #059669 0%, #047857 100%);
+		transform: translateY(-3px);
+		box-shadow: 0 12px 40px var(--accent-glow);
+	}
+
+	.cta-primary:active {
+		transform: translateY(-1px);
 	}
 
 	.error-message {
@@ -1143,27 +1269,79 @@
 	.pricing-card {
 		background: var(--bg-elevated);
 		border: 1px solid var(--border);
-		border-radius: 16px;
-		padding: 28px;
+		border-radius: 20px;
+		padding: 32px 24px;
 		text-align: center;
 		position: relative;
+		transition: all 0.3s;
+	}
+
+	.pricing-card:hover {
+		transform: translateY(-4px);
+		border-color: var(--text-muted);
 	}
 
 	.pricing-card.featured {
 		border: 2px solid var(--accent);
 		transform: scale(1.05);
-		box-shadow: 0 0 40px var(--accent-glow);
+		box-shadow: 0 0 50px var(--accent-glow);
 		z-index: 1;
+		background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-elevated) 100%);
 	}
 
 	.pricing-card.featured:hover {
-		box-shadow: 0 0 60px var(--accent-glow);
+		transform: scale(1.05) translateY(-4px);
+		box-shadow: 0 0 70px var(--accent-glow);
+	}
+
+	.pricing-icon {
+		width: 48px;
+		height: 48px;
+		border-radius: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 auto 16px;
+	}
+
+	.pricing-icon svg {
+		width: 24px;
+		height: 24px;
+	}
+
+	.pricing-icon.free-icon {
+		background: rgba(100, 116, 139, 0.2);
+		color: #94a3b8;
+	}
+
+	.pricing-icon.featured-icon {
+		background: rgba(16, 185, 129, 0.2);
+		color: var(--accent);
+		animation: pulse-icon 2s ease-in-out infinite;
+	}
+
+	.pricing-icon.pro-icon {
+		background: rgba(59, 130, 246, 0.2);
+		color: #3b82f6;
+	}
+
+	.pricing-icon.team-icon {
+		background: rgba(139, 92, 246, 0.2);
+		color: #8b5cf6;
+	}
+
+	@keyframes pulse-icon {
+		0%, 100% { transform: scale(1); }
+		50% { transform: scale(1.05); }
 	}
 
 	.refund-note {
-		margin-top: 12px;
-		font-size: 0.8rem;
+		margin-top: 16px;
+		font-size: 0.85rem;
 		color: var(--text-muted);
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 	}
 
 	.featured-badge {
