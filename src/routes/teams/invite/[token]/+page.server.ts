@@ -3,7 +3,20 @@ import type { PageServerLoad, Actions } from './$types';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { acceptInvitation } from '$lib/server/teams';
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string | null {
+	const session = cookies.get('session');
+	if (!session) return null;
+	try {
+		const parsed = JSON.parse(session);
+		return parsed.userId || null;
+	} catch {
+		return null;
+	}
+}
+
+export const load: PageServerLoad = async ({ params, cookies }) => {
+	const userId = getUserIdFromSession(cookies);
+
 	// Get invitation details
 	const { data: invitation, error: invError } = await supabaseAdmin
 		.from('team_invitations')
@@ -32,6 +45,17 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw error(410, 'This invitation has expired');
 	}
 
+	// Get user email if logged in
+	let userEmail: string | null = null;
+	if (userId) {
+		const { data: profile } = await supabaseAdmin
+			.from('profiles')
+			.select('email')
+			.eq('id', userId)
+			.single();
+		userEmail = profile?.email || null;
+	}
+
 	return {
 		invitation: {
 			id: invitation.id,
@@ -39,21 +63,24 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			role: invitation.role,
 			expiresAt: invitation.expires_at,
 			team: invitation.teams,
-			invitedBy: invitation.inviter
+			invitedBy: invitation.inviter,
+			token: params.token
 		},
-		isLoggedIn: !!locals.user,
-		userEmail: locals.profile?.email
+		isLoggedIn: !!userId,
+		userEmail
 	};
 };
 
 export const actions: Actions = {
-	accept: async ({ params, locals }) => {
-		if (!locals.user) {
+	accept: async ({ params, cookies }) => {
+		const userId = getUserIdFromSession(cookies);
+
+		if (!userId) {
 			throw redirect(303, `/auth/login?redirect=/teams/invite/${params.token}`);
 		}
 
 		try {
-			const result = await acceptInvitation(params.token, locals.user.id);
+			const result = await acceptInvitation(params.token, userId);
 			throw redirect(303, `/dashboard?joined=${result.team.slug}`);
 		} catch (err) {
 			if (err instanceof Response) throw err; // Re-throw redirects

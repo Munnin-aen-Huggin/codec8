@@ -1,20 +1,33 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { removeTeamMember, leaveTeam, updateMemberRole } from '$lib/server/teams';
-import { supabaseAdmin } from '$lib/server/supabase';
 
-// DELETE /api/teams/[id]/members - Remove member or leave team
-export const DELETE: RequestHandler = async ({ params, locals, request }) => {
-	if (!locals.user) {
+function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
+	const session = cookies.get('session');
+	if (!session) {
 		throw error(401, 'Unauthorized');
 	}
+	try {
+		const parsed = JSON.parse(session);
+		if (!parsed.userId) {
+			throw error(401, 'Invalid session');
+		}
+		return parsed.userId;
+	} catch {
+		throw error(401, 'Invalid session');
+	}
+}
+
+// DELETE /api/teams/[id]/members - Remove member or leave team
+export const DELETE: RequestHandler = async ({ params, cookies, request }) => {
+	const userId = getUserIdFromSession(cookies);
 
 	try {
 		const { memberId, action } = await request.json();
 
 		if (action === 'leave') {
 			// User leaving the team
-			await leaveTeam(params.id, locals.user.id);
+			await leaveTeam(params.id, userId);
 			return json({ success: true, message: 'Left team successfully' });
 		}
 
@@ -23,7 +36,7 @@ export const DELETE: RequestHandler = async ({ params, locals, request }) => {
 		}
 
 		// Admin removing a member
-		await removeTeamMember(params.id, memberId, locals.user.id);
+		await removeTeamMember(params.id, memberId, userId);
 		return json({ success: true, message: 'Member removed successfully' });
 	} catch (err) {
 		console.error('Error removing member:', err);
@@ -32,10 +45,8 @@ export const DELETE: RequestHandler = async ({ params, locals, request }) => {
 };
 
 // PATCH /api/teams/[id]/members - Update member role
-export const PATCH: RequestHandler = async ({ params, locals, request }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
+export const PATCH: RequestHandler = async ({ cookies, request }) => {
+	const userId = getUserIdFromSession(cookies);
 
 	try {
 		const { memberId, role } = await request.json();
@@ -48,7 +59,7 @@ export const PATCH: RequestHandler = async ({ params, locals, request }) => {
 			throw error(400, 'Role must be admin or member');
 		}
 
-		await updateMemberRole(memberId, role, locals.user.id);
+		await updateMemberRole(memberId, role, userId);
 		return json({ success: true, message: 'Role updated successfully' });
 	} catch (err) {
 		console.error('Error updating role:', err);

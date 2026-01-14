@@ -70,7 +70,7 @@
 						</p>
 					</div>
 					<a
-						href="/auth/logout?redirect=/teams/invite/{data.invitation.token}"
+						href="/auth/logout?redirect=/teams/invite/{data.invitation.token ?? ''}"
 						class="block w-full text-center bg-zinc-800 hover:bg-zinc-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
 					>
 						Switch Account
@@ -78,7 +78,7 @@
 				{/if}
 			{:else}
 				<a
-					href="/auth/login?redirect=/teams/invite/{data.invitation.token}"
+					href="/auth/login?redirect=/teams/invite/{data.invitation.token ?? ''}"
 					class="block w-full text-center bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200"
 				>
 					Sign In to Accept

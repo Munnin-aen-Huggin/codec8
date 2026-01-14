@@ -1,15 +1,30 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createTeam, getUserTeams } from '$lib/server/teams';
+import { supabaseAdmin } from '$lib/server/supabase';
 
-// GET /api/teams - Get user's teams
-export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.user) {
+function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
+	const session = cookies.get('session');
+	if (!session) {
 		throw error(401, 'Unauthorized');
 	}
+	try {
+		const parsed = JSON.parse(session);
+		if (!parsed.userId) {
+			throw error(401, 'Invalid session');
+		}
+		return parsed.userId;
+	} catch {
+		throw error(401, 'Invalid session');
+	}
+}
+
+// GET /api/teams - Get user's teams
+export const GET: RequestHandler = async ({ cookies }) => {
+	const userId = getUserIdFromSession(cookies);
 
 	try {
-		const teams = await getUserTeams(locals.user.id);
+		const teams = await getUserTeams(userId);
 		return json({ teams });
 	} catch (err) {
 		console.error('Error fetching teams:', err);
@@ -18,13 +33,17 @@ export const GET: RequestHandler = async ({ locals }) => {
 };
 
 // POST /api/teams - Create new team
-export const POST: RequestHandler = async ({ locals, request }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
+export const POST: RequestHandler = async ({ cookies, request }) => {
+	const userId = getUserIdFromSession(cookies);
 
 	// Check if user has Team tier
-	if (locals.profile?.subscription_tier !== 'team') {
+	const { data: profile } = await supabaseAdmin
+		.from('profiles')
+		.select('subscription_tier')
+		.eq('id', userId)
+		.single();
+
+	if (profile?.subscription_tier !== 'team') {
 		throw error(403, 'Team tier subscription required');
 	}
 
@@ -35,7 +54,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			throw error(400, 'Team name must be at least 2 characters');
 		}
 
-		const team = await createTeam(locals.user.id, name.trim());
+		const team = await createTeam(userId, name.trim());
 		return json({ team });
 	} catch (err) {
 		console.error('Error creating team:', err);

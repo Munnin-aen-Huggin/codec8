@@ -31,7 +31,8 @@ export async function getUserTeams(userId: string): Promise<Team[]> {
 		.eq('user_id', userId);
 
 	if (error) throw error;
-	return (data || []).map((d: { teams: Team | null }) => d.teams).filter((t): t is Team => t !== null);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return (data || []).map((d: any) => d.teams).filter((t: Team | null): t is Team => t !== null);
 }
 
 // Get team by ID with members
@@ -78,10 +79,11 @@ export async function getTeamWithMembers(
 
 	return {
 		team,
-		members: (members || []).map((m: TeamMember & { profiles: { id: string; email: string; github_username: string } | null }) => ({
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		members: (members || []).map((m: any) => ({
 			...m,
-			profile: m.profiles
-		})),
+			profile: m.profiles || undefined
+		})) as TeamMember[],
 		isAdmin: membership.role === 'owner' || membership.role === 'admin'
 	};
 }

@@ -3,18 +3,32 @@ import type { RequestHandler } from './$types';
 import { createInvitation, getTeamInvitations, cancelInvitation } from '$lib/server/teams';
 import { supabaseAdmin } from '$lib/server/supabase';
 
-// GET /api/teams/[id]/invitations - Get pending invitations
-export const GET: RequestHandler = async ({ params, locals }) => {
-	if (!locals.user) {
+function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
+	const session = cookies.get('session');
+	if (!session) {
 		throw error(401, 'Unauthorized');
 	}
+	try {
+		const parsed = JSON.parse(session);
+		if (!parsed.userId) {
+			throw error(401, 'Invalid session');
+		}
+		return parsed.userId;
+	} catch {
+		throw error(401, 'Invalid session');
+	}
+}
+
+// GET /api/teams/[id]/invitations - Get pending invitations
+export const GET: RequestHandler = async ({ params, cookies }) => {
+	const userId = getUserIdFromSession(cookies);
 
 	// Verify admin access
 	const { data: membership } = await supabaseAdmin
 		.from('team_members')
 		.select('role')
 		.eq('team_id', params.id)
-		.eq('user_id', locals.user.id)
+		.eq('user_id', userId)
 		.single();
 
 	if (!membership || (membership.role !== 'owner' && membership.role !== 'admin')) {
@@ -31,17 +45,15 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 };
 
 // POST /api/teams/[id]/invitations - Create invitation
-export const POST: RequestHandler = async ({ params, locals, request }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
+export const POST: RequestHandler = async ({ params, cookies, request }) => {
+	const userId = getUserIdFromSession(cookies);
 
 	// Verify admin access
 	const { data: membership } = await supabaseAdmin
 		.from('team_members')
 		.select('role')
 		.eq('team_id', params.id)
-		.eq('user_id', locals.user.id)
+		.eq('user_id', userId)
 		.single();
 
 	if (!membership || (membership.role !== 'owner' && membership.role !== 'admin')) {
@@ -63,7 +75,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 			params.id,
 			email,
 			role || 'member',
-			locals.user.id
+			userId
 		);
 
 		return json({ invitation });
@@ -74,17 +86,15 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 };
 
 // DELETE /api/teams/[id]/invitations - Cancel invitation
-export const DELETE: RequestHandler = async ({ params, locals, request }) => {
-	if (!locals.user) {
-		throw error(401, 'Unauthorized');
-	}
+export const DELETE: RequestHandler = async ({ params, cookies, request }) => {
+	const userId = getUserIdFromSession(cookies);
 
 	// Verify admin access
 	const { data: membership } = await supabaseAdmin
 		.from('team_members')
 		.select('role')
 		.eq('team_id', params.id)
-		.eq('user_id', locals.user.id)
+		.eq('user_id', userId)
 		.single();
 
 	if (!membership || (membership.role !== 'owner' && membership.role !== 'admin')) {
