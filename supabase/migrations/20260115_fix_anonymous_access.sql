@@ -41,9 +41,17 @@ CREATE POLICY "authenticated_insert_leads" ON public.leads
   TO authenticated
   WITH CHECK (true);
 
--- Grant insert to anon and authenticated
-GRANT INSERT ON public.leads TO anon;
-GRANT INSERT ON public.leads TO authenticated;
+-- Allow anonymous updates (for upsert)
+DROP POLICY IF EXISTS "anon_update_leads" ON public.leads;
+CREATE POLICY "anon_update_leads" ON public.leads
+  FOR UPDATE
+  TO anon
+  USING (true)
+  WITH CHECK (true);
+
+-- Grant insert and update to anon and authenticated
+GRANT INSERT, UPDATE ON public.leads TO anon;
+GRANT INSERT, UPDATE ON public.leads TO authenticated;
 
 -- ============================================
 -- 3. Verify policies
