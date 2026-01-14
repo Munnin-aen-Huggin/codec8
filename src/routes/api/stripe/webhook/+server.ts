@@ -134,8 +134,8 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     }
 
     // Track analytics
-    trackCheckoutCompleted(userId, 'single', 39);
-    await trackEvent(EVENTS.PURCHASE_COMPLETED, { product: 'single', amount: 39, repo_url: repoUrl }, userId);
+    trackCheckoutCompleted(userId, 'single', 99);
+    await trackEvent(EVENTS.PURCHASE_COMPLETED, { product: 'single', amount: 99, repo_url: repoUrl }, userId);
     return;
   }
 
@@ -170,7 +170,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       }
 
       // Track analytics
-      const amount = product === 'pro' ? 99 : 249;
+      const amount = product === 'pro' ? 149 : 399;
       trackCheckoutCompleted(userId, product, amount);
 
       // Track trial or subscription created based on status
