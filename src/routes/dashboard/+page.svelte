@@ -29,18 +29,26 @@
     if (checkoutTier && ['single', 'pro', 'team'].includes(checkoutTier)) {
       // Clear the URL parameter
       goto('/dashboard', { replaceState: true });
-      // Initiate checkout
-      await initiateCheckout(checkoutTier);
+
+      // For single repo purchase, show a message to select a repo
+      // (single requires a repo URL which we don't have from landing page)
+      if (checkoutTier === 'single') {
+        toast.info('Connect a repository below to purchase documentation for it.');
+        showConnectModal = true;
+      } else {
+        // For pro/team subscriptions, initiate checkout directly
+        await initiateCheckout(checkoutTier);
+      }
     }
   });
 
-  async function initiateCheckout(tier: string) {
+  async function initiateCheckout(product: string) {
     checkoutLoading = true;
     try {
       const response = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tier })
+        body: JSON.stringify({ product })
       });
 
       const result = await response.json();

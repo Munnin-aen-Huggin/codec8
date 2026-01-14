@@ -29,15 +29,23 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
   }
 
   // Store redirect intent for checkout flow
+  // Support both formats: redirect=checkout&tier=X and intent=purchase&(tier=X|product=X)
   const redirectTo = url.searchParams.get('redirect');
+  const intent = url.searchParams.get('intent');
   const tier = url.searchParams.get('tier');
-  if (redirectTo === 'checkout' && tier) {
-    cookies.set('checkout_tier', tier, {
-      path: '/',
-      httpOnly: true,
-      secure: !dev,
-      maxAge: 60 * 10
-    });
+  const product = url.searchParams.get('product');
+
+  if ((redirectTo === 'checkout' && tier) || (intent === 'purchase' && (tier || product))) {
+    // Use tier if provided, otherwise use product
+    const checkoutTier = tier || product;
+    if (checkoutTier) {
+      cookies.set('checkout_tier', checkoutTier, {
+        path: '/',
+        httpOnly: true,
+        secure: !dev,
+        maxAge: 60 * 10
+      });
+    }
   }
 
   // Build GitHub OAuth URL (strip trailing slash from URL if present)
