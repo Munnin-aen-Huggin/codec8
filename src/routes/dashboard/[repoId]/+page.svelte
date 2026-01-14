@@ -239,23 +239,23 @@
 	<title>{data.repo.name} - Documentation - CodeDoc AI</title>
 </svelte:head>
 
-<div class="min-h-screen bg-[#09090b]">
-	<header class="bg-zinc-900 border-b border-zinc-800">
-		<div class="container mx-auto px-4 sm:px-6 py-4">
+<div class="min-h-screen bg-dark-900">
+	<!-- Header with glass effect -->
+	<header class="glass-dark sticky top-0 z-50 border-b border-dark-500">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
 			<div class="flex flex-col sm:flex-row sm:items-center gap-4">
 				<div class="flex items-center gap-4">
 					<a
 						href="/dashboard"
-						class="text-zinc-400 hover:text-zinc-300 flex items-center gap-1 min-h-[44px]"
+						class="w-10 h-10 rounded-xl bg-dark-700 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-dark-600 transition-colors"
 					>
 						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 						</svg>
-						<span class="sr-only sm:not-sr-only">Back</span>
 					</a>
 					<div class="flex-1">
-						<h1 class="text-lg sm:text-xl font-bold text-white truncate">{data.repo.name}</h1>
-						<p class="text-xs sm:text-sm text-zinc-400 truncate">{data.repo.full_name}</p>
+						<h1 class="text-h4 text-text-primary truncate">{data.repo.name}</h1>
+						<p class="text-body-sm text-text-muted truncate">{data.repo.full_name}</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-2 sm:gap-3 sm:ml-auto">
@@ -263,9 +263,9 @@
 					<button
 						on:click={toggleAutoSync}
 						disabled={isTogglingAutoSync}
-						class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors {autoSyncEnabled
-							? 'bg-emerald-900/50 text-emerald-400 border-emerald-500/50 hover:bg-emerald-900/70'
-							: 'text-zinc-400 border-zinc-700 hover:bg-zinc-800'} disabled:opacity-50 disabled:cursor-not-allowed"
+						class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-xl border transition-all {autoSyncEnabled
+							? 'bg-accent/20 text-accent border-accent/30 hover:bg-accent/30'
+							: 'text-text-muted border-dark-400 hover:bg-dark-700 hover:text-text-secondary'} disabled:opacity-50 disabled:cursor-not-allowed"
 						title={autoSyncEnabled ? 'Auto-sync enabled - docs regenerate on git push' : 'Enable auto-sync to regenerate docs on git push'}
 					>
 						{#if isTogglingAutoSync}
@@ -284,7 +284,7 @@
 					<button
 						on:click={generateDocs}
 						disabled={isGenerating}
-						class="px-3 sm:px-4 py-2 text-sm font-medium text-emerald-400 border border-emerald-500/50 rounded-lg hover:bg-emerald-900/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-h-[44px]"
+						class="btn-primary btn-sm touch-target"
 					>
 						{#if isGenerating}
 							<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
@@ -293,8 +293,10 @@
 							</svg>
 							<span class="hidden sm:inline">Generating...</span>
 						{:else}
-							<span class="hidden sm:inline">Regenerate All</span>
-							<span class="sm:hidden">Regen</span>
+							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+							</svg>
+							<span class="hidden sm:inline">Regenerate</span>
 						{/if}
 					</button>
 				</div>
@@ -302,22 +304,22 @@
 		</div>
 	</header>
 
-	<main class="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
+	<main class="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
 		{#if !data.hasAnyDocs}
-			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
-				<div class="w-16 h-16 mx-auto mb-4 bg-zinc-800 rounded-full flex items-center justify-center">
-					<svg class="w-8 h-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<div class="card p-12 text-center animate-fade-in">
+				<div class="w-16 h-16 mx-auto mb-4 bg-dark-600 rounded-2xl flex items-center justify-center">
+					<svg class="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 					</svg>
 				</div>
-				<h2 class="text-xl font-semibold text-white mb-2">No Documentation Yet</h2>
-				<p class="text-zinc-400 mb-6">
+				<h2 class="text-h3 text-text-primary mb-2">No Documentation Yet</h2>
+				<p class="text-body text-text-secondary mb-6 max-w-md mx-auto">
 					Generate professional documentation for this repository using AI.
 				</p>
 				<button
 					on:click={generateDocs}
 					disabled={isGenerating}
-					class="px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+					class="btn-primary btn-lg"
 				>
 					{#if isGenerating}
 						<svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -326,27 +328,32 @@
 						</svg>
 						Generating Documentation...
 					{:else}
+						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+						</svg>
 						Generate Documentation
 					{/if}
 				</button>
 			</div>
 		{:else}
-			<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
+			<div class="card overflow-hidden animate-fade-in">
 				<!-- Tabs -->
-				<div class="border-b border-zinc-800 flex overflow-x-auto scrollbar-hide">
+				<div class="border-b border-dark-500 flex overflow-x-auto scrollbar-hide bg-dark-700/50">
 					{#each docTypes as docType}
 						<button
 							on:click={() => selectTab(docType.key)}
-							class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors {activeTab === docType.key
-								? 'border-emerald-500 text-emerald-400'
-								: 'border-transparent text-zinc-400 hover:text-zinc-300 hover:border-zinc-700'}"
+							class="flex items-center gap-2 px-5 py-4 text-sm font-medium border-b-2 -mb-px transition-all touch-target {activeTab === docType.key
+								? 'border-accent text-accent bg-dark-800/50'
+								: 'border-transparent text-text-muted hover:text-text-secondary hover:bg-dark-700'}"
 						>
 							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={docType.icon} />
 							</svg>
-							{docType.label}
+							<span class="hidden sm:inline">{docType.label}</span>
 							{#if !data.documentation[docType.key]}
-								<span class="w-2 h-2 rounded-full bg-zinc-600"></span>
+								<span class="w-2 h-2 rounded-full bg-dark-400"></span>
+							{:else}
+								<span class="w-2 h-2 rounded-full bg-success"></span>
 							{/if}
 						</button>
 					{/each}
@@ -356,42 +363,58 @@
 				<div class="p-6">
 					{#if !currentDoc}
 						<div class="text-center py-12">
-							<p class="text-zinc-400 mb-4">
+							<div class="w-12 h-12 mx-auto mb-4 bg-dark-600 rounded-xl flex items-center justify-center">
+								<svg class="w-6 h-6 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+								</svg>
+							</div>
+							<p class="text-text-secondary mb-4">
 								No {docTypes.find(d => d.key === activeTab)?.label} documentation generated yet.
 							</p>
 							<button
 								on:click={generateDocs}
 								disabled={isGenerating}
-								class="px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-500 disabled:opacity-50"
+								class="btn-primary"
 							>
 								Generate Now
 							</button>
 						</div>
 					{:else}
 						<!-- Action Bar -->
-						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-zinc-800">
-							<div class="text-xs sm:text-sm text-zinc-400">
-								v{currentDoc.version} - {new Date(currentDoc.generated_at).toLocaleDateString()}
+						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-dark-500">
+							<div class="flex items-center gap-3">
+								<span class="badge bg-dark-600 text-text-secondary border border-dark-400">
+									v{currentDoc.version}
+								</span>
+								<span class="text-body-sm text-text-muted">
+									Generated {new Date(currentDoc.generated_at).toLocaleDateString()}
+								</span>
 							</div>
 							<div class="flex items-center gap-2 flex-wrap">
 								{#if isEditing}
 									<button
 										on:click={cancelEdit}
-										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800"
+										class="btn-ghost btn-sm"
 									>
 										Cancel
 									</button>
 									<button
 										on:click={saveEdit}
 										disabled={isSaving}
-										class="px-3 py-1.5 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-500 disabled:opacity-50"
+										class="btn-primary btn-sm"
 									>
-										{isSaving ? 'Saving...' : 'Save'}
+										{#if isSaving}
+											<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+											</svg>
+										{/if}
+										{isSaving ? 'Saving...' : 'Save Changes'}
 									</button>
 								{:else}
 									<button
 										on:click={startEdit}
-										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800 flex items-center gap-1"
+										class="btn-secondary btn-sm"
 									>
 										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -400,7 +423,7 @@
 									</button>
 									<button
 										on:click={exportMarkdown}
-										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800 flex items-center gap-1"
+										class="btn-secondary btn-sm"
 									>
 										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -409,7 +432,7 @@
 									</button>
 									<button
 										on:click={createPR}
-										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800 flex items-center gap-1"
+										class="btn-secondary btn-sm"
 									>
 										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -424,20 +447,20 @@
 						{#if isEditing}
 							<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[400px] sm:min-h-[500px]">
 								<div>
-									<label for="markdown-editor" class="block text-sm font-medium text-zinc-300 mb-2">
+									<label for="markdown-editor" class="block text-body-sm font-medium text-text-secondary mb-2">
 										Edit Markdown
 									</label>
 									<textarea
 										id="markdown-editor"
 										bind:value={editContent}
-										class="w-full h-[300px] sm:h-[400px] lg:h-[500px] p-3 sm:p-4 font-mono text-xs sm:text-sm bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+										class="input w-full h-[300px] sm:h-[400px] lg:h-[500px] font-mono text-xs sm:text-sm resize-none"
 									></textarea>
 								</div>
 								<div>
-									<span class="block text-sm font-medium text-zinc-300 mb-2">
+									<span class="block text-body-sm font-medium text-text-secondary mb-2">
 										Preview
 									</span>
-									<div class="h-[300px] sm:h-[400px] lg:h-[500px] overflow-y-auto p-3 sm:p-4 border border-zinc-700 rounded-lg bg-zinc-800 prose prose-sm prose-invert max-w-none">
+									<div class="h-[300px] sm:h-[400px] lg:h-[500px] overflow-y-auto p-4 border border-dark-500 rounded-xl bg-dark-700 prose prose-sm prose-invert max-w-none">
 										{@html marked(editContent)}
 									</div>
 								</div>

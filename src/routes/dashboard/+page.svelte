@@ -233,229 +233,330 @@
   <title>Dashboard - CodeDoc AI</title>
 </svelte:head>
 
-<div class="min-h-screen bg-[#09090b]">
-  <header class="bg-zinc-900 border-b border-zinc-800">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="/" class="text-xl font-bold text-white">CodeDoc AI</a>
-      <div class="flex items-center gap-4">
-        {#if isFreeUser}
-          <button
-            on:click={() => initiateCheckout('pro')}
-            disabled={checkoutLoading}
-            class="px-3 py-1.5 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-500 disabled:opacity-50"
-          >
-            {checkoutLoading ? 'Loading...' : 'Upgrade'}
-          </button>
-        {:else if hasSubscription}
-          <span class="px-3 py-1 bg-emerald-900/50 text-emerald-400 text-sm font-medium rounded-full border border-emerald-500/50">
-            {usageInfo?.tier}
+<div class="min-h-screen bg-dark-900">
+  <!-- Header with glass effect -->
+  <header class="glass-dark sticky top-0 z-50 border-b border-dark-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo -->
+        <a href="/" class="flex items-center gap-2.5 group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent-dark flex items-center justify-center shadow-glow-sm group-hover:shadow-glow transition-shadow">
+            <svg class="w-5 h-5 text-dark-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <span class="font-bold text-lg text-text-primary hidden sm:block group-hover:text-accent transition-colors">
+            CodeDoc AI
           </span>
-        {:else if hasPurchasedRepos}
-          <span class="px-3 py-1 bg-zinc-800 text-zinc-300 text-sm font-medium rounded-full">
-            Single Repo
-          </span>
-        {/if}
-        <span class="text-zinc-400">
-          {data.user.github_username}
-        </span>
-        <form action="/auth/logout" method="POST" class="inline">
-          <button
-            type="submit"
-            class="text-zinc-500 hover:text-zinc-300"
-            data-testid="logout-button"
-          >
-            Logout
-          </button>
-        </form>
+        </a>
+
+        <!-- Nav Items -->
+        <div class="flex items-center gap-4">
+          {#if isFreeUser}
+            <button
+              on:click={() => initiateCheckout('pro')}
+              disabled={checkoutLoading}
+              class="btn-primary btn-sm pulse-glow"
+            >
+              {#if checkoutLoading}
+                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+              {:else}
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              {/if}
+              Upgrade
+            </button>
+          {:else if hasSubscription}
+            <span class="badge-accent">
+              {usageInfo?.tier}
+            </span>
+          {:else if hasPurchasedRepos}
+            <span class="badge bg-dark-600 text-text-secondary border border-dark-400">
+              Single Repo
+            </span>
+          {/if}
+
+          <!-- User -->
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-700">
+            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-accent/50 to-accent-dark/50 flex items-center justify-center">
+              <span class="text-xs font-semibold text-text-primary">
+                {data.user.github_username?.charAt(0)?.toUpperCase() || 'U'}
+              </span>
+            </div>
+            <span class="text-sm text-text-secondary hidden sm:block max-w-[100px] truncate">
+              {data.user.github_username}
+            </span>
+          </div>
+
+          <form action="/auth/logout" method="POST" class="inline">
+            <button
+              type="submit"
+              class="btn-ghost btn-sm text-text-muted hover:text-error"
+              data-testid="logout-button"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span class="hidden sm:inline">Logout</span>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </header>
 
-  <main class="container mx-auto px-6 py-8">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
     {#if showOnboarding}
       <OnboardingWizard
         on:complete={handleOnboardingComplete}
         on:connect={handleOnboardingConnect}
       />
     {:else}
-      <h1 class="text-3xl font-bold text-white mb-8">Dashboard</h1>
+      <!-- Page Header -->
+      <div class="mb-8">
+        <h1 class="text-h1 text-text-primary mb-2">Dashboard</h1>
+        <p class="text-body text-text-secondary">Manage your repositories and documentation</p>
+      </div>
 
       <!-- Usage Stats (for subscribers) -->
-    {#if usageInfo}
-      <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-white">{usageInfo.tier} Plan Usage</h2>
-          <span class="text-zinc-400 text-sm">
-            {usageInfo.used} / {usageInfo.limit} repos this month
-          </span>
-        </div>
-        <div class="w-full bg-zinc-800 rounded-full h-2">
-          <div
-            class="h-2 rounded-full transition-all {usagePercent > 80 ? 'bg-amber-500' : 'bg-emerald-500'}"
-            style="width: {usagePercent}%"
-          ></div>
-        </div>
-        {#if usagePercent > 80}
-          <p class="text-amber-400 text-sm mt-2">
-            Approaching limit. <a href="/pricing" class="underline hover:no-underline">Upgrade for more</a>
-          </p>
-        {/if}
-      </div>
-    {/if}
-
-    <!-- Purchased Repos Section (for single-repo customers) -->
-    {#if hasPurchasedRepos}
-      <div class="mb-8">
-        <h2 class="text-xl font-semibold text-white mb-4">Purchased Repositories</h2>
-        <div class="grid gap-4">
-          {#each purchasedRepos as repo}
-            <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex items-center justify-between">
+      {#if usageInfo}
+        <div class="card p-6 mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
+                <svg class="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
               <div>
-                <h3 class="text-white font-medium">{repo.repo_name || repo.repo_url}</h3>
-                <p class="text-zinc-500 text-sm">
-                  Purchased {new Date(repo.purchased_at).toLocaleDateString()}
+                <h2 class="text-h4 text-text-primary">{usageInfo.tier} Plan</h2>
+                <p class="text-body-sm text-text-muted">
+                  {usageInfo.used} / {usageInfo.limit} repos this month
                 </p>
               </div>
-              <div class="flex gap-3">
-                <a
-                  href="/dashboard/{repo.repository_id || repo.id}"
-                  class="px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700"
-                >
-                  View Docs
-                </a>
+            </div>
+            <span class="badge-accent">{usagePercent}% used</span>
+          </div>
+          <div class="w-full bg-dark-600 rounded-full h-2.5 overflow-hidden">
+            <div
+              class="h-full rounded-full transition-all duration-500 {usagePercent > 80 ? 'bg-warning' : 'bg-accent'}"
+              style="width: {usagePercent}%"
+            ></div>
+          </div>
+          {#if usagePercent > 80}
+            <p class="text-warning text-body-sm mt-3 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Approaching limit. <a href="/pricing" class="underline hover:no-underline">Upgrade for more</a>
+            </p>
+          {/if}
+        </div>
+      {/if}
+
+      <!-- Purchased Repos Section (for single-repo customers) -->
+      {#if hasPurchasedRepos}
+        <div class="mb-8">
+          <h2 class="text-h3 text-text-primary mb-4">Purchased Repositories</h2>
+          <div class="grid gap-4">
+            {#each purchasedRepos as repo}
+              <div class="card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 class="text-text-primary font-semibold">{repo.repo_name || repo.repo_url}</h3>
+                    <p class="text-text-muted text-body-sm">
+                      Purchased {new Date(repo.purchased_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex gap-3">
+                  <a
+                    href="/dashboard/{repo.repository_id || repo.id}"
+                    class="btn-primary btn-sm"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    View Docs
+                  </a>
+                  <button
+                    on:click={() => handleRegenerate(repo.repository_id || repo.id)}
+                    disabled={checkoutLoading}
+                    class="btn-secondary btn-sm"
+                  >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Regenerate ($9)
+                  </button>
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+      {/if}
+
+      <!-- Connected Repos Section -->
+      <div>
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-h3 text-text-primary">Connected Repositories</h2>
+            <p class="text-body-sm text-text-muted mt-1">
+              {data.connectedRepos.length}
+              {#if data.user.plan === 'free' && !hasSubscription}
+                / {repoLimit} repository connected
+              {:else}
+                repositories connected
+              {/if}
+            </p>
+          </div>
+          <button
+            on:click={() => (showConnectModal = true)}
+            disabled={!canConnectMore}
+            class="btn-primary"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Connect Repository
+          </button>
+        </div>
+
+        {#if data.githubError}
+          <div class="mb-6 p-4 bg-error/10 border border-error/30 rounded-xl">
+            <div class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-error flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p class="text-error font-medium">Failed to fetch GitHub repositories</p>
+                <p class="text-body-sm text-error/70 mt-1">{data.githubError}</p>
+              </div>
+            </div>
+          </div>
+        {/if}
+
+        {#if !canConnectMore && data.user.plan === 'free' && !hasSubscription}
+          <div class="mb-6 p-4 bg-warning/10 border border-warning/30 rounded-xl">
+            <div class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <p class="text-warning font-medium">Free plan limit reached</p>
+                <p class="text-body-sm text-warning/70 mt-1">
+                  Upgrade to Pro for unlimited repositories.
+                </p>
                 <button
-                  on:click={() => handleRegenerate(repo.repository_id || repo.id)}
+                  on:click={() => initiateCheckout('pro')}
                   disabled={checkoutLoading}
-                  class="px-4 py-2 border border-zinc-700 text-zinc-300 rounded hover:border-zinc-600 disabled:opacity-50"
+                  class="btn-primary btn-sm mt-3"
                 >
-                  Regenerate ($9)
+                  {checkoutLoading ? 'Loading...' : 'Upgrade to Pro'}
                 </button>
               </div>
             </div>
-          {/each}
-        </div>
+          </div>
+        {/if}
+
+        {#if data.connectedRepos.length > 0}
+          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {#each data.connectedRepos as repo (repo.id)}
+              <a href="/dashboard/{repo.id}" class="block">
+                <RepoCard
+                  connectedRepo={repo}
+                  isConnected={true}
+                  onDisconnect={() => disconnectRepo(repo.id)}
+                  onGenerate={() => generateDocs(repo.id)}
+                  loading={disconnectingRepoId === repo.id}
+                  generating={generatingRepoId === repo.id}
+                  hasDocumentation={repoDocsMap.get(repo.id) || false}
+                />
+              </a>
+            {/each}
+          </div>
+        {:else}
+          <div class="card p-8 text-center">
+            <div class="w-16 h-16 rounded-2xl bg-dark-600 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
+            </div>
+            <p class="text-text-secondary mb-2">No repositories connected yet</p>
+            <p class="text-body-sm text-text-muted mb-4">Connect a GitHub repository to generate documentation</p>
+            <button on:click={() => (showConnectModal = true)} class="btn-primary">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Connect Your First Repository
+            </button>
+          </div>
+        {/if}
       </div>
-    {/if}
 
-    <!-- Connected Repos Section -->
-    <div>
-      <div class="flex justify-between items-center mb-4">
-        <div>
-          <h2 class="text-xl font-semibold text-white">Connected Repositories</h2>
-          <p class="text-sm text-zinc-500 mt-1">
-            {data.connectedRepos.length}
-            {#if data.user.plan === 'free' && !hasSubscription}
-              / {repoLimit} repository connected
-            {:else}
-              repositories connected
-            {/if}
-          </p>
-        </div>
-        <button
-          on:click={() => (showConnectModal = true)}
-          disabled={!canConnectMore}
-          class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Connect Repo
-        </button>
-      </div>
-
-      {#if data.githubError}
-        <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg text-red-400">
-          <p class="font-medium">Failed to fetch GitHub repositories</p>
-          <p class="text-sm mt-1">{data.githubError}</p>
-        </div>
-      {/if}
-
-      {#if !canConnectMore && data.user.plan === 'free' && !hasSubscription}
-        <div class="mb-6 p-4 bg-amber-900/30 border border-amber-500/50 rounded-lg">
-          <p class="text-amber-400 font-medium">Free plan limit reached</p>
-          <p class="text-sm text-amber-300/70 mt-1">
-            Upgrade to Pro for unlimited repositories.
-          </p>
-          <button
-            on:click={() => initiateCheckout('pro')}
-            disabled={checkoutLoading}
-            class="inline-block mt-2 text-sm font-medium text-amber-400 underline hover:no-underline disabled:opacity-50"
-          >
-            {checkoutLoading ? 'Loading...' : 'Upgrade to Pro'}
-          </button>
-        </div>
-      {/if}
-
-      {#if data.connectedRepos.length > 0}
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {#each data.connectedRepos as repo (repo.id)}
-            <a href="/dashboard/{repo.id}" class="block">
-              <RepoCard
-                connectedRepo={repo}
-                isConnected={true}
-                onDisconnect={() => disconnectRepo(repo.id)}
-                onGenerate={() => generateDocs(repo.id)}
-                loading={disconnectingRepoId === repo.id}
-                generating={generatingRepoId === repo.id}
-                hasDocumentation={repoDocsMap.get(repo.id) || false}
-              />
+      <!-- Upgrade CTA (for free users) -->
+      {#if isFreeUser}
+        <div class="mt-8 card-hover p-8 bg-gradient-to-br from-accent/10 to-dark-800 border-accent/20">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="text-center md:text-left">
+              <h3 class="text-h3 text-text-primary mb-2">Unlock All Features</h3>
+              <p class="text-body text-text-secondary max-w-md">
+                Get all 4 documentation types, private repos, and unlimited generations with our Pro plan.
+              </p>
+            </div>
+            <a href="/pricing" class="btn-primary btn-lg pulse-glow whitespace-nowrap">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              View Plans
             </a>
-          {/each}
-        </div>
-      {:else}
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center text-zinc-400">
-          <p class="mb-4">No repositories connected yet</p>
-          <a href="/dashboard/connect" class="text-emerald-400 hover:text-emerald-300 text-sm">
-            Connect your first repository &rarr;
-          </a>
+          </div>
         </div>
       {/if}
-    </div>
-
-    <!-- Upgrade CTA (for free users) -->
-    {#if isFreeUser}
-      <div class="mt-8 bg-gradient-to-r from-emerald-900/30 to-zinc-900 border border-emerald-500/30 rounded-lg p-6 text-center">
-        <h3 class="text-xl font-semibold text-white mb-2">Unlock All Features</h3>
-        <p class="text-zinc-400 mb-4">
-          Get all 4 documentation types, private repos, and unlimited generations.
-        </p>
-        <a
-          href="/pricing"
-          class="inline-block px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500"
-        >
-          View Plans &rarr;
-        </a>
-      </div>
-    {/if}
     {/if}
   </main>
 </div>
 
 {#if showConnectModal}
   <div
-    class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"
+    class="fixed inset-0 bg-dark-900/80 backdrop-blur-sm flex items-center justify-center p-4 z-50"
     on:click|self={() => (showConnectModal = false)}
     on:keydown={(e) => e.key === 'Escape' && (showConnectModal = false)}
     role="dialog"
     aria-modal="true"
     tabindex="-1"
   >
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-      <div class="p-6 border-b border-zinc-800 flex justify-between items-center">
-        <h2 class="text-xl font-bold text-white">Connect a Repository</h2>
+    <div class="bg-dark-800 border border-dark-500 rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col animate-fade-in-up">
+      <div class="p-6 border-b border-dark-500 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
+            <svg class="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <h2 class="text-h3 text-text-primary">Connect a Repository</h2>
+        </div>
         <button
           on:click={() => (showConnectModal = false)}
-          class="text-zinc-500 hover:text-zinc-300"
+          class="w-8 h-8 rounded-lg bg-dark-600 flex items-center justify-center text-text-muted hover:text-text-primary hover:bg-dark-500 transition-colors"
         >
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
       <div class="p-6 overflow-y-auto flex-1">
         {#if availableNotConnected.length > 0}
+          <p class="text-body-sm text-text-muted mb-4">Select a repository from your GitHub account to generate documentation.</p>
           <div class="space-y-3">
             {#each availableNotConnected as repo (repo.id)}
               <RepoCard
@@ -467,9 +568,14 @@
             {/each}
           </div>
         {:else}
-          <div class="text-center text-zinc-400 py-8">
-            <p>No more repositories available to connect.</p>
-            <p class="text-sm mt-2 text-zinc-500">
+          <div class="text-center py-12">
+            <div class="w-16 h-16 rounded-2xl bg-dark-600 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p class="text-text-secondary mb-1">All repositories connected</p>
+            <p class="text-body-sm text-text-muted">
               All your GitHub repositories are already connected.
             </p>
           </div>
