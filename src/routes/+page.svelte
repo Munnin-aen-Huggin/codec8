@@ -109,6 +109,13 @@
 	</div>
 </section>
 
+<!-- Video Demo Section -->
+<section class="video-section">
+	<div class="container">
+		<VideoDemo />
+	</div>
+</section>
+
 <!-- What You Get Section -->
 <section class="what-you-get">
 	<div class="container">
@@ -176,6 +183,9 @@
 		</div>
 	</div>
 </section>
+
+<!-- Product Preview Section -->
+<ProductPreview />
 
 <!-- How It Works -->
 <section class="how-section">
@@ -287,6 +297,8 @@
 				<a href="/auth/login?intent=purchase&tier=team" class="pricing-cta" rel="external">Subscribe Now</a>
 			</div>
 		</div>
+
+		<PaymentBadges />
 	</div>
 </section>
 
@@ -392,6 +404,9 @@
 	import ValueComparison from '$lib/components/ValueComparison.svelte';
 	import EnterpriseSection from '$lib/components/EnterpriseSection.svelte';
 	import ExitIntent from '$lib/components/ExitIntent.svelte';
+	import VideoDemo from '$lib/components/VideoDemo.svelte';
+	import ProductPreview from '$lib/components/ProductPreview.svelte';
+	import PaymentBadges from '$lib/components/PaymentBadges.svelte';
 	import { trackPageView, trackOnVisible, trackClientEvent } from '$lib/stores/analytics';
 
 	let repoUrl = '';
@@ -920,6 +935,11 @@
 	.section-header p {
 		color: var(--text-secondary);
 		font-size: 1.1rem;
+	}
+
+	/* Video Section */
+	.video-section {
+		padding: 60px 0;
 	}
 
 	/* What You Get Section */

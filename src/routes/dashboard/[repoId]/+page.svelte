@@ -2,9 +2,19 @@
 	import { goto } from '$app/navigation';
 	import { marked } from 'marked';
 	import { toast } from '$lib/stores/toast';
+	import UpgradePrompt from '$lib/components/UpgradePrompt.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+
+	// Check if user is on free tier and only has README
+	$: hasOnlyReadme = data.hasAnyDocs &&
+		data.documentation['readme'] &&
+		!data.documentation['api'] &&
+		!data.documentation['architecture'] &&
+		!data.documentation['setup'];
+
+	$: showUpgradePrompt = data.isFreeUser && hasOnlyReadme;
 
 	type DocType = 'readme' | 'api' | 'architecture' | 'setup';
 
@@ -157,31 +167,33 @@
 	<title>{data.repo.name} - Documentation - CodeDoc AI</title>
 </svelte:head>
 
-<div class="min-h-screen bg-gray-50">
-	<header class="bg-white border-b">
-		<div class="container mx-auto px-6 py-4">
-			<div class="flex items-center gap-4">
-				<a
-					href="/dashboard"
-					class="text-gray-500 hover:text-gray-700 flex items-center gap-1"
-				>
-					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-					</svg>
-					Back
-				</a>
-				<div class="flex-1">
-					<h1 class="text-xl font-bold text-gray-900">{data.repo.name}</h1>
-					<p class="text-sm text-gray-500">{data.repo.full_name}</p>
+<div class="min-h-screen bg-[#09090b]">
+	<header class="bg-zinc-900 border-b border-zinc-800">
+		<div class="container mx-auto px-4 sm:px-6 py-4">
+			<div class="flex flex-col sm:flex-row sm:items-center gap-4">
+				<div class="flex items-center gap-4">
+					<a
+						href="/dashboard"
+						class="text-zinc-400 hover:text-zinc-300 flex items-center gap-1 min-h-[44px]"
+					>
+						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+						</svg>
+						<span class="sr-only sm:not-sr-only">Back</span>
+					</a>
+					<div class="flex-1">
+						<h1 class="text-lg sm:text-xl font-bold text-white truncate">{data.repo.name}</h1>
+						<p class="text-xs sm:text-sm text-zinc-400 truncate">{data.repo.full_name}</p>
+					</div>
 				</div>
-				<div class="flex items-center gap-3">
+				<div class="flex items-center gap-2 sm:gap-3 sm:ml-auto">
 					<!-- Auto-sync Toggle -->
 					<button
 						on:click={toggleAutoSync}
 						disabled={isTogglingAutoSync}
 						class="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border transition-colors {autoSyncEnabled
-							? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-							: 'text-gray-600 border-gray-200 hover:bg-gray-50'} disabled:opacity-50 disabled:cursor-not-allowed"
+							? 'bg-emerald-900/50 text-emerald-400 border-emerald-500/50 hover:bg-emerald-900/70'
+							: 'text-zinc-400 border-zinc-700 hover:bg-zinc-800'} disabled:opacity-50 disabled:cursor-not-allowed"
 						title={autoSyncEnabled ? 'Auto-sync enabled - docs regenerate on git push' : 'Enable auto-sync to regenerate docs on git push'}
 					>
 						{#if isTogglingAutoSync}
@@ -194,21 +206,23 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 							</svg>
 						{/if}
-						Auto-sync {autoSyncEnabled ? 'On' : 'Off'}
+						<span class="hidden sm:inline">Auto-sync {autoSyncEnabled ? 'On' : 'Off'}</span>
+						<span class="sm:hidden">{autoSyncEnabled ? 'On' : 'Off'}</span>
 					</button>
 					<button
 						on:click={generateDocs}
 						disabled={isGenerating}
-						class="px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+						class="px-3 sm:px-4 py-2 text-sm font-medium text-emerald-400 border border-emerald-500/50 rounded-lg hover:bg-emerald-900/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-h-[44px]"
 					>
 						{#if isGenerating}
 							<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
 								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
 								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
 							</svg>
-							Generating...
+							<span class="hidden sm:inline">Generating...</span>
 						{:else}
-							Regenerate All
+							<span class="hidden sm:inline">Regenerate All</span>
+							<span class="sm:hidden">Regen</span>
 						{/if}
 					</button>
 				</div>
@@ -216,22 +230,22 @@
 		</div>
 	</header>
 
-	<main class="container mx-auto px-6 py-8">
+	<main class="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
 		{#if !data.hasAnyDocs}
-			<div class="bg-white rounded-xl border p-12 text-center">
-				<div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-					<svg class="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-12 text-center">
+				<div class="w-16 h-16 mx-auto mb-4 bg-zinc-800 rounded-full flex items-center justify-center">
+					<svg class="w-8 h-8 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 					</svg>
 				</div>
-				<h2 class="text-xl font-semibold text-gray-900 mb-2">No Documentation Yet</h2>
-				<p class="text-gray-600 mb-6">
+				<h2 class="text-xl font-semibold text-white mb-2">No Documentation Yet</h2>
+				<p class="text-zinc-400 mb-6">
 					Generate professional documentation for this repository using AI.
 				</p>
 				<button
 					on:click={generateDocs}
 					disabled={isGenerating}
-					class="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+					class="px-6 py-3 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
 				>
 					{#if isGenerating}
 						<svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -245,22 +259,22 @@
 				</button>
 			</div>
 		{:else}
-			<div class="bg-white rounded-xl border overflow-hidden">
+			<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
 				<!-- Tabs -->
-				<div class="border-b flex">
+				<div class="border-b border-zinc-800 flex overflow-x-auto scrollbar-hide">
 					{#each docTypes as docType}
 						<button
 							on:click={() => selectTab(docType.key)}
 							class="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors {activeTab === docType.key
-								? 'border-indigo-600 text-indigo-600'
-								: 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}"
+								? 'border-emerald-500 text-emerald-400'
+								: 'border-transparent text-zinc-400 hover:text-zinc-300 hover:border-zinc-700'}"
 						>
 							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={docType.icon} />
 							</svg>
 							{docType.label}
 							{#if !data.documentation[docType.key]}
-								<span class="w-2 h-2 rounded-full bg-gray-300"></span>
+								<span class="w-2 h-2 rounded-full bg-zinc-600"></span>
 							{/if}
 						</button>
 					{/each}
@@ -270,42 +284,42 @@
 				<div class="p-6">
 					{#if !currentDoc}
 						<div class="text-center py-12">
-							<p class="text-gray-500 mb-4">
+							<p class="text-zinc-400 mb-4">
 								No {docTypes.find(d => d.key === activeTab)?.label} documentation generated yet.
 							</p>
 							<button
 								on:click={generateDocs}
 								disabled={isGenerating}
-								class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+								class="px-4 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-500 disabled:opacity-50"
 							>
 								Generate Now
 							</button>
 						</div>
 					{:else}
 						<!-- Action Bar -->
-						<div class="flex items-center justify-between mb-4 pb-4 border-b">
-							<div class="text-sm text-gray-500">
-								Version {currentDoc.version} - Generated {new Date(currentDoc.generated_at).toLocaleDateString()}
+						<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-4 border-b border-zinc-800">
+							<div class="text-xs sm:text-sm text-zinc-400">
+								v{currentDoc.version} - {new Date(currentDoc.generated_at).toLocaleDateString()}
 							</div>
-							<div class="flex items-center gap-2">
+							<div class="flex items-center gap-2 flex-wrap">
 								{#if isEditing}
 									<button
 										on:click={cancelEdit}
-										class="px-3 py-1.5 text-sm font-medium text-gray-600 border rounded-md hover:bg-gray-50"
+										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800"
 									>
 										Cancel
 									</button>
 									<button
 										on:click={saveEdit}
 										disabled={isSaving}
-										class="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 disabled:opacity-50"
+										class="px-3 py-1.5 text-sm font-medium text-white bg-emerald-600 rounded-md hover:bg-emerald-500 disabled:opacity-50"
 									>
 										{isSaving ? 'Saving...' : 'Save'}
 									</button>
 								{:else}
 									<button
 										on:click={startEdit}
-										class="px-3 py-1.5 text-sm font-medium text-gray-600 border rounded-md hover:bg-gray-50 flex items-center gap-1"
+										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800 flex items-center gap-1"
 									>
 										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -314,7 +328,7 @@
 									</button>
 									<button
 										on:click={exportMarkdown}
-										class="px-3 py-1.5 text-sm font-medium text-gray-600 border rounded-md hover:bg-gray-50 flex items-center gap-1"
+										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800 flex items-center gap-1"
 									>
 										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -323,7 +337,7 @@
 									</button>
 									<button
 										on:click={createPR}
-										class="px-3 py-1.5 text-sm font-medium text-gray-600 border rounded-md hover:bg-gray-50 flex items-center gap-1"
+										class="px-3 py-1.5 text-sm font-medium text-zinc-300 border border-zinc-700 rounded-md hover:bg-zinc-800 flex items-center gap-1"
 									>
 										<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -336,86 +350,140 @@
 
 						<!-- Editor or Preview -->
 						{#if isEditing}
-							<div class="grid grid-cols-2 gap-4 min-h-[500px]">
+							<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-[400px] sm:min-h-[500px]">
 								<div>
-									<label for="markdown-editor" class="block text-sm font-medium text-gray-700 mb-2">
+									<label for="markdown-editor" class="block text-sm font-medium text-zinc-300 mb-2">
 										Edit Markdown
 									</label>
 									<textarea
 										id="markdown-editor"
 										bind:value={editContent}
-										class="w-full h-[500px] p-4 font-mono text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
+										class="w-full h-[300px] sm:h-[400px] lg:h-[500px] p-3 sm:p-4 font-mono text-xs sm:text-sm bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
 									></textarea>
 								</div>
 								<div>
-									<span class="block text-sm font-medium text-gray-700 mb-2">
+									<span class="block text-sm font-medium text-zinc-300 mb-2">
 										Preview
 									</span>
-									<div class="h-[500px] overflow-y-auto p-4 border rounded-lg bg-gray-50 prose prose-sm max-w-none">
+									<div class="h-[300px] sm:h-[400px] lg:h-[500px] overflow-y-auto p-3 sm:p-4 border border-zinc-700 rounded-lg bg-zinc-800 prose prose-sm prose-invert max-w-none">
 										{@html marked(editContent)}
 									</div>
 								</div>
 							</div>
 						{:else}
-							<div class="prose prose-indigo max-w-none">
+							<div class="prose prose-invert prose-emerald max-w-none">
 								{@html renderedContent}
 							</div>
 						{/if}
 					{/if}
 				</div>
 			</div>
+
+			<!-- Upgrade prompt for free users who only have README -->
+			{#if showUpgradePrompt}
+				<UpgradePrompt
+					repoName={data.repo.name}
+					repoFullName={data.repo.full_name}
+				/>
+			{/if}
 		{/if}
 	</main>
 </div>
 
 <style>
-	/* Additional prose styling for better markdown rendering */
-	:global(.prose pre) {
-		background-color: #1f2937;
+	/* Hide scrollbar for tabs on mobile */
+	.scrollbar-hide {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	.scrollbar-hide::-webkit-scrollbar {
+		display: none;
+	}
+
+	/* Dark theme prose styling for markdown rendering */
+	:global(.prose-invert pre) {
+		background-color: #18181b;
 		color: #e5e7eb;
 		padding: 1rem;
 		border-radius: 0.5rem;
 		overflow-x: auto;
+		border: 1px solid #27272a;
 	}
 
-	:global(.prose code) {
-		background-color: #f3f4f6;
+	:global(.prose-invert code) {
+		background-color: #27272a;
+		color: #10b981;
 		padding: 0.125rem 0.25rem;
 		border-radius: 0.25rem;
 		font-size: 0.875em;
 	}
 
-	:global(.prose pre code) {
+	:global(.prose-invert pre code) {
 		background-color: transparent;
+		color: #e5e7eb;
 		padding: 0;
 	}
 
-	:global(.prose table) {
+	:global(.prose-invert table) {
 		width: 100%;
 		border-collapse: collapse;
 	}
 
-	:global(.prose th),
-	:global(.prose td) {
-		border: 1px solid #e5e7eb;
+	:global(.prose-invert th),
+	:global(.prose-invert td) {
+		border: 1px solid #3f3f46;
 		padding: 0.5rem 0.75rem;
 	}
 
-	:global(.prose th) {
-		background-color: #f9fafb;
+	:global(.prose-invert th) {
+		background-color: #27272a;
 		font-weight: 600;
+		color: #fafafa;
 	}
 
-	:global(.prose img) {
+	:global(.prose-invert img) {
 		border-radius: 0.5rem;
 	}
 
-	/* Mermaid diagram styling */
-	:global(.prose .mermaid) {
-		background-color: #fff;
+	/* Mermaid diagram styling - dark theme */
+	:global(.prose-invert .mermaid) {
+		background-color: #18181b;
 		padding: 1rem;
 		border-radius: 0.5rem;
-		border: 1px solid #e5e7eb;
+		border: 1px solid #3f3f46;
 		text-align: center;
+	}
+
+	/* Prose headings and links */
+	:global(.prose-invert h1),
+	:global(.prose-invert h2),
+	:global(.prose-invert h3),
+	:global(.prose-invert h4) {
+		color: #fafafa;
+	}
+
+	:global(.prose-invert a) {
+		color: #34d399;
+	}
+
+	:global(.prose-invert a:hover) {
+		color: #6ee7b7;
+	}
+
+	:global(.prose-invert strong) {
+		color: #fafafa;
+	}
+
+	:global(.prose-invert blockquote) {
+		border-left-color: #10b981;
+		color: #a1a1aa;
+	}
+
+	:global(.prose-invert hr) {
+		border-color: #3f3f46;
+	}
+
+	:global(.prose-invert li::marker) {
+		color: #10b981;
 	}
 </style>

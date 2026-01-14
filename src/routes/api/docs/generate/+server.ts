@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 	// Fetch user profile to get GitHub token and subscription info
 	const { data: profile, error: profileError } = await supabaseAdmin
 		.from('profiles')
-		.select('github_token, plan, subscription_status, subscription_tier')
+		.select('github_token, plan, subscription_status, subscription_tier, trial_ends_at, subscription_ends_at')
 		.eq('id', userId)
 		.single();
 
@@ -82,10 +82,30 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 		throw error(500, 'GitHub token not found. Please reconnect your GitHub account.');
 	}
 
-	// Check if user has paid access (subscription or legacy plan)
+	// Check if subscription has ended (canceled)
+	if (profile.subscription_ends_at && new Date(profile.subscription_ends_at) < new Date()) {
+		throw error(403, 'Your subscription has ended. Please renew to continue generating documentation.');
+	}
+
+	// Check if trial has expired
+	const isTrialExpired =
+		profile.subscription_status === 'trialing' &&
+		profile.trial_ends_at &&
+		new Date(profile.trial_ends_at) < new Date();
+
+	if (isTrialExpired) {
+		throw error(403, 'Your trial has expired. Please subscribe to continue generating documentation.');
+	}
+
+	// Check if user has paid access (active subscription, valid trial, or legacy plan)
+	const hasValidTrial =
+		profile.subscription_status === 'trialing' &&
+		profile.trial_ends_at &&
+		new Date(profile.trial_ends_at) > new Date();
+
 	const hasPaidAccess =
 		profile.subscription_status === 'active' ||
-		profile.subscription_status === 'trialing' ||
+		hasValidTrial ||
 		['ltd', 'pro', 'dfy'].includes(profile.plan || '');
 
 	// Check if user has purchased this specific repo

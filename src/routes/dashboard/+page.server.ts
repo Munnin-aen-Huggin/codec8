@@ -120,6 +120,9 @@ export const load: PageServerLoad = async ({ cookies }) => {
     }
   }
 
+  // Check if user should see onboarding
+  const shouldShowOnboarding = !profile.onboarded && (connectedRepos || []).length === 0;
+
   return {
     user: {
       id: profile.id,
@@ -127,7 +130,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
       github_username: profile.github_username,
       plan: profile.plan,
       subscription_status: profile.subscription_status || null,
-      subscription_tier: profile.subscription_tier || null
+      subscription_tier: profile.subscription_tier || null,
+      onboarded: profile.onboarded || false
     },
     connectedRepos: connectedRepos || [],
     availableRepos,
@@ -136,6 +140,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     purchasedRepos: purchasedRepos || [],
     usageInfo,
     isTrialing,
-    trialEndsAt
+    trialEndsAt,
+    shouldShowOnboarding
   };
 };

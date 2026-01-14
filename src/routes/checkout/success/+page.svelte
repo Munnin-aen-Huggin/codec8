@@ -10,6 +10,11 @@
     ltd: 'Pro' // Legacy LTD mapped to Pro
   };
 
+  const tierLimits: Record<string, number> = {
+    pro: 30,
+    team: 100
+  };
+
   function copyLicenseKey() {
     if (data.licenseKey) {
       navigator.clipboard.writeText(data.licenseKey);
@@ -19,6 +24,9 @@
   }
 
   let copied = false;
+
+  $: isSingleRepo = data.tier === 'single';
+  $: isSubscription = data.tier === 'pro' || data.tier === 'team';
 </script>
 
 <svelte:head>
@@ -66,20 +74,107 @@
       {/if}
     </div>
 
+    <!-- Tier-specific Next Steps -->
+    <div class="next-steps">
+      <h3>What's Next?</h3>
+      {#if isSingleRepo}
+        <ol>
+          <li>
+            <span class="step-number">1</span>
+            <span class="step-text">Go to your dashboard</span>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <span class="step-text">Find <strong>{data.purchasedRepoName || 'your purchased repo'}</strong></span>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <span class="step-text">Click "Generate Documentation" to get all 4 doc types</span>
+          </li>
+          <li>
+            <span class="step-number">4</span>
+            <span class="step-text">Edit, export, or create a GitHub PR</span>
+          </li>
+        </ol>
+      {:else if isSubscription}
+        <ol>
+          <li>
+            <span class="step-number">1</span>
+            <span class="step-text">Connect your GitHub repositories</span>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <span class="step-text">Generate docs for up to <strong>{tierLimits[data.tier || 'pro']} repos/month</strong></span>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <span class="step-text">Enable auto-sync to keep docs updated on every push</span>
+          </li>
+          {#if data.tier === 'team'}
+            <li>
+              <span class="step-number">4</span>
+              <span class="step-text">Invite up to 5 team members from settings</span>
+            </li>
+          {/if}
+        </ol>
+      {:else}
+        <ol>
+          <li>
+            <span class="step-number">1</span>
+            <span class="step-text">Connect your repositories</span>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <span class="step-text">Generate documentation</span>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <span class="step-text">Export or create PRs</span>
+          </li>
+        </ol>
+      {/if}
+    </div>
+
     <div class="features">
       <h3>What's included:</h3>
       <ul>
-        <li>Unlimited repositories</li>
-        <li>All documentation types</li>
-        <li>Architecture diagrams</li>
-        <li>Export to Markdown & PR</li>
-        <li>Auto-sync on push</li>
-        <li>Priority support</li>
+        {#if isSingleRepo}
+          <li>Complete documentation for 1 repository</li>
+          <li>All 4 documentation types (README, API, Architecture, Setup)</li>
+          <li>Unlimited regenerations included</li>
+          <li>Export to Markdown & create PRs</li>
+          <li>Email support</li>
+        {:else if data.tier === 'pro'}
+          <li>Up to 30 repositories per month</li>
+          <li>All documentation types</li>
+          <li>Architecture diagrams (Mermaid)</li>
+          <li>Export to Markdown & PR</li>
+          <li>Auto-sync on push</li>
+          <li>Priority support</li>
+        {:else if data.tier === 'team'}
+          <li>Up to 100 repositories per month</li>
+          <li>All documentation types</li>
+          <li>Architecture diagrams (Mermaid)</li>
+          <li>Up to 5 team members</li>
+          <li>Auto-sync on push</li>
+          <li>Dedicated support</li>
+        {:else}
+          <li>Unlimited repositories</li>
+          <li>All documentation types</li>
+          <li>Architecture diagrams</li>
+          <li>Export to Markdown & PR</li>
+          <li>Auto-sync on push</li>
+          <li>Priority support</li>
+        {/if}
       </ul>
     </div>
 
     <div class="actions">
-      <a href="/dashboard" class="btn-primary">Go to Dashboard</a>
+      {#if isSingleRepo && data.purchasedRepoId}
+        <a href="/dashboard" class="btn-primary">Generate Docs Now</a>
+      {:else}
+        <a href="/dashboard" class="btn-primary">Go to Dashboard</a>
+      {/if}
     </div>
 
     <p class="support">
@@ -213,6 +308,59 @@
   .note {
     font-size: 0.8rem;
     color: #6b6b70;
+  }
+
+  .next-steps {
+    text-align: left;
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  .next-steps h3 {
+    font-size: 1rem;
+    color: #22c55e;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .next-steps ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .next-steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    color: #a1a1a6;
+  }
+
+  .step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .step-text {
+    flex: 1;
+    line-height: 1.5;
+  }
+
+  .step-text strong {
+    color: #fff;
   }
 
   .features {

@@ -6,10 +6,29 @@
   import { toast } from '$lib/stores/toast';
   import RepoCard from '$lib/components/RepoCard.svelte';
   import RepoCardSkeleton from '$lib/components/RepoCardSkeleton.svelte';
+  import OnboardingWizard from '$lib/components/OnboardingWizard.svelte';
   import type { PageData } from './$types';
   import type { GitHubRepo } from '$lib/server/github';
 
   export let data: PageData;
+
+  // Track if onboarding should be shown
+  let showOnboarding = data.shouldShowOnboarding;
+
+  async function handleOnboardingComplete() {
+    showOnboarding = false;
+    // Mark user as onboarded in the database
+    try {
+      await fetch('/api/user/onboarded', { method: 'POST' });
+    } catch (err) {
+      console.error('Failed to mark onboarding complete:', err);
+    }
+  }
+
+  function handleOnboardingConnect() {
+    showOnboarding = false;
+    showConnectModal = true;
+  }
 
   let showConnectModal = false;
   let connectingRepoId: number | null = null;
@@ -253,9 +272,15 @@
   </header>
 
   <main class="container mx-auto px-6 py-8">
-    <h1 class="text-3xl font-bold text-white mb-8">Dashboard</h1>
+    {#if showOnboarding}
+      <OnboardingWizard
+        on:complete={handleOnboardingComplete}
+        on:connect={handleOnboardingConnect}
+      />
+    {:else}
+      <h1 class="text-3xl font-bold text-white mb-8">Dashboard</h1>
 
-    <!-- Usage Stats (for subscribers) -->
+      <!-- Usage Stats (for subscribers) -->
     {#if usageInfo}
       <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-8">
         <div class="flex items-center justify-between mb-4">
@@ -398,6 +423,7 @@
           View Plans &rarr;
         </a>
       </div>
+    {/if}
     {/if}
   </main>
 </div>

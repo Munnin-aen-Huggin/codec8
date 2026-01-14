@@ -57,15 +57,43 @@ export const load: PageServerLoad = async ({ cookies, params }) => {
 		console.error('Failed to fetch documentation:', docsError);
 	}
 
+	// Fetch user profile to determine plan
+	const { data: profile } = await supabaseAdmin
+		.from('profiles')
+		.select('plan, subscription_status, subscription_tier')
+		.eq('id', userId)
+		.single();
+
+	// Check if user has purchased this repo
+	const { data: purchasedRepo } = await supabaseAdmin
+		.from('purchased_repos')
+		.select('id')
+		.eq('user_id', userId)
+		.eq('repo_url', repo.full_name)
+		.single();
+
 	// Organize docs by type for easy access
 	const documentation: Record<string, Documentation> = {};
 	for (const doc of docs || []) {
 		documentation[doc.type] = doc;
 	}
 
+	// Determine user access level
+	const hasSubscription =
+		profile?.subscription_status === 'active' ||
+		profile?.subscription_status === 'trialing';
+	const hasPurchasedThisRepo = !!purchasedRepo;
+	const isLegacyPlan = ['ltd', 'pro', 'dfy'].includes(profile?.plan || '');
+	const isFreeUser = !hasSubscription && !hasPurchasedThisRepo && !isLegacyPlan;
+
 	return {
 		repo,
 		documentation,
-		hasAnyDocs: Object.keys(documentation).length > 0
+		hasAnyDocs: Object.keys(documentation).length > 0,
+		userPlan: profile?.plan || 'free',
+		subscriptionTier: profile?.subscription_tier,
+		hasSubscription,
+		hasPurchasedThisRepo,
+		isFreeUser
 	};
 };

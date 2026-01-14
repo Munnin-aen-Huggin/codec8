@@ -20,6 +20,8 @@ export interface Profile {
 	repos_used_this_month: number;
 	current_period_start: string | null;
 	current_period_end: string | null;
+	trial_ends_at: string | null;
+	subscription_ends_at: string | null;
 }
 
 /**
@@ -83,8 +85,15 @@ export async function checkUsageLimit(userId: string): Promise<UsageResult> {
 	const limit = TIER_LIMITS[tier] || 1;
 	const used = profile.repos_used_this_month || 0;
 
-	// Check if subscription is active
-	if (profile.subscription_status !== 'active' && tier !== 'free') {
+	// Check if subscription is active or in valid trial
+	const isValidTrial =
+		profile.subscription_status === 'trialing' &&
+		profile.trial_ends_at &&
+		new Date(profile.trial_ends_at) > new Date();
+
+	const isActiveSubscription = profile.subscription_status === 'active';
+
+	if (!isActiveSubscription && !isValidTrial && tier !== 'free') {
 		return {
 			allowed: false,
 			used,
@@ -130,8 +139,36 @@ export async function canGenerateForRepo(
 		return { allowed: true };
 	}
 
-	// Check subscription-based access
-	if (profile.subscription_status === 'active' && profile.subscription_tier) {
+	// Check if subscription has ended (canceled)
+	if (profile.subscription_ends_at) {
+		const endsAt = new Date(profile.subscription_ends_at);
+		if (endsAt < new Date()) {
+			return {
+				allowed: false,
+				reason: 'Your subscription has ended. Please renew to continue.'
+			};
+		}
+	}
+
+	// Check trial expiration
+	if (profile.subscription_status === 'trialing' && profile.trial_ends_at) {
+		const trialEnd = new Date(profile.trial_ends_at);
+		if (trialEnd < new Date()) {
+			return {
+				allowed: false,
+				reason: 'Your trial has expired. Please subscribe to continue.'
+			};
+		}
+	}
+
+	// Check subscription-based access (active or valid trial)
+	const hasValidSubscription =
+		profile.subscription_status === 'active' ||
+		(profile.subscription_status === 'trialing' &&
+			profile.trial_ends_at &&
+			new Date(profile.trial_ends_at) > new Date());
+
+	if (hasValidSubscription && profile.subscription_tier) {
 		const usageResult = await checkUsageLimit(userId);
 		if (usageResult.allowed) {
 			return { allowed: true };
@@ -220,7 +257,9 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 			subscription_tier,
 			repos_used_this_month,
 			current_period_start,
-			current_period_end
+			current_period_end,
+			trial_ends_at,
+			subscription_ends_at
 		`
 		)
 		.eq('id', userId)

@@ -133,6 +133,23 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       console.log(`Successfully purchased repo ${repoName} with license ${licenseKey}`);
     }
 
+    // Also insert into licenses table for consistency with success page queries
+    const { error: licenseError } = await supabaseAdmin
+      .from('licenses')
+      .insert({
+        user_id: userId,
+        license_key: licenseKey,
+        tier: 'single',
+        stripe_payment_id: session.payment_intent as string,
+        activated_at: new Date().toISOString()
+      });
+
+    if (licenseError) {
+      console.error('Failed to insert license record:', licenseError);
+    } else {
+      console.log(`License record created for single repo purchase`);
+    }
+
     // Track analytics
     trackCheckoutCompleted(userId, 'single', 99);
     await trackEvent(EVENTS.PURCHASE_COMPLETED, { product: 'single', amount: 99, repo_url: repoUrl }, userId);
@@ -167,6 +184,24 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         console.error('Failed to update user subscription:', updateError);
       } else {
         console.log(`Successfully started ${product} subscription for user ${userId}`);
+      }
+
+      // Create license record for subscription
+      const licenseKey = generateLicenseKey();
+      const { error: licenseError } = await supabaseAdmin
+        .from('licenses')
+        .insert({
+          user_id: userId,
+          license_key: licenseKey,
+          tier: product,
+          stripe_payment_id: session.subscription as string,
+          activated_at: new Date().toISOString()
+        });
+
+      if (licenseError) {
+        console.error('Failed to insert license record:', licenseError);
+      } else {
+        console.log(`License record created for ${product} subscription`);
       }
 
       // Track analytics
