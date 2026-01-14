@@ -207,9 +207,10 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   }
 
   // Determine if this is a new billing period (reset usage)
-  const currentPeriodStart = new Date(subscription.current_period_start * 1000);
+  const periodStart = (subscription as unknown as { current_period_start?: number }).current_period_start;
+  const currentPeriodStart = periodStart ? new Date(periodStart * 1000) : null;
   const now = new Date();
-  const isNewPeriod = subscription.status === 'active' &&
+  const isNewPeriod = subscription.status === 'active' && currentPeriodStart &&
     currentPeriodStart > new Date(now.getTime() - 24 * 60 * 60 * 1000); // Within last 24 hours
 
   const updateData: Record<string, unknown> = {
