@@ -156,13 +156,13 @@
 				</ul>
 			</div>
 			<div class="comparison-card paid">
-				<h3>SINGLE REPO - $39 once</h3>
+				<h3>SINGLE REPO - $99 once</h3>
 				<ul>
 					<li class="included">All 4 documentation types</li>
 					<li class="included">Private repos</li>
 					<li class="included">Keep forever</li>
 					<li class="included">Export & PR creation</li>
-					<li class="included">Regenerate: $9</li>
+					<li class="included">Regenerate: $19</li>
 				</ul>
 			</div>
 		</div>
@@ -202,7 +202,7 @@
 	<div class="container">
 		<div class="section-header">
 			<h2>Simple Pricing</h2>
-			<p>7-day free trial on Pro & Team | $9 to regenerate Single Repo | Cancel anytime</p>
+			<p>7-day free trial on Pro & Team | $19 to regenerate Single Repo | Cancel anytime</p>
 		</div>
 
 		<div class="pricing-grid">
@@ -222,28 +222,28 @@
 			</div>
 
 			<!-- Single Repo -->
-			<div class="pricing-card">
+			<div class="pricing-card featured">
+				<div class="featured-badge">POPULAR</div>
 				<h3>SINGLE REPO</h3>
 				<div class="price">
-					<span class="amount">$39</span>
+					<span class="amount">$99</span>
 					<span class="period">one-time</span>
 				</div>
 				<ul class="features">
 					<li>All 4 doc types</li>
 					<li>Private repos</li>
 					<li>Export & PRs</li>
-					<li>Regenerate: $9</li>
-					<li>No subscription</li>
+					<li>Keep forever</li>
+					<li>Regenerate: $19</li>
 				</ul>
-				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta">Buy Once - $39</a>
+				<a href="/auth/login?intent=purchase&product=single" class="pricing-cta primary">Get Docs — $99</a>
 			</div>
 
 			<!-- Pro -->
-			<div class="pricing-card featured">
-				<div class="featured-badge">POPULAR</div>
+			<div class="pricing-card">
 				<h3>PRO</h3>
 				<div class="price">
-					<span class="amount">$99</span>
+					<span class="amount">$149</span>
 					<span class="period">/mo</span>
 				</div>
 				<ul class="features">
@@ -251,15 +251,16 @@
 					<li>All features</li>
 					<li>Auto-sync on push</li>
 					<li>Priority support</li>
+					<li>7-day free trial</li>
 				</ul>
-				<a href="/auth/login?intent=trial&tier=pro" class="pricing-cta primary">Start 7-Day Trial</a>
+				<a href="/auth/login?intent=trial&tier=pro" class="pricing-cta">Start Free Trial</a>
 			</div>
 
 			<!-- Team -->
 			<div class="pricing-card">
 				<h3>TEAM</h3>
 				<div class="price">
-					<span class="amount">$249</span>
+					<span class="amount">$399</span>
 					<span class="period">/mo</span>
 				</div>
 				<ul class="features">
@@ -267,8 +268,9 @@
 					<li>5 team members</li>
 					<li>Custom templates</li>
 					<li>Slack integration</li>
+					<li>7-day free trial</li>
 				</ul>
-				<a href="/auth/login?intent=trial&tier=team" class="pricing-cta">Start 7-Day Trial</a>
+				<a href="/auth/login?intent=trial&tier=team" class="pricing-cta">Start Free Trial</a>
 			</div>
 		</div>
 	</div>
@@ -340,6 +342,10 @@
 
 	const faqs = [
 		{
+			question: 'Why $99?',
+			answer: 'The average technical writer charges $50-100/hour. Writing proper documentation takes 6-8 hours minimum. That\'s $400-800 in writer fees, or 8 hours of your own time. CodeDoc AI: $99. 60 seconds. Done.'
+		},
+		{
 			question: 'What languages do you support?',
 			answer: 'JavaScript, TypeScript, Python, Go, Rust, Java, Ruby, PHP, and more. We support all major frameworks including React, Next.js, Express, Django, FastAPI, Rails, and Laravel.'
 		},
@@ -358,10 +364,6 @@
 		{
 			question: 'What if I\'m not satisfied?',
 			answer: 'Pro and Team subscriptions include a 7-day free trial. For Single Repo purchases, contact us within 7 days for a full refund if the documentation doesn\'t meet your expectations.'
-		},
-		{
-			question: 'Why 1 demo per day?',
-			answer: 'This limit prevents abuse while letting everyone try the service. It ensures our AI resources remain available for all users. Need more? The Single Repo option at $39 gives you unlimited access to one repository.'
 		}
 	];
 

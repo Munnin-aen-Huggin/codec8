@@ -47,19 +47,19 @@ describe('Plan Limits', () => {
 
 describe('Price Details', () => {
   it('should have correct price for Single Repo', () => {
-    expect(PRICE_DETAILS.single.price).toBe(39);
+    expect(PRICE_DETAILS.single.price).toBe(99);
     expect(PRICE_DETAILS.single.name).toBe('Single Repo');
     expect(PRICE_DETAILS.single.type).toBe('one-time');
   });
 
   it('should have correct price for Pro', () => {
-    expect(PRICE_DETAILS.pro.price).toBe(99);
+    expect(PRICE_DETAILS.pro.price).toBe(149);
     expect(PRICE_DETAILS.pro.name).toBe('Pro');
     expect(PRICE_DETAILS.pro.type).toBe('monthly');
   });
 
   it('should have correct price for Team', () => {
-    expect(PRICE_DETAILS.team.price).toBe(249);
+    expect(PRICE_DETAILS.team.price).toBe(399);
     expect(PRICE_DETAILS.team.name).toBe('Team');
     expect(PRICE_DETAILS.team.type).toBe('monthly');
   });

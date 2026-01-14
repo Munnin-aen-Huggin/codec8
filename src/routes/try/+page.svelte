@@ -217,17 +217,22 @@
 				</div>
 				<h3 class="text-xl font-semibold text-amber-400 mb-2">Daily Limit Reached</h3>
 				<p class="text-zinc-400 mb-6 max-w-md mx-auto">
-					You've used your free demo for today. Start a free trial to generate unlimited documentation for all your repositories.
+					You've used your free demo for today. Get full access to all 4 documentation types.
 				</p>
-				<a
-					href="/auth/login?intent=trial&tier=pro"
-					class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold rounded-lg transition-all"
-				>
-					Start 7-day free trial
-					<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-					</svg>
-				</a>
+				<div class="space-y-3">
+					<a
+						href="/auth/login?intent=purchase&product=single"
+						class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold rounded-lg transition-all"
+					>
+						Get All 4 Docs — $99
+						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+						</svg>
+					</a>
+					<p class="text-sm text-zinc-400">
+						Or <a href="/auth/login?intent=trial&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">start Pro trial for unlimited</a>
+					</p>
+				</div>
 			</div>
 		{/if}
 
@@ -287,17 +292,19 @@
 					<LockedDocPreview docType="setup" />
 				</div>
 
-				<div class="text-center">
+				<div class="text-center space-y-4">
 					<a
-						href="/auth/login?intent=trial&tier=pro"
+						href="/auth/login?intent=purchase&product=single"
 						class="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-lg transition-all text-lg"
 					>
-						Get all 4 doc types — Start free trial
+						Get All 4 Docs — $99
 						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
 						</svg>
 					</a>
-					<p class="text-sm text-zinc-500 mt-3">No credit card required</p>
+					<p class="text-sm text-zinc-400">
+						Or <a href="/auth/login?intent=trial&tier=pro" class="text-emerald-400 hover:text-emerald-300 underline">start Pro trial for unlimited</a>
+					</p>
 				</div>
 			</div>
 		{/if}

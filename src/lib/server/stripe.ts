@@ -102,14 +102,14 @@ export async function createRegenerateCheckout({
   successUrl: string;
   cancelUrl: string;
 }): Promise<string> {
-  // $9 one-time for regenerating a single-repo purchase
+  // $19 one-time for regenerating a single-repo purchase
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     payment_method_types: ['card'],
     line_items: [{
       price_data: {
         currency: 'usd',
-        unit_amount: 900, // $9 in cents
+        unit_amount: 1900, // $19 in cents
         product_data: { name: 'Regenerate Documentation' }
       },
       quantity: 1
@@ -155,11 +155,11 @@ export function generateLicenseKey(): string {
   return parts.join('-');
 }
 
-// Price display info (updated for new model)
+// Price display info (updated for value-based pricing)
 export const PRICE_DETAILS = {
   single: {
     name: 'Single Repo',
-    price: 39,
+    price: 99,
     type: 'one-time',
     description: 'Full documentation suite for one repository',
     features: [
@@ -167,12 +167,12 @@ export const PRICE_DETAILS = {
       'Private repo support',
       'Export & create PRs',
       'Keep forever',
-      'Regenerate: $9'
+      'Regenerate: $19'
     ]
   },
   pro: {
     name: 'Pro',
-    price: 99,
+    price: 149,
     type: 'monthly',
     description: '30 repos per month with all features',
     features: [
@@ -186,7 +186,7 @@ export const PRICE_DETAILS = {
   },
   team: {
     name: 'Team',
-    price: 249,
+    price: 399,
     type: 'monthly',
     description: '100 repos per month with team features',
     features: [

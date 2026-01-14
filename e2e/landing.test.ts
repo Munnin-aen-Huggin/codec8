@@ -80,35 +80,35 @@ test.describe('Landing Page', () => {
 			await expect(freeCard.locator('.amount')).toContainText('$0');
 		});
 
-		test('Single Repo tier shows $39 price', async ({ page }) => {
+		test('Single Repo tier shows $99 price', async ({ page }) => {
 			await page.goto('/');
 			const singleCard = page.locator('.pricing-card').filter({ hasText: 'SINGLE REPO' });
 			await expect(singleCard).toBeVisible();
-			await expect(singleCard.locator('.amount')).toContainText('$39');
+			await expect(singleCard.locator('.amount')).toContainText('$99');
 			await expect(singleCard.locator('.period')).toContainText('one-time');
 		});
 
-		test('Pro tier shows $99/mo price', async ({ page }) => {
+		test('Pro tier shows $149/mo price', async ({ page }) => {
 			await page.goto('/');
 			const proCard = page.locator('.pricing-card').filter({ hasText: 'PRO' });
 			await expect(proCard).toBeVisible();
-			await expect(proCard.locator('.amount')).toContainText('$99');
+			await expect(proCard.locator('.amount')).toContainText('$149');
 			await expect(proCard.locator('.period')).toContainText('/mo');
 		});
 
-		test('Team tier shows $249/mo price', async ({ page }) => {
+		test('Team tier shows $399/mo price', async ({ page }) => {
 			await page.goto('/');
 			const teamCard = page.locator('.pricing-card').filter({ hasText: 'TEAM' });
 			await expect(teamCard).toBeVisible();
-			await expect(teamCard.locator('.amount')).toContainText('$249');
+			await expect(teamCard.locator('.amount')).toContainText('$399');
 			await expect(teamCard.locator('.period')).toContainText('/mo');
 		});
 
-		test('Pro tier has POPULAR badge', async ({ page }) => {
+		test('Single Repo tier has POPULAR badge', async ({ page }) => {
 			await page.goto('/');
-			const proCard = page.locator('.pricing-card.featured');
-			await expect(proCard).toBeVisible();
-			await expect(proCard.locator('.featured-badge')).toContainText('POPULAR');
+			const singleCard = page.locator('.pricing-card.featured');
+			await expect(singleCard).toBeVisible();
+			await expect(singleCard.locator('.featured-badge')).toContainText('POPULAR');
 		});
 
 		test('each tier has CTA button', async ({ page }) => {
