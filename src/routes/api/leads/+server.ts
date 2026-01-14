@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { supabaseAdmin } from '$lib/server/supabase';
+import { supabase } from '$lib/server/supabase';
 
 // Simple rate limiting using in-memory store (per instance)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -60,7 +60,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 		const leadSource = validSources.includes(source) ? source : 'other';
 
 		// Store lead in database (upsert to handle duplicates)
-		const { error: dbError } = await supabaseAdmin
+		const { error: dbError } = await supabase
 			.from('leads')
 			.upsert(
 				{
@@ -89,7 +89,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 
 		// Track analytics event (fire and forget)
 		try {
-			await supabaseAdmin
+			await supabase
 				.from('analytics_events')
 				.insert({
 					event_name: 'lead_captured',
