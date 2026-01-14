@@ -11,7 +11,7 @@ test.describe('Landing Page', () => {
 			await page.goto('/');
 			const h1 = page.locator('h1').first();
 			await expect(h1).toBeVisible();
-			await expect(h1).toContainText('60 seconds');
+			await expect(h1).toContainText('writes itself');
 		});
 
 		test('navigation links are present', async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe('Landing Page', () => {
 		test('trust badge is visible', async ({ page }) => {
 			await page.goto('/');
 			await expect(page.locator('.trust-badge')).toBeVisible();
-			await expect(page.locator('.trust-badge')).toContainText('Beta');
+			await expect(page.locator('.trust-badge')).toContainText('Try free');
 		});
 
 		test('demo form input is visible', async ({ page }) => {
