@@ -40,10 +40,11 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
     });
   }
 
-  // Build GitHub OAuth URL
+  // Build GitHub OAuth URL (strip trailing slash from URL if present)
+  const baseUrl = PUBLIC_APP_URL.replace(/\/$/, '');
   const params = new URLSearchParams({
     client_id: GITHUB_CLIENT_ID,
-    redirect_uri: `${PUBLIC_APP_URL}/auth/callback`,
+    redirect_uri: `${baseUrl}/auth/callback`,
     scope: 'read:user user:email repo',
     state
   });

@@ -11,8 +11,12 @@
 	const STORAGE_KEY = 'codedoc_exit_intent_shown';
 
 	function handleMouseLeave(e: MouseEvent) {
-		// Only trigger when mouse moves toward top of viewport
-		if (e.clientY < 50 && !show && !hasBeenShown()) {
+		// Only trigger when mouse actually leaves the document (not just moving to nav)
+		// Check if mouse is leaving the viewport entirely (relatedTarget is null or outside)
+		const relatedTarget = e.relatedTarget as Node | null;
+		const isLeavingDocument = !relatedTarget || !document.body.contains(relatedTarget);
+
+		if (e.clientY < 10 && isLeavingDocument && !show && !hasBeenShown()) {
 			show = true;
 			markAsShown();
 			trackEvent('exit_intent_shown');
