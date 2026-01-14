@@ -114,11 +114,16 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		console.log('[Auth Callback] Got user email:', userEmail);
 
 		// Check if user exists in profiles table
-		const { data: existingProfile } = await supabaseAdmin
+		console.log('[Auth Callback] Looking for profile with github_username:', githubUser.login);
+		const { data: existingProfile, error: lookupError } = await supabaseAdmin
 			.from('profiles')
 			.select('id')
 			.eq('github_username', githubUser.login)
 			.single();
+
+		if (lookupError && lookupError.code !== 'PGRST116') {
+			console.error('[Auth Callback] Profile lookup error:', lookupError);
+		}
 
 		let userId: string;
 
@@ -127,17 +132,22 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		if (existingProfile) {
 			// Update existing user's token
 			userId = existingProfile.id;
-			await supabaseAdmin
+			console.log('[Auth Callback] Found existing profile, userId:', userId);
+			const { error: updateError } = await supabaseAdmin
 				.from('profiles')
 				.update({
 					github_token: tokenData.access_token,
 					email: userEmail
 				})
 				.eq('id', userId);
+			if (updateError) {
+				console.error('[Auth Callback] Profile update error:', updateError);
+			}
 		} else {
 			// Create new user profile
 			isNewUser = true;
 			const newUserId = crypto.randomUUID();
+			console.log('[Auth Callback] Creating new profile with userId:', newUserId);
 			const { error: insertError } = await supabaseAdmin.from('profiles').insert({
 				id: newUserId,
 				email: userEmail,
@@ -147,9 +157,10 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			});
 
 			if (insertError) {
-				console.error('Failed to create user profile:', insertError);
+				console.error('[Auth Callback] Failed to create user profile:', insertError);
 				throw error(500, 'Failed to create user profile');
 			}
+			console.log('[Auth Callback] Profile created successfully');
 
 			userId = newUserId;
 		}
