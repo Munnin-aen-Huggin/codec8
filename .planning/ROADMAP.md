@@ -73,19 +73,50 @@ See phase directory for full specification.
 
 ---
 
+### Phase 10: Auto-sync on Git Push
+
+**Goal:** Enable automatic documentation regeneration when code changes via GitHub webhooks
+
+**Status:** Complete
+**Plans:** 2 plans
+- [x] 10-01: Webhook Infrastructure
+- [x] 10-02: Auto-regeneration System
+
+**Delivered:**
+- GitHub webhook receiver
+- Auto-sync toggle per repository
+- Automatic doc regeneration on push
+
+---
+
+### Phase 11: Team Collaboration Features
+
+**Goal:** Enable team-based workflows for Pro and Team tier subscribers
+
+**Status:** In Progress (1/4 plans complete)
+**Plans:** 4 plans
+- [x] 11-01: Database schema for teams
+- [ ] 11-02: Team invitation system
+- [ ] 11-03: Usage analytics dashboard
+- [ ] 11-04: Custom documentation templates
+
+**Key Features:**
+- [ ] Team management (create, invite, manage members)
+- [ ] Role-based permissions (owner, admin, member)
+- [ ] Shared repository workspaces
+- [ ] Usage analytics with charts and quotas
+- [ ] Custom prompt templates per team
+
+**Target Users:**
+- Team Tier ($399/mo): Full team features, 5 seats
+- Pro Tier ($149/mo): Usage analytics only
+
+**Details:**
+See `.planning/phases/11-team-collaboration/` for full specification.
+
+---
+
 ## Future Milestones
-
-### v1.1 Growth Features (Continued)
-
-**Remaining Phases:**
-- Phase 10: Auto-sync on git push
-- Phase 11: Team collaboration features
-
-**Features:**
-- [ ] Webhook integration for auto-sync
-- [ ] Team member invitations
-- [ ] Usage analytics dashboard
-- [ ] Custom documentation templates
 
 ---
 
@@ -109,5 +140,5 @@ See phase directory for full specification.
 | Milestone | Phases | Status | Shipped |
 |-----------|--------|--------|---------|
 | v1.0 MVP | 1-8 | Complete | 2026-01-14 |
-| v1.1 Growth | 9-11 | In Progress | - |
+| v1.1 Growth | 9-11 | Phase 11 Planned | - |
 | v2.0 Enterprise | 12+ | Future | - |
