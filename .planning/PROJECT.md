@@ -8,12 +8,12 @@ CodeDoc AI is a SaaS application that automatically generates professional docum
 
 **Speed:** Complete documentation suite in 60 seconds vs 6-8 hours manually.
 
-## Current State (v1.0 shipped)
+## Current State (v1.1 shipped)
 
-- **Codebase:** 11,501 LOC TypeScript/Svelte
+- **Codebase:** 20,555 LOC TypeScript/Svelte
 - **Tests:** 308 passing (260 unit + 48 E2E)
 - **Tech stack:** SvelteKit 2.0, Supabase, Stripe, Claude API, Vercel
-- **Status:** Ready for launch
+- **Status:** Growth features complete, ready for enterprise
 
 ## Tech Stack
 
@@ -53,7 +53,7 @@ CodeDoc AI is a SaaS application that automatically generates professional docum
 
 ## Requirements
 
-### Validated (v1.0)
+### Validated
 
 - ✓ GitHub OAuth authentication — v1.0
 - ✓ Repository connection and listing — v1.0
@@ -65,14 +65,18 @@ CodeDoc AI is a SaaS application that automatically generates professional docum
 - ✓ Beta signup and feedback system — v1.0
 - ✓ CRO-optimized landing page — v1.0
 - ✓ Comprehensive test coverage — v1.0
+- ✓ Auto-sync documentation on git push — v1.1
+- ✓ Team member invitations — v1.1
+- ✓ Custom documentation templates — v1.1
+- ✓ Usage analytics dashboard — v1.1
 
-### Active (v1.1+)
+### Active (v2.0+)
 
-- [ ] Auto-sync documentation on git push
-- [ ] Team member invitations
-- [ ] Custom documentation templates
+- [ ] SSO/SAML authentication
+- [ ] Audit logs for enterprise
 - [ ] Slack integration for teams
-- [ ] Usage analytics dashboard
+- [ ] On-premise deployment option
+- [ ] Custom branding for teams
 
 ### Out of Scope
 
@@ -90,6 +94,10 @@ CodeDoc AI is a SaaS application that automatically generates professional docum
 | Remove fake social proof | Build trust, avoid backlash | ✓ Good |
 | IP-based rate limiting | Prevent abuse without accounts | ✓ Good |
 | Comprehensive TDD | Catch regressions, ship confidently | ✓ Good |
+| Token-based team invitations | Secure, email-verified invites | ✓ Good |
+| 5-minute webhook cooldown | Prevent rapid-fire regenerations | ✓ Good |
+| CSS-based payment badges | Avoid SVG rendering issues | ✓ Good |
+| Team tier for collaboration | Clear value prop for upgrade | ✓ Good |
 
 ## Constraints
 
@@ -107,4 +115,4 @@ CodeDoc AI is a SaaS application that automatically generates professional docum
 - MRR growth
 
 ---
-*Last updated: 2026-01-14 after v1.0 milestone*
+*Last updated: 2026-01-15 after v1.1 milestone*

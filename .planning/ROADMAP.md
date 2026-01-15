@@ -3,8 +3,8 @@
 ## Milestones
 
 - [v1.0 MVP Launch](milestones/v1.0-ROADMAP.md) — Phases 1-8 (SHIPPED 2026-01-14)
-- **v1.1 Growth** — Phases 9-10 (planned)
-- **v2.0 Enterprise** — Phases 11+ (future)
+- [v1.1 Growth](milestones/v1.1-ROADMAP.md) — Phases 9-11 (SHIPPED 2026-01-15)
+- **v2.0 Enterprise** — Phases 12+ (planned)
 
 ---
 
@@ -33,105 +33,71 @@ See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 
 </details>
 
----
+<details>
+<summary>v1.1 Growth (Phases 9-11) — SHIPPED 2026-01-15</summary>
 
-## Current Milestone: v1.1 Growth
-
-### Phase 9: CRO Landing Page Rebuild
-
-**Goal:** Rebuild landing page for $90K revenue target with conversion-optimized design
-
-**Depends on:** v1.0 shipped
-**Plans:** 6 plans
-- [x] 09-01: Post-Demo Upsell Enhancement
-- [x] 09-02: Hero Section Redesign
-- [x] 09-03: Urgency Banner + Social Proof
-- [x] 09-04: Value Comparison + Pricing
-- [x] 09-05: Exit Intent + Enterprise
-- [x] 09-06: Analytics + Mobile Optimization
-
-**Target Metrics:**
-- Revenue: $90K in 30 days
-- Visitor → Demo: 20%+
-- Demo → Purchase: 30%+
-- 500+ Single Repo purchases
-- 150+ Pro subscribers
-
-**Key Features:**
-- [ ] Post-demo upsell with locked previews
-- [ ] Value anchor ($600 → $99)
-- [ ] Urgency banner with countdown
-- [ ] Social proof section
-- [ ] Bulk purchase option
-- [ ] Enterprise/Calendly section
-- [ ] Exit intent email capture
-- [ ] Retargeting pixel
-
-**Details:**
-Complete landing page rewrite following AIDA framework (Attention → Interest → Desire → Action).
-See phase directory for full specification.
-
----
-
-### Phase 10: Auto-sync on Git Push
-
-**Goal:** Enable automatic documentation regeneration when code changes via GitHub webhooks
-
-**Status:** Complete
-**Plans:** 2 plans
-- [x] 10-01: Webhook Infrastructure
-- [x] 10-02: Auto-regeneration System
+- [x] Phase 9: CRO Landing Page Rebuild (6/6 plans)
+- [x] Phase 10: Auto-sync on Git Push (2/2 plans)
+- [x] Phase 11: Team Collaboration Features (4/4 plans)
 
 **Delivered:**
-- GitHub webhook receiver
-- Auto-sync toggle per repository
-- Automatic doc regeneration on push
+- Conversion-optimized landing page with value-based pricing
+- Design system overhaul for visual consistency
+- GitHub webhook infrastructure for auto-sync
+- Team collaboration (invitations, roles, permissions)
+- Usage analytics dashboard with 30-day charts
+- Custom documentation templates for teams
+
+See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
+
+</details>
 
 ---
 
-### Phase 11: Team Collaboration Features
+## Current Milestone: v2.0 Enterprise
 
-**Goal:** Enable team-based workflows for Pro and Team tier subscribers
+### Phase 12: Enterprise Authentication
 
-**Status:** Complete (4/4 plans)
-**Plans:** 4 plans
-- [x] 11-01: Database schema for teams
-- [x] 11-02: Team invitation system
-- [x] 11-03: Usage analytics dashboard
-- [x] 11-04: Custom documentation templates
+**Goal:** Add SSO/SAML authentication for enterprise customers
 
-**Key Features:**
-- [ ] Team management (create, invite, manage members)
-- [ ] Role-based permissions (owner, admin, member)
-- [ ] Shared repository workspaces
-- [ ] Usage analytics with charts and quotas
-- [ ] Custom prompt templates per team
-
-**Target Users:**
-- Team Tier ($399/mo): Full team features, 5 seats
-- Pro Tier ($149/mo): Usage analytics only
-
-**Details:**
-See `.planning/phases/11-team-collaboration/` for full specification.
-
----
-
-## Future Milestones
-
----
-
-### v2.0 Enterprise
-
-**Status:** Future
-
-**Goal:** Enterprise features for larger organizations.
+**Status:** Not started
+**Plans:** TBD
 
 **Potential Features:**
-- [ ] SSO/SAML authentication
-- [ ] Audit logs
-- [ ] SLA support
-- [ ] Custom branding
-- [ ] On-premise option
+- [ ] SAML 2.0 integration
+- [ ] SSO with Okta, Azure AD, Google Workspace
+- [ ] Directory sync for team members
+- [ ] Just-in-time provisioning
+
+---
+
+### Phase 13: Audit & Compliance
+
+**Goal:** Enterprise audit logging and compliance features
+
+**Status:** Not started
+**Plans:** TBD
+
+**Potential Features:**
+- [ ] Comprehensive audit logs
+- [ ] Data retention policies
+- [ ] Export capabilities for compliance
+- [ ] SOC 2 preparation
+
+---
+
+### Phase 14: Enterprise Customization
+
+**Goal:** White-label and customization options for enterprise
+
+**Status:** Not started
+**Plans:** TBD
+
+**Potential Features:**
+- [ ] Custom branding (logo, colors)
+- [ ] Custom domain support
+- [ ] On-premise deployment option
+- [ ] SLA support tiers
 
 ---
 
@@ -140,5 +106,5 @@ See `.planning/phases/11-team-collaboration/` for full specification.
 | Milestone | Phases | Status | Shipped |
 |-----------|--------|--------|---------|
 | v1.0 MVP | 1-8 | Complete | 2026-01-14 |
-| v1.1 Growth | 9-11 | Phase 11 Planned | - |
-| v2.0 Enterprise | 12+ | Future | - |
+| v1.1 Growth | 9-11 | Complete | 2026-01-15 |
+| v2.0 Enterprise | 12-14 | Planned | - |

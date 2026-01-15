@@ -4,26 +4,27 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-01-14)
+See: .planning/PROJECT.md (updated 2026-01-15)
 
 **Core value:** Speed — complete docs in 60 seconds
-**Current focus:** v1.1 Growth - Team collaboration features
+**Current focus:** v2.0 Enterprise - SSO/SAML, audit logs, customization
 
 ## Milestone Status
 
 **v1.0 MVP Launch:** SHIPPED 2026-01-14
-**v1.1 Growth:** In Progress
+**v1.1 Growth:** SHIPPED 2026-01-15
+**v2.0 Enterprise:** Planning
 
 ## Current Position
 
-Phase: 11 — Team Collaboration Features
-Plan: 4 of 4 complete
-Status: Complete
-Last activity: 2026-01-15 — Completed all Phase 11 plans
+Phase: 12 — Enterprise Authentication
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-01-15 — v1.1 milestone complete
 
-Progress: [██████████] 4/4 plans in Phase 11
+Progress: [░░░░░░░░░░] 0/? plans in Phase 12
 
-**Next Action:** Launch preparation or next milestone
+**Next Action:** Plan v2.0 Enterprise features or launch activities
 
 ## Feature Status
 
@@ -42,6 +43,9 @@ Progress: [██████████] 4/4 plans in Phase 11
 | Rate Limiting | Complete | IP-based demo limiting |
 | Analytics | Complete | Event tracking |
 | Landing Page | Complete | CRO-optimized |
+| Auto-sync | Complete | GitHub webhooks |
+| Team Collaboration | Complete | Invitations, roles, templates |
+| Usage Analytics | Complete | 30-day charts |
 
 ## Current Pricing Model
 
@@ -91,28 +95,24 @@ npm run check        # TypeScript check
 | Remove fake social proof | Build trust, avoid backlash |
 | Try-without-signup | Reduce friction |
 | Comprehensive TDD | Ship confidently |
+| Token-based invitations | Secure team invites |
+| 5-minute webhook cooldown | Prevent spam regenerations |
+| CSS-based payment badges | Avoid SVG rendering issues |
 
-## Completed Phases (v1.1)
+## Completed Milestones
 
-| Phase | Status | Notes |
-|-------|--------|-------|
-| Phase 9: CRO Landing Page | COMPLETE | Full landing page rebuild |
-| Phase 10: Auto-sync | COMPLETE | Webhook infrastructure |
-| Phase 11: Team Collaboration | PLANNED | 4 plans ready |
+| Milestone | Status | Notes |
+|-----------|--------|-------|
+| v1.0 MVP Launch | SHIPPED | 2026-01-14 |
+| v1.1 Growth | SHIPPED | 2026-01-15 |
 
 ## Next Steps
 
-1. **Execute Phase 11:** Run plan 11-01 (Database Schema)
-2. **Team Features:** Invitations, analytics, templates
-3. **Launch:** Execute launch runbook
-
-## Roadmap Evolution
-
-- Phase 9: CRO Landing Page Rebuild - COMPLETE
-- Phase 10: Auto-sync on Git Push - COMPLETE
-- Phase 11: Team Collaboration - PLANNED
+1. **Launch:** Execute launch runbook (Product Hunt, HN, Reddit)
+2. **Gather feedback:** Monitor user signups and conversions
+3. **Plan v2.0:** Enterprise features based on customer demand
 
 ---
 
 *v1.0 shipped: 2026-01-14*
-*Phase 11 planned: 2026-01-15*
+*v1.1 shipped: 2026-01-15*
