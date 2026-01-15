@@ -218,3 +218,10 @@ BEGIN
     RAISE NOTICE 'Team enterprise columns added successfully';
   END IF;
 END $$;
+
+-- Add SCIM token for directory sync
+ALTER TABLE sso_configs ADD COLUMN IF NOT EXISTS scim_token TEXT;
+ALTER TABLE sso_configs ADD COLUMN IF NOT EXISTS scim_enabled BOOLEAN DEFAULT false;
+
+-- Index for SCIM token lookup
+CREATE INDEX IF NOT EXISTS idx_sso_configs_scim_token ON sso_configs(scim_token) WHERE scim_token IS NOT NULL;
