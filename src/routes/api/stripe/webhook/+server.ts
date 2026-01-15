@@ -209,8 +209,14 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       const amount = product === 'pro' ? 149 : product === 'team' ? 399 : 999;
       trackCheckoutCompleted(userId, product, amount);
 
+      // For team tier, create a team if one doesn't exist
+      if (product === 'team') {
+        await ensureTeamForUser(userId);
+      }
+
       // For enterprise tier, enable enterprise features on team
       if (product === 'enterprise') {
+        await ensureTeamForUser(userId);
         await enableEnterpriseFeaturesForUser(userId);
       }
 
@@ -512,6 +518,121 @@ async function handleAddonPurchase(
   } catch (err) {
     console.error('Error processing addon purchase:', err);
   }
+}
+
+/**
+ * Ensure a team exists for a user (for Team/Enterprise subscriptions)
+ * Creates a new team if the user doesn't have one
+ */
+async function ensureTeamForUser(userId: string): Promise<string | null> {
+  console.log(`Ensuring team exists for user ${userId}`);
+
+  // Get user profile
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('id, email, github_username, default_team_id')
+    .eq('id', userId)
+    .single();
+
+  if (!profile) {
+    console.error(`No profile found for user ${userId}`);
+    return null;
+  }
+
+  // Check if user already has a team (owned or member)
+  if (profile.default_team_id) {
+    console.log(`User ${userId} already has default_team_id: ${profile.default_team_id}`);
+    return profile.default_team_id;
+  }
+
+  // Check if user owns a team
+  const { data: ownedTeam } = await supabaseAdmin
+    .from('teams')
+    .select('id')
+    .eq('owner_id', userId)
+    .single();
+
+  if (ownedTeam) {
+    // Update profile with default team
+    await supabaseAdmin
+      .from('profiles')
+      .update({ default_team_id: ownedTeam.id })
+      .eq('id', userId);
+    console.log(`User ${userId} already owns team ${ownedTeam.id}`);
+    return ownedTeam.id;
+  }
+
+  // Check if user is a member of any team
+  const { data: membership } = await supabaseAdmin
+    .from('team_members')
+    .select('team_id')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .single();
+
+  if (membership) {
+    await supabaseAdmin
+      .from('profiles')
+      .update({ default_team_id: membership.team_id })
+      .eq('id', userId);
+    console.log(`User ${userId} is member of team ${membership.team_id}`);
+    return membership.team_id;
+  }
+
+  // Create a new team for the user
+  const teamName = profile.github_username
+    ? `${profile.github_username}'s Team`
+    : 'My Team';
+
+  const teamSlug = (profile.github_username || 'team')
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 30);
+
+  const { data: newTeam, error: teamError } = await supabaseAdmin
+    .from('teams')
+    .insert({
+      name: teamName,
+      slug: `${teamSlug}-${Date.now().toString(36)}`,
+      owner_id: userId,
+      max_seats: 5, // Team plan default
+      created_at: new Date().toISOString()
+    })
+    .select()
+    .single();
+
+  if (teamError) {
+    console.error('Failed to create team:', teamError);
+    return null;
+  }
+
+  console.log(`Created new team ${newTeam.id} for user ${userId}`);
+
+  // Add owner as team member
+  const { error: memberError } = await supabaseAdmin
+    .from('team_members')
+    .insert({
+      team_id: newTeam.id,
+      user_id: userId,
+      role: 'owner',
+      status: 'active',
+      invited_by: userId,
+      joined_at: new Date().toISOString()
+    });
+
+  if (memberError) {
+    console.error('Failed to add owner as team member:', memberError);
+  }
+
+  // Update user's default team
+  await supabaseAdmin
+    .from('profiles')
+    .update({ default_team_id: newTeam.id })
+    .eq('id', userId);
+
+  console.log(`Team ${newTeam.id} fully set up for user ${userId}`);
+  return newTeam.id;
 }
 
 /**

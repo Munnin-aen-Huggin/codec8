@@ -30,10 +30,89 @@
 
 	<!-- Main Content -->
 	<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-		<div class="mb-8">
-			<p class="text-zinc-400">Track your documentation generation activity and usage patterns.</p>
-		</div>
+		{#if data.hasAccess}
+			<div class="mb-8">
+				<p class="text-zinc-400">Track your documentation generation activity and usage patterns.</p>
+			</div>
 
-		<UsageAnalytics teamId={data.profile?.default_team_id} />
+			<UsageAnalytics teamId={data.profile?.default_team_id} />
+		{:else}
+			<!-- Upgrade Prompt for Free Users -->
+			<div class="max-w-2xl mx-auto text-center py-16">
+				<div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 flex items-center justify-center mx-auto mb-6">
+					<svg class="w-10 h-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+					</svg>
+				</div>
+
+				<h2 class="text-2xl font-bold text-white mb-3">Unlock Usage Analytics</h2>
+				<p class="text-zinc-400 mb-8 max-w-md mx-auto">
+					Get detailed insights into your documentation generation activity, token usage, and team performance with a Pro or Team subscription.
+				</p>
+
+				<!-- Feature Preview -->
+				<div class="grid gap-4 sm:grid-cols-2 text-left mb-8">
+					<div class="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
+						<div class="flex items-center gap-3 mb-2">
+							<div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+								<svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+								</svg>
+							</div>
+							<h3 class="font-semibold text-white">30-Day Usage Charts</h3>
+						</div>
+						<p class="text-sm text-zinc-400">Visualize your daily documentation generation trends</p>
+					</div>
+
+					<div class="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
+						<div class="flex items-center gap-3 mb-2">
+							<div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+								<svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+								</svg>
+							</div>
+							<h3 class="font-semibold text-white">Document Breakdown</h3>
+						</div>
+						<p class="text-sm text-zinc-400">See which doc types you generate most often</p>
+					</div>
+
+					<div class="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
+						<div class="flex items-center gap-3 mb-2">
+							<div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+								<svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+							</div>
+							<h3 class="font-semibold text-white">Token Tracking</h3>
+						</div>
+						<p class="text-sm text-zinc-400">Monitor AI token consumption and costs</p>
+					</div>
+
+					<div class="p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
+						<div class="flex items-center gap-3 mb-2">
+							<div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+								<svg class="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+								</svg>
+							</div>
+							<h3 class="font-semibold text-white">Team Activity</h3>
+						</div>
+						<p class="text-sm text-zinc-400">Track member contributions and usage</p>
+					</div>
+				</div>
+
+				<div class="flex flex-col sm:flex-row gap-3 justify-center">
+					<a href="/pricing" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-2">
+						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+						</svg>
+						Upgrade to Pro
+					</a>
+					<a href="/dashboard" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-2">
+						Back to Dashboard
+					</a>
+				</div>
+			</div>
+		{/if}
 	</main>
 </div>

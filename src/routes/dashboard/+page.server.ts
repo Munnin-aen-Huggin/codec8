@@ -129,6 +129,91 @@ export const load: PageServerLoad = async ({ cookies }) => {
     };
   }
 
+  // Get user's team ID (for team add-ons)
+  let userTeamId: string | null = null;
+  if (profile.subscription_tier === 'team' || profile.subscription_tier === 'enterprise') {
+    // First check default_team_id on profile
+    if (profile.default_team_id) {
+      userTeamId = profile.default_team_id;
+    } else {
+      // Check if user owns a team
+      const { data: ownedTeam } = await supabaseAdmin
+        .from('teams')
+        .select('id')
+        .eq('owner_id', userId)
+        .single();
+
+      if (ownedTeam) {
+        userTeamId = ownedTeam.id;
+        // Update profile with default team
+        await supabaseAdmin
+          .from('profiles')
+          .update({ default_team_id: ownedTeam.id })
+          .eq('id', userId);
+      } else {
+        // Check if user is a member of a team
+        const { data: membership } = await supabaseAdmin
+          .from('team_members')
+          .select('team_id')
+          .eq('user_id', userId)
+          .eq('status', 'active')
+          .single();
+
+        if (membership) {
+          userTeamId = membership.team_id;
+          await supabaseAdmin
+            .from('profiles')
+            .update({ default_team_id: membership.team_id })
+            .eq('id', userId);
+        } else {
+          // Auto-create team for Team/Enterprise subscribers without a team
+          const teamName = profile.github_username
+            ? `${profile.github_username}'s Team`
+            : 'My Team';
+
+          const teamSlug = (profile.github_username || 'team')
+            .toLowerCase()
+            .replace(/[^a-z0-9-]/g, '-')
+            .replace(/-+/g, '-')
+            .slice(0, 30);
+
+          const { data: newTeam } = await supabaseAdmin
+            .from('teams')
+            .insert({
+              name: teamName,
+              slug: `${teamSlug}-${Date.now().toString(36)}`,
+              owner_id: userId,
+              max_seats: profile.subscription_tier === 'enterprise' ? 9999 : 5,
+              created_at: new Date().toISOString()
+            })
+            .select()
+            .single();
+
+          if (newTeam) {
+            userTeamId = newTeam.id;
+            // Add owner as team member
+            await supabaseAdmin
+              .from('team_members')
+              .insert({
+                team_id: newTeam.id,
+                user_id: userId,
+                role: 'owner',
+                status: 'active',
+                invited_by: userId,
+                joined_at: new Date().toISOString()
+              });
+            // Update profile with default team
+            await supabaseAdmin
+              .from('profiles')
+              .update({ default_team_id: newTeam.id })
+              .eq('id', userId);
+            console.log(`Auto-created team ${newTeam.id} for user ${userId}`);
+          }
+        }
+      }
+    }
+  }
+
   // Fetch stale doc alerts
   let staleAlerts: StalenessAlert[] = [];
   try {
@@ -171,6 +256,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     trialEndsAt,
     shouldShowOnboarding,
     addonInfo,
-    staleAlerts
+    staleAlerts,
+    userTeamId
   };
 };

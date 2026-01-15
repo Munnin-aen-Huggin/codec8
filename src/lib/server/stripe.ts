@@ -2,16 +2,19 @@ import Stripe from 'stripe';
 import { STRIPE_SECRET_KEY } from '$env/static/private';
 import { env } from '$env/dynamic/private';
 
-// Get addon price IDs from dynamic env (optional)
+// Get price IDs from dynamic env (optional)
+// Support both ADDON_ prefix and non-prefix versions for backwards compatibility
 const STRIPE_PRICE_SINGLE = env.STRIPE_PRICE_SINGLE || '';
 const STRIPE_PRICE_PRO = env.STRIPE_PRICE_PRO || '';
 const STRIPE_PRICE_TEAM = env.STRIPE_PRICE_TEAM || '';
-const STRIPE_PRICE_ADDON_UNLIMITED_REGEN = env.STRIPE_PRICE_ADDON_UNLIMITED_REGEN || '';
-const STRIPE_PRICE_ADDON_EXTRA_REPOS = env.STRIPE_PRICE_ADDON_EXTRA_REPOS || '';
-const STRIPE_PRICE_ADDON_EXTRA_SEATS = env.STRIPE_PRICE_ADDON_EXTRA_SEATS || '';
-const STRIPE_PRICE_ADDON_AUDIT_LOGS = env.STRIPE_PRICE_ADDON_AUDIT_LOGS || '';
 const STRIPE_PRICE_ENTERPRISE = env.STRIPE_PRICE_ENTERPRISE || '';
-const STRIPE_PRICE_ADDON_SSO = env.STRIPE_PRICE_ADDON_SSO || '';
+
+// Add-on prices - check both naming conventions
+const STRIPE_PRICE_UNLIMITED_REGEN = env.STRIPE_PRICE_UNLIMITED_REGEN || env.STRIPE_PRICE_ADDON_UNLIMITED_REGEN || '';
+const STRIPE_PRICE_EXTRA_REPOS = env.STRIPE_PRICE_EXTRA_REPOS || env.STRIPE_PRICE_ADDON_EXTRA_REPOS || '';
+const STRIPE_PRICE_EXTRA_SEAT = env.STRIPE_PRICE_EXTRA_SEAT || env.STRIPE_PRICE_ADDON_EXTRA_SEATS || '';
+const STRIPE_PRICE_AUDIT_LOGS = env.STRIPE_PRICE_AUDIT_LOGS || env.STRIPE_PRICE_ADDON_AUDIT_LOGS || '';
+const STRIPE_PRICE_SSO = env.STRIPE_PRICE_SSO || env.STRIPE_PRICE_ADDON_SSO || '';
 
 export const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2025-12-15.clover'
@@ -58,7 +61,7 @@ interface AddonConfig {
 
 export const ADDON_PRODUCTS: Record<AddonType, AddonConfig> = {
   unlimited_regen: {
-    priceId: STRIPE_PRICE_ADDON_UNLIMITED_REGEN || 'price_unlimited_regen_placeholder',
+    priceId: STRIPE_PRICE_UNLIMITED_REGEN || 'price_unlimited_regen_placeholder',
     name: 'Unlimited Regenerations',
     price: 29,
     description: 'Remove the 5-minute cooldown between regenerations',
@@ -66,15 +69,15 @@ export const ADDON_PRODUCTS: Record<AddonType, AddonConfig> = {
     forTeam: false
   },
   extra_repos: {
-    priceId: STRIPE_PRICE_ADDON_EXTRA_REPOS || 'price_extra_repos_placeholder',
+    priceId: STRIPE_PRICE_EXTRA_REPOS || 'price_extra_repos_placeholder',
     name: 'Extra Repos',
     price: 5,
     description: '10 additional repos per month',
     perUnit: '/10 repos/month',
-    forTeam: true
+    forTeam: false // Changed: Pro users can also buy extra repos
   },
   extra_seats: {
-    priceId: STRIPE_PRICE_ADDON_EXTRA_SEATS || 'price_extra_seats_placeholder',
+    priceId: STRIPE_PRICE_EXTRA_SEAT || 'price_extra_seats_placeholder',
     name: 'Additional Seat',
     price: 49,
     description: 'Add one more team member',
@@ -82,7 +85,7 @@ export const ADDON_PRODUCTS: Record<AddonType, AddonConfig> = {
     forTeam: true
   },
   audit_logs: {
-    priceId: STRIPE_PRICE_ADDON_AUDIT_LOGS || 'price_audit_logs_placeholder',
+    priceId: STRIPE_PRICE_AUDIT_LOGS || 'price_audit_logs_placeholder',
     name: 'Audit Logs',
     price: 49,
     description: 'Compliance audit logging for your team',
@@ -90,7 +93,7 @@ export const ADDON_PRODUCTS: Record<AddonType, AddonConfig> = {
     forTeam: true
   },
   sso: {
-    priceId: STRIPE_PRICE_ADDON_SSO || 'price_sso_placeholder',
+    priceId: STRIPE_PRICE_SSO || 'price_sso_placeholder',
     name: 'SSO/SAML',
     price: 99,
     description: 'Single sign-on with Okta, Azure AD, Google Workspace',

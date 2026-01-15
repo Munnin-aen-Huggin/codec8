@@ -37,7 +37,7 @@
   let checkoutLoading = false;
 
   // Extract usage data from page data
-  $: ({ usageInfo, purchasedRepos, addonInfo, staleAlerts } = data);
+  $: ({ usageInfo, purchasedRepos, addonInfo, staleAlerts, userTeamId } = data);
 
   // Track dismissed alerts locally
   let dismissedAlertIds: Set<string> = new Set();
@@ -63,10 +63,23 @@
   async function purchaseAddon(addonType: string) {
     addonCheckoutLoading = addonType;
     try {
+      // Team add-ons require teamId
+      const teamAddons = ['extra_seats', 'audit_logs', 'sso'];
+      const needsTeam = teamAddons.includes(addonType);
+
+      if (needsTeam && !userTeamId) {
+        toast.error('You must be part of a team to purchase this add-on');
+        addonCheckoutLoading = null;
+        return;
+      }
+
       const response = await fetch('/api/stripe/addon-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addonType })
+        body: JSON.stringify({
+          addonType,
+          teamId: needsTeam ? userTeamId : undefined
+        })
       });
 
       const result = await response.json();
@@ -405,6 +418,26 @@
         <p class="text-body text-text-secondary">Manage your repositories and documentation</p>
       </div>
 
+      <!-- Quick Actions -->
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+        <a href="/dashboard/analytics" class="card p-5 hover:border-accent/30 hover:bg-dark-700 transition-all cursor-pointer group">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center flex-shrink-0">
+              <svg class="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-text-primary font-semibold group-hover:text-accent transition-colors">Usage Analytics</h3>
+              <p class="text-body-sm text-text-muted truncate">View detailed usage stats and trends</p>
+            </div>
+            <svg class="w-5 h-5 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-all flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </a>
+      </div>
+
       <!-- Usage Stats (for subscribers) -->
       {#if usageInfo}
         <div class="card p-6 mb-8">
@@ -526,16 +559,21 @@
               </div>
 
               <!-- Analytics Link -->
-              <a href="/dashboard/analytics" class="p-4 bg-dark-700 rounded-xl border border-dark-500 hover:border-accent/30 transition-colors block">
+              <a href="/dashboard/analytics" class="p-4 bg-dark-700 rounded-xl border border-dark-500 hover:border-accent/30 hover:bg-dark-600 transition-all cursor-pointer block group">
                 <div class="flex items-start justify-between mb-3">
                   <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
                     <svg class="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   </div>
-                  <span class="text-text-muted text-body-sm">Included</span>
+                  <div class="flex items-center gap-1 text-text-muted text-body-sm">
+                    <span>Included</span>
+                    <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
-                <h3 class="text-text-primary font-medium mb-1">Usage Analytics</h3>
+                <h3 class="text-text-primary font-medium mb-1 group-hover:text-accent transition-colors">Usage Analytics</h3>
                 <p class="text-body-sm text-text-muted">View detailed usage stats and trends</p>
               </a>
             </div>

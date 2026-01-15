@@ -29,15 +29,14 @@ export const load: PageServerLoad = async ({ cookies }) => {
 
 	const tier = profile?.subscription_tier || profile?.plan || 'free';
 
-	// Only Pro and Team users can access analytics
-	if (!['pro', 'team', 'ltd', 'dfy'].includes(tier)) {
-		throw redirect(303, '/dashboard?upgrade=analytics');
-	}
+	// Check if user has access to analytics (Pro, Team, LTD, or DFY)
+	const hasAccess = ['pro', 'team', 'ltd', 'dfy'].includes(tier);
 
 	return {
 		profile: {
 			subscription_tier: tier,
 			default_team_id: profile?.default_team_id
-		}
+		},
+		hasAccess
 	};
 };
