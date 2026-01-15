@@ -29,7 +29,12 @@ export type AuditAction =
 	| 'subscription_started'
 	| 'subscription_cancelled'
 	| 'addon_purchased'
-	| 'addon_cancelled';
+	| 'addon_cancelled'
+	// SSO/SAML
+	| 'sso_configured'
+	| 'sso_removed'
+	| 'sso_login'
+	| 'sso_logout';
 
 export type ResourceType =
 	| 'team'
@@ -37,7 +42,40 @@ export type ResourceType =
 	| 'invitation'
 	| 'documentation'
 	| 'repository'
-	| 'subscription';
+	| 'subscription'
+	| 'sso_config'
+	| 'sso_session';
+
+// Action constants for easy import
+export const AUDIT_ACTIONS = {
+	// Team management
+	MEMBER_INVITED: 'member_invited' as const,
+	MEMBER_REMOVED: 'member_removed' as const,
+	MEMBER_JOINED: 'member_joined' as const,
+	ROLE_CHANGED: 'role_changed' as const,
+	TEAM_CREATED: 'team_created' as const,
+	TEAM_DELETED: 'team_deleted' as const,
+	TEAM_SETTINGS_CHANGED: 'team_settings_changed' as const,
+	// Documentation
+	DOC_GENERATED: 'doc_generated' as const,
+	DOC_EDITED: 'doc_edited' as const,
+	DOC_EXPORTED: 'doc_exported' as const,
+	DOC_DELETED: 'doc_deleted' as const,
+	// Repository
+	REPO_CONNECTED: 'repo_connected' as const,
+	REPO_DISCONNECTED: 'repo_disconnected' as const,
+	REPO_SYNCED: 'repo_synced' as const,
+	// Subscription
+	SUBSCRIPTION_STARTED: 'subscription_started' as const,
+	SUBSCRIPTION_CANCELLED: 'subscription_cancelled' as const,
+	ADDON_PURCHASED: 'addon_purchased' as const,
+	ADDON_CANCELLED: 'addon_cancelled' as const,
+	// SSO/SAML
+	SSO_CONFIGURED: 'sso_configured' as const,
+	SSO_REMOVED: 'sso_removed' as const,
+	SSO_LOGIN: 'sso_login' as const,
+	SSO_LOGOUT: 'sso_logout' as const
+};
 
 export interface AuditLogEntry {
 	id: string;
