@@ -7,24 +7,25 @@
 See: .planning/PROJECT.md (updated 2026-01-15)
 
 **Core value:** Speed — complete docs in 60 seconds
-**Current focus:** v2.0 Enterprise - SSO/SAML, audit logs, customization
+**Current focus:** v2.0 Enterprise - SSO/SAML, customization
 
 ## Milestone Status
 
 **v1.0 MVP Launch:** SHIPPED 2026-01-14
 **v1.1 Growth:** SHIPPED 2026-01-15
+**v1.2 Upsells:** SHIPPED 2026-01-15
 **v2.0 Enterprise:** Planning
 
 ## Current Position
 
-Phase: 12 — Enterprise Authentication
+Phase: 13 — Enterprise Authentication (SSO/SAML)
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-01-15 — v1.1 milestone complete
+Last activity: 2026-01-15 — Phase 12 upsell features complete
 
-Progress: [░░░░░░░░░░] 0/? plans in Phase 12
+Progress: [░░░░░░░░░░] 0/? plans in Phase 13
 
-**Next Action:** Plan v2.0 Enterprise features or launch activities
+**Next Action:** Plan SSO/SAML or launch activities
 
 ## Feature Status
 
@@ -46,6 +47,10 @@ Progress: [░░░░░░░░░░] 0/? plans in Phase 12
 | Auto-sync | Complete | GitHub webhooks |
 | Team Collaboration | Complete | Invitations, roles, templates |
 | Usage Analytics | Complete | 30-day charts |
+| Subscription Add-ons | Complete | Extra repos, seats, unlimited regen |
+| Stale Doc Alerts | Complete | Staleness detection system |
+| Doc Quality Scoring | Complete | AI-powered analysis |
+| Audit Logs | Complete | Team compliance logging |
 
 ## Current Pricing Model
 
@@ -55,6 +60,15 @@ Progress: [░░░░░░░░░░] 0/? plans in Phase 12
 | Single Repo | $99 | One-time | All 4 doc types, 1 repo forever |
 | Pro | $149/mo | Subscription | 30 repos/month, cancel anytime |
 | Team | $399/mo | Subscription | 100 repos/month, 5 seats, cancel anytime |
+
+### Add-ons (Pro/Team)
+
+| Add-on | Price | Features |
+|--------|-------|----------|
+| Unlimited Regenerations | $29/mo | Remove 5-min cooldown |
+| Extra Repos | $5/10 repos/mo | Stackable |
+| Additional Seats | $49/seat/mo | Team only |
+| Audit Logs | $49/mo | Team compliance |
 
 ## Test Coverage
 
@@ -105,14 +119,16 @@ npm run check        # TypeScript check
 |-----------|--------|-------|
 | v1.0 MVP Launch | SHIPPED | 2026-01-14 |
 | v1.1 Growth | SHIPPED | 2026-01-15 |
+| v1.2 Upsells | SHIPPED | 2026-01-15 |
 
 ## Next Steps
 
 1. **Launch:** Execute launch runbook (Product Hunt, HN, Reddit)
 2. **Gather feedback:** Monitor user signups and conversions
-3. **Plan v2.0:** Enterprise features based on customer demand
+3. **Plan v2.0:** Enterprise features (SSO/SAML) based on customer demand
 
 ---
 
 *v1.0 shipped: 2026-01-14*
 *v1.1 shipped: 2026-01-15*
+*v1.2 shipped: 2026-01-15*

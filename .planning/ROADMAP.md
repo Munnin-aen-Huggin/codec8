@@ -4,7 +4,8 @@
 
 - [v1.0 MVP Launch](milestones/v1.0-ROADMAP.md) — Phases 1-8 (SHIPPED 2026-01-14)
 - [v1.1 Growth](milestones/v1.1-ROADMAP.md) — Phases 9-11 (SHIPPED 2026-01-15)
-- **v2.0 Enterprise** — Phases 12+ (planned)
+- **v1.2 Upsells** — Phase 12 (SHIPPED 2026-01-15)
+- **v2.0 Enterprise** — Phases 13+ (planned)
 
 ---
 
@@ -52,11 +53,25 @@ See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 
 </details>
 
+<details>
+<summary>v1.2 Upsells (Phase 12) — SHIPPED 2026-01-15</summary>
+
+- [x] Phase 12: Upsell Features (1/1 plan)
+
+**Delivered:**
+- Subscription add-ons: unlimited regenerations ($29/mo), extra repos ($5/10 repos), extra seats ($49/seat)
+- Audit logs for team compliance ($49/mo)
+- Document quality scoring with AI analysis
+- Stale documentation alerts system
+- Stripe webhook handling for add-on subscriptions
+
+</details>
+
 ---
 
 ## Current Milestone: v2.0 Enterprise
 
-### Phase 12: Enterprise Authentication
+### Phase 13: Enterprise Authentication
 
 **Goal:** Add SSO/SAML authentication for enterprise customers
 
@@ -68,21 +83,6 @@ See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 - [ ] SSO with Okta, Azure AD, Google Workspace
 - [ ] Directory sync for team members
 - [ ] Just-in-time provisioning
-
----
-
-### Phase 13: Audit & Compliance
-
-**Goal:** Enterprise audit logging and compliance features
-
-**Status:** Not started
-**Plans:** TBD
-
-**Potential Features:**
-- [ ] Comprehensive audit logs
-- [ ] Data retention policies
-- [ ] Export capabilities for compliance
-- [ ] SOC 2 preparation
 
 ---
 
@@ -107,4 +107,5 @@ See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 |-----------|--------|--------|---------|
 | v1.0 MVP | 1-8 | Complete | 2026-01-14 |
 | v1.1 Growth | 9-11 | Complete | 2026-01-15 |
-| v2.0 Enterprise | 12-14 | Planned | - |
+| v1.2 Upsells | 12 | Complete | 2026-01-15 |
+| v2.0 Enterprise | 13-14 | Planned | - |
