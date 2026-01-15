@@ -2,7 +2,7 @@
  * Demo API Endpoint - Try Without Signup
  *
  * Generates README documentation for public GitHub repositories
- * without requiring authentication. Rate limited to 1/day per IP.
+ * without requiring authentication. Limited to 1 demo per IP (ever).
  */
 
 import { json } from '@sveltejs/kit';
@@ -400,7 +400,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			);
 		}
 
-		// STEP 4: Rate limiting (1/day per IP)
+		// STEP 4: Rate limiting (1 demo per IP ever)
 		const { allowed } = await checkDemoLimit(ipHash);
 		if (!allowed) {
 			// Track rate limit hit
@@ -408,8 +408,8 @@ export const POST: RequestHandler = async ({ request }) => {
 			return json(
 				{
 					error: 'limit_reached',
-					message: 'Daily demo limit reached. Start your free trial for unlimited access.',
-					canTryAgainAt: getNextMidnightUTC()
+					message: 'You\'ve used your free demo. Get full access with all 4 doc types for just $99.',
+					upgradeUrl: '/#pricing'
 				},
 				{ status: 429 }
 			);

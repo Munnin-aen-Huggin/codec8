@@ -36,7 +36,7 @@ CodeDoc AI is a SaaS application that automatically generates professional docum
 
 | Tier | Price | Type | Features |
 |------|-------|------|----------|
-| Free Demo | $0 | - | README only, 1/day, public repos |
+| Free Demo | $0 | - | README only, 1 per IP, public repos |
 | Single Repo | $99 | One-time | All 4 doc types, 1 repo forever |
 | Pro | $149/mo | Subscription | 30 repos/month, 7-day trial |
 | Team | $399/mo | Subscription | 100 repos/month, 5 seats, 7-day trial |

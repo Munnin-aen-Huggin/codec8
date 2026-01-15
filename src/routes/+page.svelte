@@ -118,7 +118,7 @@
 
 			<!-- Demo Details - Updated microcopy -->
 			<div class="demo-details">
-				<span>1 free demo per day</span>
+				<span>1 free demo</span>
 				<span class="separator">•</span>
 				<span>README preview</span>
 				<span class="separator">•</span>
@@ -132,39 +132,6 @@
 <section class="video-section">
 	<div class="container">
 		<VideoDemo />
-	</div>
-</section>
-
-<!-- What You Get Section -->
-<section class="what-you-get">
-	<div class="container">
-		<div class="section-header">
-			<h2>What You Get</h2>
-			<p>Four documentation types, automatically generated</p>
-		</div>
-
-		<div class="get-grid">
-			<div class="get-card">
-				<div class="get-icon">README</div>
-				<h3>README.md</h3>
-				<p>Project overview, badges, installation, usage, and configuration - ready to merge.</p>
-			</div>
-			<div class="get-card">
-				<div class="get-icon">API</div>
-				<h3>API Documentation</h3>
-				<p>Auto-detected endpoints, request/response examples, authentication docs.</p>
-			</div>
-			<div class="get-card">
-				<div class="get-icon">ARCH</div>
-				<h3>Architecture Diagram</h3>
-				<p>Component relationships and data flow in editable Mermaid.js format.</p>
-			</div>
-			<div class="get-card">
-				<div class="get-icon">SETUP</div>
-				<h3>Setup Guide</h3>
-				<p>Environment setup, dependencies, and deployment instructions.</p>
-			</div>
-		</div>
 	</div>
 </section>
 
@@ -185,7 +152,7 @@
 					<li class="locked">Architecture diagram</li>
 					<li class="locked">Setup guide</li>
 					<li class="included">Public repos only</li>
-					<li class="included">1 demo per day</li>
+					<li class="included">1 demo only</li>
 					<li class="locked">No export</li>
 				</ul>
 			</div>
@@ -261,7 +228,7 @@
 				</div>
 				<ul class="features">
 					<li>README only</li>
-					<li>1/day limit</li>
+					<li>One-time only</li>
 					<li>Public repos</li>
 					<li>No signup</li>
 				</ul>
@@ -1066,51 +1033,6 @@
 	/* Video Section */
 	.video-section {
 		padding: 60px 0;
-	}
-
-	/* What You Get Section */
-	.what-you-get {
-		padding: 80px 0;
-	}
-
-	.get-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-		gap: 24px;
-	}
-
-	.get-card {
-		background: var(--bg-elevated);
-		border: 1px solid var(--border);
-		border-radius: 12px;
-		padding: 28px;
-		transition: all 0.3s;
-	}
-
-	.get-card:hover {
-		border-color: var(--accent);
-		transform: translateY(-4px);
-	}
-
-	.get-icon {
-		display: inline-block;
-		background: rgba(16, 185, 129, 0.1);
-		color: var(--accent);
-		padding: 8px 12px;
-		border-radius: 6px;
-		font-size: 0.75rem;
-		font-weight: 700;
-		margin-bottom: 16px;
-	}
-
-	.get-card h3 {
-		font-size: 1.15rem;
-		margin-bottom: 8px;
-	}
-
-	.get-card p {
-		color: var(--text-secondary);
-		font-size: 0.95rem;
 	}
 
 	/* Comparison Section */

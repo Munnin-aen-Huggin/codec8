@@ -64,42 +64,36 @@ export async function isBlocked(ipHash: string, fingerprint?: string): Promise<b
 
 /**
  * Check if a demo usage is allowed for the given IP
- * Limit is 1 per day per IP
+ * Limit is 1 demo EVER per IP (not daily reset)
  */
 export async function checkDemoLimit(ipHash: string): Promise<{ allowed: boolean; remaining: number }> {
-	const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 	const ipHashShort = ipHash.substring(0, 8); // For logging
 
-	console.log(`[RateLimit] Checking demo limit for IP hash ${ipHashShort}... on ${today}`);
+	console.log(`[RateLimit] Checking demo limit for IP hash ${ipHashShort}...`);
 	console.log(`[RateLimit] Supabase URL configured: ${!!process.env.PUBLIC_SUPABASE_URL}`);
 
+	// Check if this IP has EVER used the demo (not just today)
 	const { data, error } = await supabaseAdmin
 		.from('demo_usage')
 		.select('usage_count')
 		.eq('ip_hash', ipHash)
-		.eq('date', today)
-		.single();
+		.limit(1);
 
-	if (error && error.code !== 'PGRST116') {
-		// PGRST116 = no rows found, which is fine
+	if (error) {
 		console.error(`[RateLimit] DB error checking limit for ${ipHashShort}:`, error.code, error.message);
 		// On error, allow but log
 		return { allowed: true, remaining: 1 };
 	}
 
-	if (error?.code === 'PGRST116') {
-		console.log(`[RateLimit] No usage record found for ${ipHashShort} today - allowing`);
-	}
+	// If any record exists for this IP, they've used their one-time demo
+	const hasUsedDemo = data && data.length > 0;
+	const allowed = !hasUsedDemo;
 
-	const used = data?.usage_count || 0;
-	const limit = 1;
-	const allowed = used < limit;
-
-	console.log(`[RateLimit] IP ${ipHashShort}: used=${used}, limit=${limit}, allowed=${allowed}`);
+	console.log(`[RateLimit] IP ${ipHashShort}: hasUsedDemo=${hasUsedDemo}, allowed=${allowed}`);
 
 	return {
 		allowed,
-		remaining: Math.max(0, limit - used)
+		remaining: allowed ? 1 : 0
 	};
 }
 

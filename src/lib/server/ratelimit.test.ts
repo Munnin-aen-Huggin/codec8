@@ -38,6 +38,10 @@ vi.mock('./supabase', () => ({
 										}
 									};
 								},
+								limit: (...limitArgs: unknown[]) => {
+									mockLimit(...limitArgs);
+									return mockSingle();
+								},
 								single: () => mockSingle()
 							};
 						}
@@ -45,7 +49,9 @@ vi.mock('./supabase', () => ({
 				},
 				upsert: (...upsertArgs: unknown[]) => {
 					mockUpsert(...upsertArgs);
-					return mockSingle();
+					return {
+						select: () => mockSingle()
+					};
 				},
 				insert: (...insertArgs: unknown[]) => {
 					mockInsert(...insertArgs);
@@ -59,7 +65,9 @@ vi.mock('./supabase', () => ({
 							return {
 								eq: (...eq2Args: unknown[]) => {
 									mockEq(...eq2Args);
-									return mockSingle();
+									return {
+										select: () => mockSingle()
+									};
 								}
 							};
 						}
@@ -196,10 +204,10 @@ describe('checkDemoLimit', () => {
 		vi.clearAllMocks();
 	});
 
-	it('should return allowed: true, remaining: 1 for new IP (no rows)', async () => {
+	it('should return allowed: true, remaining: 1 for new IP (empty array)', async () => {
 		mockSingle.mockResolvedValueOnce({
-			data: null,
-			error: { code: 'PGRST116', message: 'No rows found' }
+			data: [],
+			error: null
 		});
 
 		const result = await checkDemoLimit('new-ip-hash');
@@ -207,9 +215,9 @@ describe('checkDemoLimit', () => {
 		expect(result.remaining).toBe(1);
 	});
 
-	it('should return allowed: true, remaining: 1 when usage_count is 0', async () => {
+	it('should return allowed: true, remaining: 1 when no usage records exist', async () => {
 		mockSingle.mockResolvedValueOnce({
-			data: { usage_count: 0 },
+			data: null,
 			error: null
 		});
 
@@ -218,9 +226,9 @@ describe('checkDemoLimit', () => {
 		expect(result.remaining).toBe(1);
 	});
 
-	it('should return allowed: false, remaining: 0 when limit reached', async () => {
+	it('should return allowed: false, remaining: 0 when IP has used demo', async () => {
 		mockSingle.mockResolvedValueOnce({
-			data: { usage_count: 1 },
+			data: [{ usage_count: 1 }],
 			error: null
 		});
 
@@ -229,9 +237,9 @@ describe('checkDemoLimit', () => {
 		expect(result.remaining).toBe(0);
 	});
 
-	it('should return allowed: false when usage exceeds limit', async () => {
+	it('should return allowed: false when any usage record exists', async () => {
 		mockSingle.mockResolvedValueOnce({
-			data: { usage_count: 5 },
+			data: [{ usage_count: 5 }],
 			error: null
 		});
 
@@ -255,13 +263,14 @@ describe('checkDemoLimit', () => {
 		consoleError.mockRestore();
 	});
 
-	it('should call supabase with correct table and date', async () => {
-		mockSingle.mockResolvedValueOnce({ data: null, error: { code: 'PGRST116' } });
+	it('should call supabase with correct table', async () => {
+		mockSingle.mockResolvedValueOnce({ data: [], error: null });
 
 		await checkDemoLimit('test-ip');
 
 		expect(mockFrom).toHaveBeenCalledWith('demo_usage');
 		expect(mockSelect).toHaveBeenCalledWith('usage_count');
+		expect(mockLimit).toHaveBeenCalledWith(1);
 	});
 });
 
@@ -328,15 +337,18 @@ describe('incrementDemoUsage', () => {
 
 	it('should log error when both upsert and update fail', async () => {
 		const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-		mockSingle.mockResolvedValueOnce({ error: { message: 'Upsert failed' } });
-		mockSingle.mockResolvedValueOnce({ error: { message: 'Update failed' } });
+		mockSingle.mockResolvedValueOnce({ error: { code: 'UPSERT_ERR', message: 'Upsert failed' } });
+		mockSingle.mockResolvedValueOnce({ error: { code: 'UPDATE_ERR', message: 'Update failed' } });
 
 		await incrementDemoUsage('ip-hash', {
 			repoUrl: 'https://github.com/user/repo',
 			userAgent: 'Mozilla/5.0'
 		});
 
-		expect(consoleError).toHaveBeenCalledWith('Error incrementing demo usage:', expect.any(Object));
+		// Verify both error logs were called
+		expect(consoleError).toHaveBeenCalledTimes(2);
+		expect(consoleError).toHaveBeenNthCalledWith(1, expect.stringContaining('Upsert failed'), 'UPSERT_ERR', 'Upsert failed', expect.anything());
+		expect(consoleError).toHaveBeenNthCalledWith(2, expect.stringContaining('Fallback update also failed'), 'UPDATE_ERR', 'Update failed');
 
 		consoleError.mockRestore();
 	});

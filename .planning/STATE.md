@@ -51,7 +51,7 @@ Progress: [░░░░░░░░░░] 0/? plans in Phase 12
 
 | Tier | Price | Type | Features |
 |------|-------|------|----------|
-| Free Demo | $0 | - | README only, 1/day, public repos |
+| Free Demo | $0 | - | README only, 1 per IP, public repos |
 | Single Repo | $99 | One-time | All 4 doc types, 1 repo forever |
 | Pro | $149/mo | Subscription | 30 repos/month, cancel anytime |
 | Team | $399/mo | Subscription | 100 repos/month, 5 seats, cancel anytime |
