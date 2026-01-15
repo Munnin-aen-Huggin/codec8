@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createCheckoutSession, createRegenerateCheckout, type ProductType } from '$lib/server/stripe';
 import { supabaseAdmin } from '$lib/server/supabase';
@@ -9,15 +9,18 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
   // Verify authentication
   const session = cookies.get('session');
   if (!session) {
-    throw error(401, 'Not authenticated');
+    return json({ success: false, message: 'Please log in to continue' }, { status: 401 });
   }
 
   let userId: string;
   try {
     const parsed = JSON.parse(session);
     userId = parsed.userId;
+    if (!userId) {
+      return json({ success: false, message: 'Invalid session' }, { status: 401 });
+    }
   } catch {
-    throw error(401, 'Invalid session');
+    return json({ success: false, message: 'Invalid session' }, { status: 401 });
   }
 
   // Get user profile
@@ -27,8 +30,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     .eq('id', userId)
     .single();
 
-  if (profileError || !profile) {
-    throw error(404, 'User profile not found');
+  if (profileError) {
+    console.error('[Checkout] Profile error:', profileError);
+    return json({ success: false, message: 'Failed to retrieve user profile. Please try logging out and back in.' }, { status: 500 });
+  }
+
+  if (!profile) {
+    return json({ success: false, message: 'User profile not found. Please try logging out and back in.' }, { status: 404 });
   }
 
   // Get request body
@@ -56,18 +64,19 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
       return json({ success: true, url });
     } catch (err) {
       console.error('Regenerate checkout error:', err);
-      throw error(500, 'Failed to create regeneration checkout');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      return json({ success: false, message: `Failed to create regeneration checkout: ${errorMessage}` }, { status: 500 });
     }
   }
 
   // Validate product type for standard checkout
   if (!product || !['single', 'pro', 'team'].includes(product)) {
-    throw error(400, 'Invalid product type. Must be: single, pro, or team');
+    return json({ success: false, message: 'Invalid product type. Must be: single, pro, or team' }, { status: 400 });
   }
 
   // For single repo purchase, require repoUrl
   if (product === 'single' && !repoUrl) {
-    throw error(400, 'Repository URL required for single repo purchase');
+    return json({ success: false, message: 'Repository URL required for single repo purchase' }, { status: 400 });
   }
 
   try {
@@ -87,12 +96,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     return json({ success: true, url });
   } catch (err) {
     console.error('Checkout session error:', err);
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
 
     // Check if it's a configuration error
     if (err instanceof Error && err.message.includes('not configured')) {
-      throw error(500, 'Payment system not fully configured. Please contact support.');
+      return json({ success: false, message: 'Payment system not fully configured. Please contact support.' }, { status: 500 });
     }
 
-    throw error(500, 'Failed to create checkout session');
+    return json({ success: false, message: `Failed to create checkout session: ${errorMessage}` }, { status: 500 });
   }
 };

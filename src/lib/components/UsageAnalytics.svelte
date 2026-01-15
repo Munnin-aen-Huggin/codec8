@@ -6,7 +6,7 @@
 
 	interface Stats {
 		totalDocs: number;
-		totalTokens: number;
+		reposConnected: number;
 		avgGenerationTime: number;
 		docsByType: Record<string, number>;
 		dailyUsage: Array<{ date: string; count: number }>;
@@ -97,8 +97,8 @@
 				<p class="text-2xl font-bold text-white">{stats.totalDocs}</p>
 			</div>
 			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-				<p class="text-zinc-500 text-sm">Total Tokens Used</p>
-				<p class="text-2xl font-bold text-white">{(stats.totalTokens / 1000).toFixed(1)}K</p>
+				<p class="text-zinc-500 text-sm">Repos Connected</p>
+				<p class="text-2xl font-bold text-white">{stats.reposConnected}</p>
 			</div>
 			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
 				<p class="text-zinc-500 text-sm">Avg Generation Time</p>

@@ -31,8 +31,8 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
 
 	const tier = profile?.subscription_tier || profile?.plan || 'free';
 
-	// Only Pro and Team users can access detailed analytics
-	if (!['pro', 'team', 'ltd', 'dfy'].includes(tier)) {
+	// Only Pro, Team, Enterprise, LTD, and DFY users can access detailed analytics
+	if (!['pro', 'team', 'enterprise', 'ltd', 'dfy'].includes(tier)) {
 		throw error(403, 'Pro or Team subscription required for analytics');
 	}
 

@@ -20,21 +20,31 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		throw redirect(303, '/auth/login');
 	}
 
-	// Get user profile
-	const { data: profile } = await supabaseAdmin
+	// Get user profile with subscription info
+	const { data: profile, error: profileError } = await supabaseAdmin
 		.from('profiles')
-		.select('subscription_tier, plan, default_team_id')
+		.select('subscription_tier, subscription_status, plan, default_team_id')
 		.eq('id', userId)
 		.single();
 
-	const tier = profile?.subscription_tier || profile?.plan || 'free';
+	if (profileError) {
+		console.error('[Analytics] Profile fetch error:', profileError);
+	}
 
-	// Check if user has access to analytics (Pro, Team, LTD, or DFY)
-	const hasAccess = ['pro', 'team', 'ltd', 'dfy'].includes(tier);
+	const tier = profile?.subscription_tier || profile?.plan || 'free';
+	const status = profile?.subscription_status;
+
+	// Check if user has access to analytics
+	// Access granted for: Pro, Team, Enterprise, LTD, or DFY tiers with active/trialing status
+	const validTiers = ['pro', 'team', 'enterprise', 'ltd', 'dfy'];
+	const hasValidTier = validTiers.includes(tier);
+	const hasActiveStatus = status === 'active' || status === 'trialing' || tier === 'ltd' || tier === 'dfy';
+	const hasAccess = hasValidTier && hasActiveStatus;
 
 	return {
 		profile: {
 			subscription_tier: tier,
+			subscription_status: status,
 			default_team_id: profile?.default_team_id
 		},
 		hasAccess

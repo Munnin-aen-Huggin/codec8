@@ -396,7 +396,7 @@ export async function logUsage(params: LogUsageParams): Promise<void> {
  */
 export interface DetailedUsageStats {
 	totalDocs: number;
-	totalTokens: number;
+	reposConnected: number;
 	avgGenerationTime: number;
 	docsByType: Record<string, number>;
 	dailyUsage: Array<{ date: string; count: number }>;
@@ -436,9 +436,26 @@ export async function getUserDetailedStats(
 
 	const logList = logs || [];
 
+	// Get repos connected count
+	let reposConnected = 0;
+	if (teamId) {
+		// For team, count team repos
+		const { count } = await supabaseAdmin
+			.from('repositories')
+			.select('*', { count: 'exact', head: true })
+			.eq('team_id', teamId);
+		reposConnected = count || 0;
+	} else {
+		// For individual user
+		const { count } = await supabaseAdmin
+			.from('repositories')
+			.select('*', { count: 'exact', head: true })
+			.eq('user_id', userId);
+		reposConnected = count || 0;
+	}
+
 	// Calculate stats
 	const totalDocs = logList.length;
-	const totalTokens = logList.reduce((sum, l) => sum + (l.tokens_used || 0), 0);
 	const avgGenerationTime = totalDocs > 0
 		? Math.round(logList.reduce((sum, l) => sum + (l.generation_time_ms || 0), 0) / totalDocs)
 		: 0;
@@ -467,7 +484,7 @@ export async function getUserDetailedStats(
 
 	return {
 		totalDocs,
-		totalTokens,
+		reposConnected,
 		avgGenerationTime,
 		docsByType,
 		dailyUsage,
