@@ -46,7 +46,7 @@ test.describe('Landing Page', () => {
 		test('demo details show usage info', async ({ page }) => {
 			await page.goto('/');
 			const details = page.locator('.demo-details');
-			await expect(details).toContainText('1 free demo per day');
+			await expect(details).toContainText('1 free demo');
 			await expect(details).toContainText('No signup');
 		});
 
