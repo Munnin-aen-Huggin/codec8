@@ -1,6 +1,6 @@
 # CodeDoc AI - Current State
 
-**Last Updated:** 2026-01-15
+**Last Updated:** 2026-01-16
 
 ## Project Reference
 
@@ -38,7 +38,7 @@ Progress: [██████████] 7/7 tasks in Phase 13
 | Doc Viewer/Editor | Complete | With markdown preview |
 | Payments (Stripe) | Complete | Value-based pricing |
 | UI Components | Complete | Toast, Skeleton, DocTabs, DocEditor |
-| Unit Tests | Complete | 260 tests passing |
+| Unit Tests | Complete | 334 tests passing |
 | E2E Tests | Complete | 48 tests passing |
 | Try-Without-Signup | Complete | /try page, README only |
 | Rate Limiting | Complete | IP-based demo limiting |
@@ -80,9 +80,9 @@ Progress: [██████████] 7/7 tasks in Phase 13
 
 | Category | Tests | Status |
 |----------|-------|--------|
-| Unit Tests | 260 | Passing |
+| Unit Tests | 334 | Passing |
 | E2E Tests | 48 | Passing |
-| **Total** | **308** | **All passing** |
+| **Total** | **382** | **All passing** |
 
 ## Quick Commands
 

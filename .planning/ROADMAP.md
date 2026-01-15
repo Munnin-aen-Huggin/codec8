@@ -28,7 +28,7 @@
 - AI documentation generation (4 types)
 - Value-based pricing ($99/$149/$399)
 - Try-without-signup demo
-- 308 tests (260 unit + 48 E2E)
+- 382 tests (334 unit + 48 E2E)
 
 See [v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md) for full details.
 
