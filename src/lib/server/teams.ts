@@ -357,3 +357,215 @@ function generateSlug(name: string): string {
 		.replace(/^-|-$/g, '');
 	return `${base}-${nanoid(6)}`;
 }
+
+// ============================================
+// SSO JIT Provisioning Functions
+// ============================================
+
+export interface SSOUserData {
+	nameId: string;
+	email: string;
+	firstName?: string;
+	lastName?: string;
+	groups?: string[];
+	provider: string;
+}
+
+/**
+ * Provision a new user via SSO JIT (Just-in-Time) provisioning
+ */
+export async function provisionSSOUser(
+	ssoData: SSOUserData,
+	teamId: string
+): Promise<string> {
+	const newUserId = crypto.randomUUID();
+
+	// Construct display name
+	const displayName = ssoData.firstName && ssoData.lastName
+		? `${ssoData.firstName} ${ssoData.lastName}`
+		: ssoData.email.split('@')[0];
+
+	const { error: insertError } = await supabaseAdmin
+		.from('profiles')
+		.insert({
+			id: newUserId,
+			email: ssoData.email.toLowerCase(),
+			github_username: displayName.replace(/\s+/g, '-').toLowerCase(),
+			sso_id: ssoData.nameId,
+			sso_provider: ssoData.provider,
+			sso_team_id: teamId,
+			plan: 'free'
+		});
+
+	if (insertError) {
+		console.error('[JIT Provisioning] Failed to create user:', insertError);
+		throw new Error('Failed to create user account via SSO');
+	}
+
+	return newUserId;
+}
+
+/**
+ * Add a user to a team via SSO (bypasses invitation system)
+ */
+export async function addUserToTeamViaSso(
+	userId: string,
+	teamId: string,
+	role: 'member' | 'admin' = 'member'
+): Promise<void> {
+	// Check if already a member
+	const { data: existingMembership } = await supabaseAdmin
+		.from('team_members')
+		.select('id')
+		.eq('team_id', teamId)
+		.eq('user_id', userId)
+		.single();
+
+	if (existingMembership) {
+		// Already a member, no action needed
+		return;
+	}
+
+	// Check seat limit (SSO users still count against seat limit)
+	const { data: team } = await supabaseAdmin
+		.from('teams')
+		.select('max_seats, addon_extra_seats, addon_extra_seats_expires')
+		.eq('id', teamId)
+		.single();
+
+	const { count: memberCount } = await supabaseAdmin
+		.from('team_members')
+		.select('*', { count: 'exact', head: true })
+		.eq('team_id', teamId);
+
+	// Calculate effective seat limit
+	const baseSeats = team?.max_seats || 5;
+	const addonSeats = team?.addon_extra_seats || 0;
+	const addonSeatsValid = !team?.addon_extra_seats_expires ||
+		new Date(team.addon_extra_seats_expires) > new Date();
+	const effectiveSeats = baseSeats + (addonSeatsValid ? addonSeats : 0);
+
+	if ((memberCount || 0) >= effectiveSeats) {
+		throw new Error('Team has reached maximum seats. Contact your administrator.');
+	}
+
+	// Add to team
+	const { error } = await supabaseAdmin
+		.from('team_members')
+		.insert({
+			team_id: teamId,
+			user_id: userId,
+			role
+		});
+
+	if (error) {
+		console.error('[JIT Provisioning] Failed to add user to team:', error);
+		throw new Error('Failed to add user to team via SSO');
+	}
+}
+
+/**
+ * Link existing user to SSO
+ */
+export async function linkUserToSSO(
+	userId: string,
+	ssoData: SSOUserData,
+	teamId: string
+): Promise<void> {
+	const { error } = await supabaseAdmin
+		.from('profiles')
+		.update({
+			sso_id: ssoData.nameId,
+			sso_provider: ssoData.provider,
+			sso_team_id: teamId
+		})
+		.eq('id', userId);
+
+	if (error) {
+		console.error('[SSO Link] Failed to link user to SSO:', error);
+		throw new Error('Failed to link account to SSO');
+	}
+}
+
+/**
+ * Check if a team requires SSO for login
+ */
+export async function checkTeamSSORequirement(
+	teamId: string
+): Promise<{ requiresSso: boolean; ssoUrl?: string }> {
+	const { data: team, error } = await supabaseAdmin
+		.from('teams')
+		.select('sso_required, slug')
+		.eq('id', teamId)
+		.single();
+
+	if (error || !team) {
+		return { requiresSso: false };
+	}
+
+	if (!team.sso_required) {
+		return { requiresSso: false };
+	}
+
+	// SSO is required, provide the login URL
+	return {
+		requiresSso: true,
+		ssoUrl: `/auth/sso?team=${team.slug}`
+	};
+}
+
+/**
+ * Find user's SSO team (for enforcing SSO login)
+ */
+export async function getUserSSOTeam(
+	userId: string
+): Promise<{ teamId: string; teamSlug: string; ssoRequired: boolean } | null> {
+	const { data: profile, error } = await supabaseAdmin
+		.from('profiles')
+		.select(`
+			sso_team_id,
+			teams:sso_team_id (
+				id,
+				slug,
+				sso_required
+			)
+		`)
+		.eq('id', userId)
+		.single();
+
+	if (error || !profile?.sso_team_id) {
+		return null;
+	}
+
+	// Handle the joined data
+	const teamData = profile.teams as unknown as { id: string; slug: string; sso_required: boolean } | null;
+
+	if (!teamData) {
+		return null;
+	}
+
+	return {
+		teamId: teamData.id,
+		teamSlug: teamData.slug,
+		ssoRequired: teamData.sso_required || false
+	};
+}
+
+/**
+ * Map SSO groups to team roles
+ */
+export function mapSSOGroupsToRole(
+	groups: string[] | undefined,
+	attributeMapping?: { adminGroups?: string[] }
+): 'admin' | 'member' {
+	if (!groups || !attributeMapping?.adminGroups) {
+		return 'member';
+	}
+
+	// Check if user is in any admin group
+	const isAdmin = groups.some(group =>
+		attributeMapping.adminGroups?.includes(group)
+	);
+
+	return isAdmin ? 'admin' : 'member';
+}
