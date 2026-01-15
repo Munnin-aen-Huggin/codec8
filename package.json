@@ -47,6 +47,7 @@
 	},
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.71.2",
+		"@node-saml/node-saml": "^5.1.0",
 		"@supabase/supabase-js": "^2.90.1",
 		"dompurify": "^3.3.1",
 		"marked": "^17.0.1",

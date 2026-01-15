@@ -112,3 +112,47 @@ export interface TeamUsage {
   repos_used: number;
   seats_used: number;
 }
+
+// ============================================
+// SSO/SAML Types (Phase 13)
+// ============================================
+
+export interface SSOConfig {
+  id: string;
+  team_id: string;
+  provider: 'okta' | 'azure_ad' | 'google' | 'custom';
+  entity_id: string;
+  sso_url: string;
+  certificate: string;
+  attribute_mapping: SSOAttributeMapping;
+  require_sso: boolean;
+  jit_provisioning: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SSOAttributeMapping {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  groups?: string;
+}
+
+export interface SSOSession {
+  id: string;
+  user_id: string;
+  team_id: string;
+  idp_session_id: string | null;
+  expires_at: string;
+  created_at: string;
+}
+
+export interface SAMLUser {
+  nameId: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  groups?: string[];
+  attributes: Record<string, string | string[]>;
+  sessionIndex?: string;
+}
