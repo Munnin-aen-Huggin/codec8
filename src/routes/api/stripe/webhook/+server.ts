@@ -157,8 +157,8 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Handle subscription purchases (pro/team)
-  if (product === 'pro' || product === 'team') {
+  // Handle subscription purchases (pro/team/enterprise)
+  if (product === 'pro' || product === 'team' || product === 'enterprise') {
     console.log(`Processing ${product} subscription for user ${userId}`);
 
     try {
@@ -206,8 +206,13 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
       }
 
       // Track analytics
-      const amount = product === 'pro' ? 149 : 399;
+      const amount = product === 'pro' ? 149 : product === 'team' ? 399 : 999;
       trackCheckoutCompleted(userId, product, amount);
+
+      // For enterprise tier, enable enterprise features on team
+      if (product === 'enterprise') {
+        await enableEnterpriseFeaturesForUser(userId);
+      }
 
       // Track trial or subscription created based on status
       if (subscription.status === 'trialing') {
@@ -471,6 +476,28 @@ async function handleAddonPurchase(
         }
         break;
       }
+
+      case 'sso': {
+        if (!teamId) {
+          console.error('sso addon requires a team');
+          return;
+        }
+
+        // Enable SSO for the team (enterprise_tier allows SSO config)
+        const { error: updateError } = await supabaseAdmin
+          .from('teams')
+          .update({
+            enterprise_tier: true
+          })
+          .eq('id', teamId);
+
+        if (updateError) {
+          console.error('Failed to enable SSO addon:', updateError);
+        } else {
+          console.log(`Enabled SSO for team ${teamId}`);
+        }
+        break;
+      }
     }
 
     // Track analytics
@@ -484,5 +511,64 @@ async function handleAddonPurchase(
 
   } catch (err) {
     console.error('Error processing addon purchase:', err);
+  }
+}
+
+/**
+ * Enable enterprise features for a user's default team
+ * Called when enterprise subscription is activated
+ */
+async function enableEnterpriseFeaturesForUser(userId: string) {
+  console.log(`Enabling enterprise features for user ${userId}`);
+
+  // Get user's default team or create one
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('default_team_id')
+    .eq('id', userId)
+    .single();
+
+  let teamId = profile?.default_team_id;
+
+  if (!teamId) {
+    // Check if user owns any team
+    const { data: teams } = await supabaseAdmin
+      .from('team_members')
+      .select('team_id, role')
+      .eq('user_id', userId)
+      .eq('role', 'owner');
+
+    if (teams && teams.length > 0) {
+      teamId = teams[0].team_id;
+    }
+  }
+
+  if (!teamId) {
+    console.log(`No team found for user ${userId}, enterprise features will apply when team is created`);
+    return;
+  }
+
+  // Enable enterprise features on the team
+  const { error: updateError } = await supabaseAdmin
+    .from('teams')
+    .update({
+      enterprise_tier: true,
+      addon_audit_logs: true,
+      max_seats: 9999 // Effectively unlimited
+    })
+    .eq('id', teamId);
+
+  if (updateError) {
+    console.error('Failed to enable enterprise features:', updateError);
+  } else {
+    console.log(`Enterprise features enabled for team ${teamId}`);
+  }
+
+  // Update user's default team if not set
+  if (!profile?.default_team_id) {
+    await supabaseAdmin
+      .from('profiles')
+      .update({ default_team_id: teamId })
+      .eq('id', userId);
   }
 }

@@ -10,14 +10,16 @@ const STRIPE_PRICE_ADDON_UNLIMITED_REGEN = env.STRIPE_PRICE_ADDON_UNLIMITED_REGE
 const STRIPE_PRICE_ADDON_EXTRA_REPOS = env.STRIPE_PRICE_ADDON_EXTRA_REPOS || '';
 const STRIPE_PRICE_ADDON_EXTRA_SEATS = env.STRIPE_PRICE_ADDON_EXTRA_SEATS || '';
 const STRIPE_PRICE_ADDON_AUDIT_LOGS = env.STRIPE_PRICE_ADDON_AUDIT_LOGS || '';
+const STRIPE_PRICE_ENTERPRISE = env.STRIPE_PRICE_ENTERPRISE || '';
+const STRIPE_PRICE_ADDON_SSO = env.STRIPE_PRICE_ADDON_SSO || '';
 
 export const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2025-12-15.clover'
 });
 
 // Product types
-export type ProductType = 'single' | 'pro' | 'team';
-export type AddonType = 'unlimited_regen' | 'extra_repos' | 'extra_seats' | 'audit_logs';
+export type ProductType = 'single' | 'pro' | 'team' | 'enterprise';
+export type AddonType = 'unlimited_regen' | 'extra_repos' | 'extra_seats' | 'audit_logs' | 'sso';
 type PurchaseMode = 'payment' | 'subscription';
 
 interface ProductConfig {
@@ -36,6 +38,10 @@ const PRODUCTS: Record<ProductType, ProductConfig> = {
   },
   team: {
     priceId: STRIPE_PRICE_TEAM || 'price_team_placeholder',
+    mode: 'subscription'
+  },
+  enterprise: {
+    priceId: STRIPE_PRICE_ENTERPRISE || 'price_enterprise_placeholder',
     mode: 'subscription'
   }
 };
@@ -82,6 +88,14 @@ export const ADDON_PRODUCTS: Record<AddonType, AddonConfig> = {
     description: 'Compliance audit logging for your team',
     perUnit: '/month',
     forTeam: true
+  },
+  sso: {
+    priceId: STRIPE_PRICE_ADDON_SSO || 'price_sso_placeholder',
+    name: 'SSO/SAML',
+    price: 99,
+    description: 'Single sign-on with Okta, Azure AD, Google Workspace',
+    perUnit: '/month',
+    forTeam: true
   }
 };
 
@@ -90,7 +104,8 @@ export const PLAN_LIMITS = {
   free: { repos: 1, docsPerMonth: 3 },
   single: { repos: 1, docsPerMonth: -1 }, // 1 specific repo, unlimited regenerations with payment
   pro: { reposPerMonth: 30 },
-  team: { reposPerMonth: 100, seats: 5 }
+  team: { reposPerMonth: 100, seats: 5 },
+  enterprise: { reposPerMonth: -1, seats: -1 } // Unlimited for enterprise
 } as const;
 
 export async function createCheckoutSession({
@@ -294,6 +309,23 @@ export const PRICE_DETAILS = {
       'Slack integration',
       'Cancel anytime'
     ]
+  },
+  enterprise: {
+    name: 'Enterprise',
+    price: 999,
+    type: 'monthly',
+    description: 'Unlimited usage with enterprise features',
+    features: [
+      'Unlimited repos',
+      'Unlimited team members',
+      'Everything in Team',
+      'SSO/SAML included',
+      'Audit logs included',
+      'SCIM directory sync',
+      'Dedicated support',
+      'SLA guarantee',
+      'Custom contracts'
+    ]
   }
 } as const;
 
@@ -341,6 +373,19 @@ export const ADDON_PRICE_DETAILS = {
       'Complete audit trail',
       'Export reports',
       'Team activity tracking'
+    ]
+  },
+  sso: {
+    name: 'SSO/SAML',
+    price: 99,
+    type: 'monthly',
+    description: 'Enterprise authentication',
+    features: [
+      'Okta integration',
+      'Azure AD integration',
+      'Google Workspace',
+      'JIT provisioning',
+      'Directory sync'
     ]
   }
 } as const;
