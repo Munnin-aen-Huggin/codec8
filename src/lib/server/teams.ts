@@ -95,10 +95,10 @@ export async function createInvitation(
 	role: 'admin' | 'member',
 	invitedBy: string
 ): Promise<TeamInvitation> {
-	// Check seat limit
+	// Check seat limit (including addon extra seats)
 	const { data: team } = await supabaseAdmin
 		.from('teams')
-		.select('max_seats')
+		.select('max_seats, addon_extra_seats, addon_extra_seats_expires')
 		.eq('id', teamId)
 		.single();
 
@@ -113,8 +113,15 @@ export async function createInvitation(
 		.eq('team_id', teamId)
 		.is('accepted_at', null);
 
-	if ((memberCount || 0) + (pendingCount || 0) >= (team?.max_seats || 5)) {
-		throw new Error('Team has reached maximum seats');
+	// Calculate effective seat limit including addons
+	const baseSeats = team?.max_seats || 5;
+	const addonSeats = team?.addon_extra_seats || 0;
+	const addonSeatsValid = !team?.addon_extra_seats_expires ||
+		new Date(team.addon_extra_seats_expires) > new Date();
+	const effectiveSeats = baseSeats + (addonSeatsValid ? addonSeats : 0);
+
+	if ((memberCount || 0) + (pendingCount || 0) >= effectiveSeats) {
+		throw new Error(`Team has reached maximum seats (${effectiveSeats}). Purchase additional seats to invite more members.`);
 	}
 
 	// Check if already a member

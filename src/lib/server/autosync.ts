@@ -37,6 +37,9 @@ interface RepoWithProfile {
 		subscription_status: string | null;
 		subscription_tier: string | null;
 		repos_used_this_month: number;
+		addon_unlimited_regen: boolean;
+		addon_unlimited_regen_expires: string | null;
+		addon_extra_repos: number;
 	};
 }
 
@@ -69,7 +72,10 @@ export async function triggerAutoRegeneration(repoId: string): Promise<void> {
 					plan,
 					subscription_status,
 					subscription_tier,
-					repos_used_this_month
+					repos_used_this_month,
+					addon_unlimited_regen,
+					addon_unlimited_regen_expires,
+					addon_extra_repos
 				)
 			`)
 			.eq('id', repoId)
@@ -88,8 +94,13 @@ export async function triggerAutoRegeneration(repoId: string): Promise<void> {
 			return;
 		}
 
-		// 2. Check cooldown (rate limiting)
-		if (repoData.last_synced_at) {
+		// 2. Check cooldown (rate limiting) - bypass if unlimited regen addon is active
+		const profile = repoData.profiles;
+		const hasUnlimitedRegen = profile.addon_unlimited_regen &&
+			(!profile.addon_unlimited_regen_expires ||
+			 new Date(profile.addon_unlimited_regen_expires) > new Date());
+
+		if (repoData.last_synced_at && !hasUnlimitedRegen) {
 			const lastSync = new Date(repoData.last_synced_at).getTime();
 			const now = Date.now();
 			if (now - lastSync < COOLDOWN_MS) {
@@ -101,8 +112,11 @@ export async function triggerAutoRegeneration(repoId: string): Promise<void> {
 			}
 		}
 
+		if (hasUnlimitedRegen) {
+			console.log(`[AutoSync] Unlimited regeneration addon active, bypassing cooldown`);
+		}
+
 		// 3. Check if user's plan allows auto-sync
-		const profile = repoData.profiles;
 		const hasLegacyAccess = AUTO_SYNC_LEGACY_PLANS.includes(profile.plan);
 		const hasSubscriptionAccess =
 			profile.subscription_status === 'active' &&
@@ -116,12 +130,14 @@ export async function triggerAutoRegeneration(repoId: string): Promise<void> {
 			return;
 		}
 
-		// 4. Check subscription limits for subscription users
+		// 4. Check subscription limits for subscription users (including extra repos addon)
 		if (hasSubscriptionAccess && !hasLegacyAccess) {
-			const limit = profile.subscription_tier === 'team' ? 100 : 30;
-			if (profile.repos_used_this_month >= limit) {
+			const baseLimit = profile.subscription_tier === 'team' ? 100 : 30;
+			const extraRepos = (profile.addon_extra_repos || 0) * 10; // Each addon = 10 repos
+			const effectiveLimit = baseLimit + extraRepos;
+			if (profile.repos_used_this_month >= effectiveLimit) {
 				console.log(
-					`[AutoSync] Monthly limit reached for ${repoData.full_name}: ${profile.repos_used_this_month}/${limit}`
+					`[AutoSync] Monthly limit reached for ${repoData.full_name}: ${profile.repos_used_this_month}/${effectiveLimit}`
 				);
 				return;
 			}

@@ -1,11 +1,12 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { constructWebhookEvent, generateLicenseKey, stripe } from '$lib/server/stripe';
+import { constructWebhookEvent, generateLicenseKey, stripe, ADDON_PRODUCTS } from '$lib/server/stripe';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { trackCheckoutCompleted } from '$lib/utils/analytics';
 import { trackEvent, EVENTS } from '$lib/server/analytics';
 import { STRIPE_WEBHOOK_SECRET } from '$env/static/private';
 import type Stripe from 'stripe';
+import type { AddonType } from '$lib/server/stripe';
 
 /**
  * Extract owner/repo from GitHub URL
@@ -220,6 +221,19 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     return;
   }
 
+  // Handle add-on purchases
+  const { addonType, teamId, quantity } = session.metadata || {};
+  if (addonType && (addonType as AddonType) in ADDON_PRODUCTS) {
+    await handleAddonPurchase(
+      userId,
+      addonType as AddonType,
+      teamId || null,
+      parseInt(quantity || '1'),
+      session.subscription as string
+    );
+    return;
+  }
+
   // Legacy fallback for unknown product types
   console.log(`Unknown product type: ${product}`);
 }
@@ -302,5 +316,173 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     console.log(`Subscription canceled for user ${profile.id}`);
     // Track subscription cancellation
     await trackEvent(EVENTS.SUBSCRIPTION_CANCELED, {}, profile.id);
+  }
+}
+
+/**
+ * Handle add-on subscription purchase
+ */
+async function handleAddonPurchase(
+  userId: string,
+  addonType: AddonType,
+  teamId: string | null,
+  quantity: number,
+  subscriptionId: string
+) {
+  console.log(`Processing addon purchase: ${addonType} x${quantity} for user ${userId}, team: ${teamId}`);
+
+  try {
+    // Record addon purchase
+    const { error: purchaseError } = await supabaseAdmin
+      .from('addon_purchases')
+      .insert({
+        user_id: userId,
+        team_id: teamId,
+        addon_type: addonType,
+        quantity,
+        stripe_subscription_id: subscriptionId,
+        stripe_price_id: ADDON_PRODUCTS[addonType].priceId,
+        status: 'active'
+      });
+
+    if (purchaseError) {
+      console.error('Failed to record addon purchase:', purchaseError);
+    }
+
+    // Update the relevant table based on addon type
+    switch (addonType) {
+      case 'unlimited_regen': {
+        // Update user profile
+        const { error: updateError } = await supabaseAdmin
+          .from('profiles')
+          .update({
+            addon_unlimited_regen: true,
+            addon_unlimited_regen_expires: null // Active subscription
+          })
+          .eq('id', userId);
+
+        if (updateError) {
+          console.error('Failed to update unlimited_regen addon:', updateError);
+        } else {
+          console.log(`Enabled unlimited regenerations for user ${userId}`);
+        }
+        break;
+      }
+
+      case 'extra_repos': {
+        if (teamId) {
+          // Update team
+          const { data: team } = await supabaseAdmin
+            .from('teams')
+            .select('addon_extra_repos')
+            .eq('id', teamId)
+            .single();
+
+          const currentRepos = team?.addon_extra_repos || 0;
+
+          const { error: updateError } = await supabaseAdmin
+            .from('teams')
+            .update({
+              addon_extra_repos: currentRepos + quantity,
+              addon_extra_repos_expires: null
+            })
+            .eq('id', teamId);
+
+          if (updateError) {
+            console.error('Failed to update team extra_repos:', updateError);
+          } else {
+            console.log(`Added ${quantity * 10} extra repos to team ${teamId}`);
+          }
+        } else {
+          // Update user profile
+          const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('addon_extra_repos')
+            .eq('id', userId)
+            .single();
+
+          const currentRepos = profile?.addon_extra_repos || 0;
+
+          const { error: updateError } = await supabaseAdmin
+            .from('profiles')
+            .update({
+              addon_extra_repos: currentRepos + quantity,
+              addon_extra_repos_expires: null
+            })
+            .eq('id', userId);
+
+          if (updateError) {
+            console.error('Failed to update extra_repos addon:', updateError);
+          } else {
+            console.log(`Added ${quantity * 10} extra repos to user ${userId}`);
+          }
+        }
+        break;
+      }
+
+      case 'extra_seats': {
+        if (!teamId) {
+          console.error('extra_seats addon requires a team');
+          return;
+        }
+
+        const { data: team } = await supabaseAdmin
+          .from('teams')
+          .select('addon_extra_seats')
+          .eq('id', teamId)
+          .single();
+
+        const currentSeats = team?.addon_extra_seats || 0;
+
+        const { error: updateError } = await supabaseAdmin
+          .from('teams')
+          .update({
+            addon_extra_seats: currentSeats + quantity,
+            addon_extra_seats_expires: null
+          })
+          .eq('id', teamId);
+
+        if (updateError) {
+          console.error('Failed to update extra_seats addon:', updateError);
+        } else {
+          console.log(`Added ${quantity} extra seats to team ${teamId}`);
+        }
+        break;
+      }
+
+      case 'audit_logs': {
+        if (!teamId) {
+          console.error('audit_logs addon requires a team');
+          return;
+        }
+
+        const { error: updateError } = await supabaseAdmin
+          .from('teams')
+          .update({
+            addon_audit_logs: true,
+            addon_audit_logs_expires: null
+          })
+          .eq('id', teamId);
+
+        if (updateError) {
+          console.error('Failed to enable audit_logs addon:', updateError);
+        } else {
+          console.log(`Enabled audit logs for team ${teamId}`);
+        }
+        break;
+      }
+    }
+
+    // Track analytics
+    const addonPrice = ADDON_PRODUCTS[addonType].price * quantity;
+    await trackEvent(EVENTS.ADDON_PURCHASED || 'addon_purchased', {
+      addon_type: addonType,
+      quantity,
+      amount: addonPrice,
+      team_id: teamId
+    }, userId);
+
+  } catch (err) {
+    console.error('Error processing addon purchase:', err);
   }
 }

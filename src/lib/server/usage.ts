@@ -22,6 +22,11 @@ export interface Profile {
 	current_period_end: string | null;
 	trial_ends_at: string | null;
 	subscription_ends_at: string | null;
+	// Add-on fields
+	addon_unlimited_regen: boolean;
+	addon_unlimited_regen_expires: string | null;
+	addon_extra_repos: number;
+	addon_extra_repos_expires: string | null;
 }
 
 /**
@@ -82,8 +87,15 @@ export async function checkUsageLimit(userId: string): Promise<UsageResult> {
 
 	// Check subscription status
 	const tier = profile.subscription_tier || 'free';
-	const limit = TIER_LIMITS[tier] || 1;
+	const baseLimit = TIER_LIMITS[tier] || 1;
 	const used = profile.repos_used_this_month || 0;
+
+	// Calculate effective limit including addon extra repos
+	const addonExtraRepos = profile.addon_extra_repos || 0;
+	const addonReposValid = !profile.addon_extra_repos_expires ||
+		new Date(profile.addon_extra_repos_expires) > new Date();
+	const extraRepos = addonReposValid ? addonExtraRepos * 10 : 0; // Each addon = 10 repos
+	const effectiveLimit = baseLimit + extraRepos;
 
 	// Check if subscription is active or in valid trial
 	const isValidTrial =
@@ -103,9 +115,9 @@ export async function checkUsageLimit(userId: string): Promise<UsageResult> {
 	}
 
 	return {
-		allowed: used < limit,
+		allowed: used < effectiveLimit,
 		used,
-		limit,
+		limit: effectiveLimit,
 		tier
 	};
 }
@@ -259,7 +271,11 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 			current_period_start,
 			current_period_end,
 			trial_ends_at,
-			subscription_ends_at
+			subscription_ends_at,
+			addon_unlimited_regen,
+			addon_unlimited_regen_expires,
+			addon_extra_repos,
+			addon_extra_repos_expires
 		`
 		)
 		.eq('id', userId)
