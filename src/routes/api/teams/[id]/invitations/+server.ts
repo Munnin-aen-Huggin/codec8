@@ -63,7 +63,9 @@ export const POST: RequestHandler = async ({ params, cookies, request }) => {
 	try {
 		const { email, role } = await request.json();
 
-		if (!email || !email.includes('@')) {
+		// Robust email validation
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!email || !emailRegex.test(email) || email.length > 254) {
 			throw error(400, 'Valid email is required');
 		}
 

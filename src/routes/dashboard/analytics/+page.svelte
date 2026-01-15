@@ -2,6 +2,33 @@
 	import UsageAnalytics from '$lib/components/UsageAnalytics.svelte';
 
 	let { data } = $props();
+	let upgrading = $state(false);
+	let upgradeError = $state('');
+
+	async function handleUpgrade() {
+		upgrading = true;
+		upgradeError = '';
+
+		try {
+			const res = await fetch('/api/stripe/checkout', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ product: 'pro' })
+			});
+
+			const result = await res.json();
+
+			if (result.success && result.url) {
+				window.location.href = result.url;
+			} else {
+				upgradeError = result.message || 'Failed to start checkout';
+				upgrading = false;
+			}
+		} catch (err) {
+			upgradeError = 'Network error. Please try again.';
+			upgrading = false;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -101,13 +128,31 @@
 					</div>
 				</div>
 
+				{#if upgradeError}
+					<div class="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+						{upgradeError}
+					</div>
+				{/if}
+
 				<div class="flex flex-col sm:flex-row gap-3 justify-center">
-					<a href="/pricing" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-2">
-						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-						</svg>
-						Upgrade to Pro
-					</a>
+					<button
+						onclick={handleUpgrade}
+						disabled={upgrading}
+						class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-2"
+					>
+						{#if upgrading}
+							<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+							</svg>
+							Processing...
+						{:else}
+							<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+							</svg>
+							Upgrade to Pro
+						{/if}
+					</button>
 					<a href="/dashboard" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold rounded-xl transition-colors inline-flex items-center justify-center gap-2">
 						Back to Dashboard
 					</a>

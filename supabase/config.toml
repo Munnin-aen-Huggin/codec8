@@ -1,0 +1,22 @@
+# Supabase configuration file
+# See: https://supabase.com/docs/guides/cli/config
+
+[api]
+# Port to use for the API URL
+port = 54321
+# Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
+# endpoints. `public` is always included.
+schemas = ["public"]
+
+[db]
+# Port to use for the local database URL.
+port = 54322
+
+[studio]
+# Port to use for Supabase Studio.
+port = 54323
+
+[auth]
+# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
+# in emails.
+site_url = "http://localhost:5173"

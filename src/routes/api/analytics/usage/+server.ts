@@ -36,7 +36,8 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
 		throw error(403, 'Pro or Team subscription required for analytics');
 	}
 
-	const days = parseInt(url.searchParams.get('days') || '30');
+	// Validate and bound the days parameter (1-365 days)
+	const days = Math.min(365, Math.max(1, parseInt(url.searchParams.get('days') || '30') || 30));
 	const teamId = url.searchParams.get('teamId') || profile?.default_team_id;
 
 	try {

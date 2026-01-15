@@ -7,6 +7,27 @@
 	import UpgradePrompt from '$lib/components/UpgradePrompt.svelte';
 	import type { PageData } from './$types';
 
+	// DOMPurify for XSS protection in markdown rendering
+	let purify: typeof import('dompurify').default | null = null;
+
+	/**
+	 * Safely render markdown to sanitized HTML
+	 */
+	function renderMarkdown(markdown: string): string {
+		const rawHtml = marked(markdown) as string;
+		if (purify) {
+			return purify.sanitize(rawHtml, {
+				ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'ul', 'ol', 'li',
+					'a', 'strong', 'em', 'code', 'pre', 'blockquote', 'table', 'thead', 'tbody',
+					'tr', 'th', 'td', 'img', 'span', 'div', 'dl', 'dt', 'dd', 'del', 'ins', 'sup', 'sub'],
+				ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target', 'rel'],
+				ALLOW_DATA_ATTR: false
+			});
+		}
+		// Fallback: strip all HTML tags if DOMPurify not loaded
+		return rawHtml.replace(/<[^>]*>/g, '');
+	}
+
 	export let data: PageData;
 
 	// Initialize Mermaid for diagram rendering
@@ -71,7 +92,12 @@
 		}
 	}
 
-	onMount(() => {
+	onMount(async () => {
+		// Load DOMPurify for XSS protection
+		if (browser) {
+			const DOMPurify = (await import('dompurify')).default;
+			purify = DOMPurify;
+		}
 		renderMermaidDiagrams();
 	});
 
@@ -167,7 +193,7 @@
 			isTogglingAutoSync = false;
 		}
 	}
-	$: renderedContent = currentDoc?.content ? marked(currentDoc.content) : '';
+	$: renderedContent = currentDoc?.content ? renderMarkdown(currentDoc.content) : '';
 
 	function selectTab(type: DocType) {
 		if (isEditing) {
@@ -547,7 +573,7 @@
 										Preview
 									</span>
 									<div class="h-[300px] sm:h-[400px] lg:h-[500px] overflow-y-auto p-4 border border-dark-500 rounded-xl bg-dark-700 prose prose-sm prose-invert max-w-none">
-										{@html marked(editContent)}
+										{@html renderMarkdown(editContent)}
 									</div>
 								</div>
 							</div>

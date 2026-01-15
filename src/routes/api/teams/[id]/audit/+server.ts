@@ -50,10 +50,10 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 		throw error(403, 'Audit logs addon is not enabled for this team');
 	}
 
-	// Parse query params
+	// Parse query params with bounds checking
 	const format = url.searchParams.get('format');
-	const limit = parseInt(url.searchParams.get('limit') || '50');
-	const offset = parseInt(url.searchParams.get('offset') || '0');
+	const limit = Math.min(1000, Math.max(1, parseInt(url.searchParams.get('limit') || '50') || 50));
+	const offset = Math.max(0, parseInt(url.searchParams.get('offset') || '0') || 0);
 	const action = url.searchParams.get('action') as AuditAction | null;
 	const userId = url.searchParams.get('userId');
 	const startDate = url.searchParams.get('startDate');
@@ -68,10 +68,12 @@ export const GET: RequestHandler = async ({ params, url, locals }) => {
 				endDate || new Date().toISOString()
 			);
 
+			// Sanitize teamId for filename to prevent path traversal
+			const sanitizedTeamId = teamId.replace(/[^a-z0-9-]/gi, '');
 			return new Response(csv, {
 				headers: {
 					'Content-Type': 'text/csv',
-					'Content-Disposition': `attachment; filename="audit-logs-${teamId}.csv"`
+					'Content-Disposition': `attachment; filename="audit-logs-${sanitizedTeamId}.csv"`
 				}
 			});
 		}

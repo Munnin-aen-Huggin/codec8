@@ -93,7 +93,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     .eq('user_id', userId)
     .order('purchased_at', { ascending: false });
 
-  // Calculate usage info for subscribers
+  // Calculate usage info for subscribers (will be updated after effective tier is determined)
   let usageInfo: {
     used: number;
     limit: number;
@@ -101,26 +101,53 @@ export const load: PageServerLoad = async ({ cookies }) => {
     resetDate: string | null;
   } | null = null;
 
-  if (
-    profile.subscription_tier &&
-    ['pro', 'team'].includes(profile.subscription_tier) &&
-    profile.subscription_status === 'active'
-  ) {
-    usageInfo = {
-      used: profile.repos_used_this_month || 0,
-      limit: TIER_LIMITS[profile.subscription_tier] || 30,
-      tier: profile.subscription_tier === 'pro' ? 'Pro' : 'Team',
-      resetDate: profile.current_period_end || null
-    };
-  }
-
-  // Check if in trial
-  const isTrialing = profile.subscription_status === 'trialing';
+  // Check if in trial (will be updated after effective tier is determined)
+  let isTrialing = profile.subscription_status === 'trialing';
   const trialEndsAt = profile.trial_ends_at || null;
 
-  // Get addon info
+  // Determine effective subscription tier - check user's profile first, then team membership
+  let effectiveSubscriptionTier = profile.subscription_tier;
+  let effectiveSubscriptionStatus = profile.subscription_status;
+
+  // If user doesn't have their own subscription, check if they're a team member
+  if (!effectiveSubscriptionTier || !['pro', 'team', 'enterprise'].includes(effectiveSubscriptionTier)) {
+    // Check team membership
+    const { data: membership } = await supabaseAdmin
+      .from('team_members')
+      .select('team_id, role, teams(owner_id)')
+      .eq('user_id', userId)
+      .eq('status', 'active')
+      .single();
+
+    if (membership && membership.teams) {
+      // Get team owner's subscription info
+      const teamOwner = membership.teams as { owner_id: string };
+      const { data: ownerProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('subscription_tier, subscription_status, addon_unlimited_regen, addon_unlimited_regen_expires, addon_extra_repos, addon_extra_repos_expires')
+        .eq('id', teamOwner.owner_id)
+        .single();
+
+      if (ownerProfile) {
+        effectiveSubscriptionTier = ownerProfile.subscription_tier;
+        effectiveSubscriptionStatus = ownerProfile.subscription_status;
+        // Also inherit team-level addon info if available
+        if (!profile.addon_unlimited_regen && ownerProfile.addon_unlimited_regen) {
+          profile.addon_unlimited_regen = ownerProfile.addon_unlimited_regen;
+          profile.addon_unlimited_regen_expires = ownerProfile.addon_unlimited_regen_expires;
+        }
+        if (!profile.addon_extra_repos && ownerProfile.addon_extra_repos) {
+          profile.addon_extra_repos = ownerProfile.addon_extra_repos;
+          profile.addon_extra_repos_expires = ownerProfile.addon_extra_repos_expires;
+        }
+        console.log(`[Dashboard] User ${userId} inherits tier ${effectiveSubscriptionTier} from team owner ${teamOwner.owner_id}`);
+      }
+    }
+  }
+
+  // Get addon info - now using effective tier
   let addonInfo: AddonInfo | null = null;
-  if (profile.subscription_tier && ['pro', 'team'].includes(profile.subscription_tier)) {
+  if (effectiveSubscriptionTier && ['pro', 'team', 'enterprise'].includes(effectiveSubscriptionTier)) {
     addonInfo = {
       unlimitedRegen: profile.addon_unlimited_regen || false,
       unlimitedRegenExpires: profile.addon_unlimited_regen_expires || null,
@@ -129,9 +156,27 @@ export const load: PageServerLoad = async ({ cookies }) => {
     };
   }
 
-  // Get user's team ID (for team add-ons)
+  // Update isTrialing based on effective status
+  isTrialing = effectiveSubscriptionStatus === 'trialing';
+
+  // Calculate usage info using effective subscription tier
+  if (
+    effectiveSubscriptionTier &&
+    ['pro', 'team', 'enterprise'].includes(effectiveSubscriptionTier) &&
+    (effectiveSubscriptionStatus === 'active' || effectiveSubscriptionStatus === 'trialing')
+  ) {
+    const tierLabel = effectiveSubscriptionTier === 'pro' ? 'Pro' : effectiveSubscriptionTier === 'team' ? 'Team' : 'Enterprise';
+    usageInfo = {
+      used: profile.repos_used_this_month || 0,
+      limit: effectiveSubscriptionTier === 'enterprise' ? 9999 : (TIER_LIMITS[effectiveSubscriptionTier] || 30),
+      tier: tierLabel,
+      resetDate: profile.current_period_end || null
+    };
+  }
+
+  // Get user's team ID (for team add-ons) - use effective tier
   let userTeamId: string | null = null;
-  if (profile.subscription_tier === 'team' || profile.subscription_tier === 'enterprise') {
+  if (effectiveSubscriptionTier === 'team' || effectiveSubscriptionTier === 'enterprise') {
     // First check default_team_id on profile
     if (profile.default_team_id) {
       userTeamId = profile.default_team_id;
@@ -242,8 +287,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
       email: profile.email,
       github_username: profile.github_username,
       plan: profile.plan,
-      subscription_status: profile.subscription_status || null,
-      subscription_tier: profile.subscription_tier || null,
+      subscription_status: effectiveSubscriptionStatus || profile.subscription_status || null,
+      subscription_tier: effectiveSubscriptionTier || profile.subscription_tier || null,
       onboarded: profile.onboarded || false
     },
     connectedRepos: connectedRepos || [],
