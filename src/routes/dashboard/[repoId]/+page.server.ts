@@ -6,6 +6,7 @@
 
 import { redirect, error } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { getRepoAggregateScore, getRepoQualityScores } from '$lib/server/quality';
 import type { PageServerLoad } from './$types';
 import type { Documentation } from '$lib/types';
 
@@ -86,6 +87,30 @@ export const load: PageServerLoad = async ({ cookies, params }) => {
 	const isLegacyPlan = ['ltd', 'pro', 'dfy'].includes(profile?.plan || '');
 	const isFreeUser = !hasSubscription && !hasPurchasedThisRepo && !isLegacyPlan;
 
+	// Fetch quality scores
+	let qualityScore: {
+		overall: number;
+		completeness: number;
+		accuracy: number;
+		clarity: number;
+		docsScored: number;
+	} | null = null;
+
+	let docQualityScores: Record<string, { score: number; suggestions: number }> = {};
+
+	try {
+		qualityScore = await getRepoAggregateScore(repoId);
+		const scores = await getRepoQualityScores(repoId);
+		for (const item of scores) {
+			docQualityScores[item.docType] = {
+				score: item.score.overall_score,
+				suggestions: item.score.suggestions?.length || 0
+			};
+		}
+	} catch (err) {
+		console.error('[RepoDetail] Error fetching quality scores:', err);
+	}
+
 	return {
 		repo,
 		documentation,
@@ -94,6 +119,8 @@ export const load: PageServerLoad = async ({ cookies, params }) => {
 		subscriptionTier: profile?.subscription_tier,
 		hasSubscription,
 		hasPurchasedThisRepo,
-		isFreeUser
+		isFreeUser,
+		qualityScore,
+		docQualityScores
 	};
 };

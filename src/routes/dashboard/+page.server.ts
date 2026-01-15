@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { fetchUserRepos } from '$lib/server/github';
+import { getActiveAlerts, type StalenessAlert } from '$lib/server/staleness';
 import type { PageServerLoad } from './$types';
 
 interface SessionData {
@@ -13,6 +14,14 @@ const TIER_LIMITS: Record<string, number> = {
   pro: 30,
   team: 100
 };
+
+// Addon info interface
+interface AddonInfo {
+  unlimitedRegen: boolean;
+  unlimitedRegenExpires: string | null;
+  extraRepos: number;
+  extraReposExpires: string | null;
+}
 
 export const load: PageServerLoad = async ({ cookies }) => {
   const sessionCookie = cookies.get('session');
@@ -109,6 +118,25 @@ export const load: PageServerLoad = async ({ cookies }) => {
   const isTrialing = profile.subscription_status === 'trialing';
   const trialEndsAt = profile.trial_ends_at || null;
 
+  // Get addon info
+  let addonInfo: AddonInfo | null = null;
+  if (profile.subscription_tier && ['pro', 'team'].includes(profile.subscription_tier)) {
+    addonInfo = {
+      unlimitedRegen: profile.addon_unlimited_regen || false,
+      unlimitedRegenExpires: profile.addon_unlimited_regen_expires || null,
+      extraRepos: profile.addon_extra_repos || 0,
+      extraReposExpires: profile.addon_extra_repos_expires || null
+    };
+  }
+
+  // Fetch stale doc alerts
+  let staleAlerts: StalenessAlert[] = [];
+  try {
+    staleAlerts = await getActiveAlerts(userId);
+  } catch (err) {
+    console.error('[Dashboard] Error fetching stale alerts:', err);
+  }
+
   let availableRepos: Awaited<ReturnType<typeof fetchUserRepos>> = [];
   let githubError: string | null = null;
 
@@ -141,6 +169,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
     usageInfo,
     isTrialing,
     trialEndsAt,
-    shouldShowOnboarding
+    shouldShowOnboarding,
+    addonInfo,
+    staleAlerts
   };
 };

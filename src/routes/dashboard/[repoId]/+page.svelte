@@ -104,8 +104,49 @@
 	let isGenerating = false;
 	let autoSyncEnabled = data.repo.auto_sync_enabled || false;
 	let isTogglingAutoSync = false;
+	let isScoring = false;
 
 	$: currentDoc = data.documentation[activeTab];
+	$: qualityScore = data.qualityScore;
+	$: docQualityScores = data.docQualityScores || {};
+	$: currentDocScore = docQualityScores[activeTab];
+
+	// Helper to get score color
+	function getScoreColor(score: number): string {
+		if (score >= 80) return 'text-success';
+		if (score >= 60) return 'text-warning';
+		return 'text-error';
+	}
+
+	function getScoreBg(score: number): string {
+		if (score >= 80) return 'bg-success/20 border-success/30';
+		if (score >= 60) return 'bg-warning/20 border-warning/30';
+		return 'bg-error/20 border-error/30';
+	}
+
+	async function scoreCurrentDoc() {
+		if (!currentDoc) return;
+		isScoring = true;
+		try {
+			const response = await fetch(`/api/docs/${currentDoc.id}/quality`, {
+				method: 'POST'
+			});
+			if (!response.ok) throw new Error('Failed to score document');
+			const result = await response.json();
+			if (result.score) {
+				docQualityScores[activeTab] = {
+					score: result.score.overall_score,
+					suggestions: result.score.suggestions?.length || 0
+				};
+				docQualityScores = docQualityScores;
+				toast.success(`Quality score: ${result.score.overall_score}/100`);
+			}
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : 'Failed to score document');
+		} finally {
+			isScoring = false;
+		}
+	}
 
 	async function toggleAutoSync() {
 		isTogglingAutoSync = true;
@@ -255,7 +296,14 @@
 						</svg>
 					</a>
 					<div class="flex-1">
-						<h1 class="text-h4 text-text-primary truncate">{data.repo.name}</h1>
+						<div class="flex items-center gap-2">
+							<h1 class="text-h4 text-text-primary truncate">{data.repo.name}</h1>
+							{#if qualityScore}
+								<span class="px-2 py-0.5 text-xs font-medium rounded-full border {getScoreBg(qualityScore.overall)} {getScoreColor(qualityScore.overall)}">
+									{qualityScore.overall}/100
+								</span>
+							{/if}
+						</div>
 						<p class="text-body-sm text-text-muted truncate">{data.repo.full_name}</p>
 					</div>
 				</div>
@@ -361,6 +409,10 @@
 								<span class="hidden sm:inline">{docType.label}</span>
 								{#if !data.documentation[docType.key]}
 									<span class="w-2 h-2 rounded-full bg-dark-400" title="Not generated"></span>
+								{:else if docQualityScores[docType.key]}
+									<span class="text-xs font-medium {getScoreColor(docQualityScores[docType.key].score)}" title="Quality score">
+										{docQualityScores[docType.key].score}
+									</span>
 								{:else}
 									<span class="w-2 h-2 rounded-full bg-success animate-pulse-subtle" title="Generated"></span>
 								{/if}
@@ -454,6 +506,24 @@
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
 										</svg>
 										Create PR
+									</button>
+									<button
+										on:click={scoreCurrentDoc}
+										disabled={isScoring}
+										class="btn-secondary btn-sm"
+										title="Analyze document quality with AI"
+									>
+										{#if isScoring}
+											<svg class="animate-spin h-4 w-4" viewBox="0 0 24 24">
+												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+											</svg>
+										{:else}
+											<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+											</svg>
+										{/if}
+										{currentDocScore ? `${currentDocScore.score}/100` : 'Score'}
 									</button>
 								{/if}
 							</div>

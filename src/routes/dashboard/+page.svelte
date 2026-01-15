@@ -37,7 +37,51 @@
   let checkoutLoading = false;
 
   // Extract usage data from page data
-  $: ({ usageInfo, purchasedRepos } = data);
+  $: ({ usageInfo, purchasedRepos, addonInfo, staleAlerts } = data);
+
+  // Track dismissed alerts locally
+  let dismissedAlertIds: Set<string> = new Set();
+  $: visibleAlerts = (staleAlerts || []).filter(a => !dismissedAlertIds.has(a.id));
+
+  async function dismissAlert(alertId: string) {
+    dismissedAlertIds.add(alertId);
+    dismissedAlertIds = dismissedAlertIds; // Trigger reactivity
+
+    try {
+      await fetch('/api/docs/staleness', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ alertId })
+      });
+    } catch (err) {
+      console.error('Failed to dismiss alert:', err);
+    }
+  }
+
+  let addonCheckoutLoading: string | null = null;
+
+  async function purchaseAddon(addonType: string) {
+    addonCheckoutLoading = addonType;
+    try {
+      const response = await fetch('/api/stripe/addon-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ addonType })
+      });
+
+      const result = await response.json();
+      if (result.success && result.url) {
+        window.location.href = result.url;
+      } else {
+        toast.error(result.message || 'Failed to start checkout');
+        addonCheckoutLoading = null;
+      }
+    } catch (err) {
+      console.error('Addon checkout error:', err);
+      toast.error('Failed to start checkout');
+      addonCheckoutLoading = null;
+    }
+  }
 
   // Calculate usage percentage
   $: usagePercent = usageInfo ? Math.round((usageInfo.used / usageInfo.limit) * 100) : 0;
@@ -316,6 +360,45 @@
         on:connect={handleOnboardingConnect}
       />
     {:else}
+      <!-- Stale Doc Alerts -->
+      {#if visibleAlerts.length > 0}
+        <div class="mb-6 space-y-3">
+          {#each visibleAlerts as alert (alert.id)}
+            <div class="p-4 bg-warning/10 border border-warning/30 rounded-xl flex items-start justify-between gap-4">
+              <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-warning flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p class="text-warning font-medium">
+                    {#if alert.alert_type === 'stale'}
+                      Documentation is {alert.days_stale} days old
+                    {:else if alert.alert_type === 'code_changed'}
+                      Code changed since last generation
+                    {:else}
+                      Documentation needs attention
+                    {/if}
+                  </p>
+                  <p class="text-body-sm text-warning/70 mt-1">
+                    {alert.repo_full_name || alert.repo_name || 'Repository'} may need regeneration.
+                    <a href="/dashboard/{alert.repo_id}" class="underline hover:no-underline">View docs</a>
+                  </p>
+                </div>
+              </div>
+              <button
+                on:click={() => dismissAlert(alert.id)}
+                class="text-warning/60 hover:text-warning transition-colors p-1"
+                aria-label="Dismiss alert"
+              >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          {/each}
+        </div>
+      {/if}
+
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-h1 text-text-primary mb-2">Dashboard</h1>
@@ -355,7 +438,109 @@
               Approaching limit. <a href="/pricing" class="underline hover:no-underline">Upgrade for more</a>
             </p>
           {/if}
+
+          <!-- Active Add-ons -->
+          {#if addonInfo && (addonInfo.unlimitedRegen || addonInfo.extraRepos > 0)}
+            <div class="mt-4 pt-4 border-t border-dark-500">
+              <p class="text-body-sm text-text-muted mb-2">Active Add-ons:</p>
+              <div class="flex flex-wrap gap-2">
+                {#if addonInfo.unlimitedRegen}
+                  <span class="badge bg-accent/20 text-accent border border-accent/30">
+                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Unlimited Regen
+                  </span>
+                {/if}
+                {#if addonInfo.extraRepos > 0}
+                  <span class="badge bg-accent/20 text-accent border border-accent/30">
+                    <svg class="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    +{addonInfo.extraRepos * 10} Repos
+                  </span>
+                {/if}
+              </div>
+            </div>
+          {/if}
         </div>
+
+        <!-- Add-ons Upsell -->
+        {#if hasSubscription && addonInfo}
+          <div class="card p-6 mb-8">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center">
+                <svg class="w-5 h-5 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-h4 text-text-primary">Power-ups</h2>
+                <p class="text-body-sm text-text-muted">Enhance your plan with add-ons</p>
+              </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <!-- Unlimited Regenerations -->
+              {#if !addonInfo.unlimitedRegen}
+                <div class="p-4 bg-dark-700 rounded-xl border border-dark-500 hover:border-accent/30 transition-colors">
+                  <div class="flex items-start justify-between mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    </div>
+                    <span class="text-accent font-semibold">$29/mo</span>
+                  </div>
+                  <h3 class="text-text-primary font-medium mb-1">Unlimited Regenerations</h3>
+                  <p class="text-body-sm text-text-muted mb-3">Remove the 5-minute cooldown between regenerations</p>
+                  <button
+                    on:click={() => purchaseAddon('unlimited_regen')}
+                    disabled={addonCheckoutLoading === 'unlimited_regen'}
+                    class="btn-secondary btn-sm w-full"
+                  >
+                    {addonCheckoutLoading === 'unlimited_regen' ? 'Loading...' : 'Add to Plan'}
+                  </button>
+                </div>
+              {/if}
+
+              <!-- Extra Repos -->
+              <div class="p-4 bg-dark-700 rounded-xl border border-dark-500 hover:border-accent/30 transition-colors">
+                <div class="flex items-start justify-between mb-3">
+                  <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                  </div>
+                  <span class="text-accent font-semibold">$5/mo</span>
+                </div>
+                <h3 class="text-text-primary font-medium mb-1">+10 Extra Repos</h3>
+                <p class="text-body-sm text-text-muted mb-3">Add 10 more repos to your monthly limit</p>
+                <button
+                  on:click={() => purchaseAddon('extra_repos')}
+                  disabled={addonCheckoutLoading === 'extra_repos'}
+                  class="btn-secondary btn-sm w-full"
+                >
+                  {addonCheckoutLoading === 'extra_repos' ? 'Loading...' : 'Add to Plan'}
+                </button>
+              </div>
+
+              <!-- Analytics Link -->
+              <a href="/dashboard/analytics" class="p-4 bg-dark-700 rounded-xl border border-dark-500 hover:border-accent/30 transition-colors block">
+                <div class="flex items-start justify-between mb-3">
+                  <div class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <span class="text-text-muted text-body-sm">Included</span>
+                </div>
+                <h3 class="text-text-primary font-medium mb-1">Usage Analytics</h3>
+                <p class="text-body-sm text-text-muted">View detailed usage stats and trends</p>
+              </a>
+            </div>
+          </div>
+        {/if}
       {/if}
 
       <!-- Purchased Repos Section (for single-repo customers) -->
