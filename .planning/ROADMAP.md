@@ -5,7 +5,7 @@
 - [v1.0 MVP Launch](milestones/v1.0-ROADMAP.md) — Phases 1-8 (SHIPPED 2026-01-14)
 - [v1.1 Growth](milestones/v1.1-ROADMAP.md) — Phases 9-11 (SHIPPED 2026-01-15)
 - **v1.2 Upsells** — Phase 12 (SHIPPED 2026-01-15)
-- **v2.0 Enterprise** — Phases 13+ (planned)
+- **v2.0 Enterprise** — Phase 13 (SHIPPED 2026-01-15)
 
 ---
 
@@ -67,26 +67,35 @@ See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 
 </details>
 
+<details>
+<summary>v2.0 Enterprise (Phase 13) — SHIPPED 2026-01-15</summary>
+
+- [x] Phase 13: Enterprise Authentication (7/7 tasks)
+
+**Delivered:**
+- SSO/SAML 2.0 authentication with Okta, Azure AD, Google Workspace
+- JIT (Just-in-Time) user provisioning
+- SCIM 2.0 directory sync stubs
+- SSO Configuration UI for team admins
+- Enterprise tier ($999/mo) with unlimited usage
+- SSO add-on ($99/mo) for Team tier
+
+**Tasks Completed:**
+- [x] 13-01: SAML Library Integration (@node-saml/node-saml)
+- [x] 13-02: SSO Configuration API (CRUD endpoints)
+- [x] 13-03: SSO Authentication Routes (login/callback/logout)
+- [x] 13-04: SSO Configuration UI (team settings)
+- [x] 13-05: JIT Provisioning (auto-create users)
+- [x] 13-06: Directory Sync (SCIM 2.0 stubs)
+- [x] 13-07: Enterprise Tier & Pricing
+
+</details>
+
 ---
 
-## Current Milestone: v2.0 Enterprise
+## Future Milestones
 
-### Phase 13: Enterprise Authentication
-
-**Goal:** Add SSO/SAML authentication for enterprise customers
-
-**Status:** Not started
-**Plans:** TBD
-
-**Potential Features:**
-- [ ] SAML 2.0 integration
-- [ ] SSO with Okta, Azure AD, Google Workspace
-- [ ] Directory sync for team members
-- [ ] Just-in-time provisioning
-
----
-
-### Phase 14: Enterprise Customization
+### Phase 14: Enterprise Customization (Future)
 
 **Goal:** White-label and customization options for enterprise
 
@@ -108,4 +117,4 @@ See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 | v1.0 MVP | 1-8 | Complete | 2026-01-14 |
 | v1.1 Growth | 9-11 | Complete | 2026-01-15 |
 | v1.2 Upsells | 12 | Complete | 2026-01-15 |
-| v2.0 Enterprise | 13-14 | Planned | - |
+| v2.0 Enterprise | 13 | Complete | 2026-01-15 |
