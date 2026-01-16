@@ -2,26 +2,12 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getTeamWithMembers } from '$lib/server/teams';
 import { supabaseAdmin } from '$lib/server/supabase';
-
-function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
-	const session = cookies.get('session');
-	if (!session) {
-		throw error(401, 'Unauthorized');
-	}
-	try {
-		const parsed = JSON.parse(session);
-		if (!parsed.userId) {
-			throw error(401, 'Invalid session');
-		}
-		return parsed.userId;
-	} catch {
-		throw error(401, 'Invalid session');
-	}
-}
+import { getValidatedUserId } from '$lib/server/session';
 
 // GET /api/teams/[id] - Get team details
 export const GET: RequestHandler = async ({ params, cookies }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	try {
 		const result = await getTeamWithMembers(params.id, userId);
@@ -34,7 +20,8 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
 // DELETE /api/teams/[id] - Delete team (owner only)
 export const DELETE: RequestHandler = async ({ params, cookies }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	// Verify ownership
 	const { data: team } = await supabaseAdmin

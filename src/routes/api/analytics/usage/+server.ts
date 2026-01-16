@@ -2,25 +2,11 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getUserDetailedStats, getTeamDetailedStats, getUsageStats } from '$lib/server/usage';
 import { supabaseAdmin } from '$lib/server/supabase';
-
-function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
-	const session = cookies.get('session');
-	if (!session) {
-		throw error(401, 'Unauthorized');
-	}
-	try {
-		const parsed = JSON.parse(session);
-		if (!parsed.userId) {
-			throw error(401, 'Invalid session');
-		}
-		return parsed.userId;
-	} catch {
-		throw error(401, 'Invalid session');
-	}
-}
+import { getValidatedUserId } from '$lib/server/session';
 
 export const GET: RequestHandler = async ({ cookies, url }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	// Get user profile to check tier
 	const { data: profile } = await supabaseAdmin

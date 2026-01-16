@@ -2,22 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { updateTemplate, deleteTemplate, duplicateTemplate } from '$lib/server/templates';
 import { supabaseAdmin } from '$lib/server/supabase';
-
-function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
-	const session = cookies.get('session');
-	if (!session) {
-		throw error(401, 'Unauthorized');
-	}
-	try {
-		const parsed = JSON.parse(session);
-		if (!parsed.userId) {
-			throw error(401, 'Invalid session');
-		}
-		return parsed.userId;
-	} catch {
-		throw error(401, 'Invalid session');
-	}
-}
+import { getValidatedUserId } from '$lib/server/session';
 
 // Helper to verify admin access
 async function verifyAdminAccess(templateId: string, userId: string): Promise<string> {
@@ -45,7 +30,8 @@ async function verifyAdminAccess(templateId: string, userId: string): Promise<st
 
 // PATCH /api/templates/[id] - Update template
 export const PATCH: RequestHandler = async ({ params, cookies, request }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	try {
 		const teamId = await verifyAdminAccess(params.id, userId);
@@ -61,7 +47,8 @@ export const PATCH: RequestHandler = async ({ params, cookies, request }) => {
 
 // DELETE /api/templates/[id] - Delete template
 export const DELETE: RequestHandler = async ({ params, cookies }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	try {
 		await verifyAdminAccess(params.id, userId);
@@ -75,7 +62,8 @@ export const DELETE: RequestHandler = async ({ params, cookies }) => {
 
 // POST /api/templates/[id] - Duplicate template
 export const POST: RequestHandler = async ({ params, cookies, request }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	try {
 		await verifyAdminAccess(params.id, userId);

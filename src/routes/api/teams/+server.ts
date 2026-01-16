@@ -2,26 +2,12 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createTeam, getUserTeams } from '$lib/server/teams';
 import { supabaseAdmin } from '$lib/server/supabase';
-
-function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
-	const session = cookies.get('session');
-	if (!session) {
-		throw error(401, 'Unauthorized');
-	}
-	try {
-		const parsed = JSON.parse(session);
-		if (!parsed.userId) {
-			throw error(401, 'Invalid session');
-		}
-		return parsed.userId;
-	} catch {
-		throw error(401, 'Invalid session');
-	}
-}
+import { getValidatedUserId } from '$lib/server/session';
 
 // GET /api/teams - Get user's teams
 export const GET: RequestHandler = async ({ cookies }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	try {
 		const teams = await getUserTeams(userId);
@@ -34,7 +20,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
 
 // POST /api/teams - Create new team
 export const POST: RequestHandler = async ({ cookies, request }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	// Check if user has Team tier
 	const { data: profile } = await supabaseAdmin

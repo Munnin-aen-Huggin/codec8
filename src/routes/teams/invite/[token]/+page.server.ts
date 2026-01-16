@@ -2,20 +2,11 @@ import { redirect, error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { acceptInvitation } from '$lib/server/teams';
-
-function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string | null {
-	const session = cookies.get('session');
-	if (!session) return null;
-	try {
-		const parsed = JSON.parse(session);
-		return parsed.userId || null;
-	} catch {
-		return null;
-	}
-}
+import { getValidatedUserIdOrNull } from '$lib/server/session';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
-	const userId = getUserIdFromSession(cookies);
+	// Use optional session validation (user may not be logged in)
+	const userId = await getValidatedUserIdOrNull(cookies);
 
 	// Get invitation details
 	const { data: invitation, error: invError } = await supabaseAdmin
@@ -73,7 +64,8 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 
 export const actions: Actions = {
 	accept: async ({ params, cookies }) => {
-		const userId = getUserIdFromSession(cookies);
+		// CRITICAL SECURITY: Validate session server-side
+		const userId = await getValidatedUserIdOrNull(cookies);
 
 		if (!userId) {
 			throw redirect(303, `/auth/login?redirect=/teams/invite/${params.token}`);

@@ -1,26 +1,12 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { removeTeamMember, leaveTeam, updateMemberRole } from '$lib/server/teams';
-
-function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
-	const session = cookies.get('session');
-	if (!session) {
-		throw error(401, 'Unauthorized');
-	}
-	try {
-		const parsed = JSON.parse(session);
-		if (!parsed.userId) {
-			throw error(401, 'Invalid session');
-		}
-		return parsed.userId;
-	} catch {
-		throw error(401, 'Invalid session');
-	}
-}
+import { getValidatedUserId } from '$lib/server/session';
 
 // DELETE /api/teams/[id]/members - Remove member or leave team
 export const DELETE: RequestHandler = async ({ params, cookies, request }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	try {
 		const { memberId, action } = await request.json();
@@ -46,7 +32,8 @@ export const DELETE: RequestHandler = async ({ params, cookies, request }) => {
 
 // PATCH /api/teams/[id]/members - Update member role
 export const PATCH: RequestHandler = async ({ cookies, request }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	try {
 		const { memberId, role } = await request.json();

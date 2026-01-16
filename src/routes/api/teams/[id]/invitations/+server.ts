@@ -2,26 +2,12 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createInvitation, getTeamInvitations, cancelInvitation } from '$lib/server/teams';
 import { supabaseAdmin } from '$lib/server/supabase';
-
-function getUserIdFromSession(cookies: { get: (name: string) => string | undefined }): string {
-	const session = cookies.get('session');
-	if (!session) {
-		throw error(401, 'Unauthorized');
-	}
-	try {
-		const parsed = JSON.parse(session);
-		if (!parsed.userId) {
-			throw error(401, 'Invalid session');
-		}
-		return parsed.userId;
-	} catch {
-		throw error(401, 'Invalid session');
-	}
-}
+import { getValidatedUserId } from '$lib/server/session';
 
 // GET /api/teams/[id]/invitations - Get pending invitations
 export const GET: RequestHandler = async ({ params, cookies }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	// Verify admin access
 	const { data: membership } = await supabaseAdmin
@@ -46,7 +32,8 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
 // POST /api/teams/[id]/invitations - Create invitation
 export const POST: RequestHandler = async ({ params, cookies, request }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	// Verify admin access
 	const { data: membership } = await supabaseAdmin
@@ -73,12 +60,7 @@ export const POST: RequestHandler = async ({ params, cookies, request }) => {
 			throw error(400, 'Role must be admin or member');
 		}
 
-		const invitation = await createInvitation(
-			params.id,
-			email,
-			role || 'member',
-			userId
-		);
+		const invitation = await createInvitation(params.id, email, role || 'member', userId);
 
 		return json({ invitation });
 	} catch (err) {
@@ -89,7 +71,8 @@ export const POST: RequestHandler = async ({ params, cookies, request }) => {
 
 // DELETE /api/teams/[id]/invitations - Cancel invitation
 export const DELETE: RequestHandler = async ({ params, cookies, request }) => {
-	const userId = getUserIdFromSession(cookies);
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
 	// Verify admin access
 	const { data: membership } = await supabaseAdmin
