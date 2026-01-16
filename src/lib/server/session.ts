@@ -65,17 +65,31 @@ export async function createSession(
 	const expiresAt = new Date();
 	expiresAt.setDate(expiresAt.getDate() + SESSION_DURATION_DAYS);
 
-	const { error } = await supabaseAdmin.from('sessions').insert({
-		user_id: userId,
-		token_hash: tokenHash,
-		expires_at: expiresAt.toISOString(),
-		ip_address: options?.ipAddress || null,
-		user_agent: options?.userAgent?.substring(0, 500) || null
+	// Use RPC function with SECURITY DEFINER to bypass RLS
+	const { data: sessionId, error: rpcError } = await supabaseAdmin.rpc('create_user_session', {
+		p_user_id: userId,
+		p_token_hash: tokenHash,
+		p_expires_at: expiresAt.toISOString(),
+		p_ip_address: options?.ipAddress || null,
+		p_user_agent: options?.userAgent?.substring(0, 500) || null
 	});
 
-	if (error) {
-		console.error('[Session] Failed to create session:', error);
-		return null;
+	if (rpcError) {
+		console.error('[Session] RPC create_user_session failed:', rpcError);
+
+		// Fallback to direct insert
+		const { error } = await supabaseAdmin.from('sessions').insert({
+			user_id: userId,
+			token_hash: tokenHash,
+			expires_at: expiresAt.toISOString(),
+			ip_address: options?.ipAddress || null,
+			user_agent: options?.userAgent?.substring(0, 500) || null
+		});
+
+		if (error) {
+			console.error('[Session] Direct insert also failed:', error);
+			return null;
+		}
 	}
 
 	return { token, expiresAt };
@@ -92,14 +106,25 @@ export async function validateSession(token: string): Promise<SessionValidationR
 
 	const tokenHash = hashSessionToken(token);
 
-	const { data: session, error } = await supabaseAdmin
-		.from('sessions')
-		.select('id, user_id, token_hash, expires_at, last_active_at')
-		.eq('token_hash', tokenHash)
-		.single();
+	// Use RPC function with SECURITY DEFINER to bypass RLS
+	const { data: sessions, error: rpcError } = await supabaseAdmin.rpc('get_session_by_token', {
+		p_token_hash: tokenHash
+	});
 
-	if (error || !session) {
-		return { valid: false, error: 'Session not found' };
+	let session = sessions?.[0];
+
+	// Fallback to direct query if RPC fails
+	if (rpcError || !session) {
+		const { data: directSession, error } = await supabaseAdmin
+			.from('sessions')
+			.select('id, user_id, token_hash, expires_at, last_active_at')
+			.eq('token_hash', tokenHash)
+			.single();
+
+		if (error || !directSession) {
+			return { valid: false, error: 'Session not found' };
+		}
+		session = directSession;
 	}
 
 	// Verify token hash matches (constant-time comparison)
@@ -110,18 +135,13 @@ export async function validateSession(token: string): Promise<SessionValidationR
 	// Check expiration
 	const expiresAt = new Date(session.expires_at);
 	if (expiresAt < new Date()) {
-		// Clean up expired session
-		await supabaseAdmin.from('sessions').delete().eq('id', session.id);
+		// Clean up expired session using RPC
+		supabaseAdmin.rpc('delete_expired_session', { p_session_id: session.id }).catch(() => {});
 		return { valid: false, error: 'Session expired' };
 	}
 
-	// Update last active timestamp (don't wait for this)
-	supabaseAdmin
-		.from('sessions')
-		.update({ last_active_at: new Date().toISOString() })
-		.eq('id', session.id)
-		.then(() => {})
-		.catch(() => {});
+	// Update last active timestamp using RPC (don't wait for this)
+	supabaseAdmin.rpc('touch_session', { p_session_id: session.id }).catch(() => {});
 
 	return {
 		valid: true,
@@ -165,11 +185,19 @@ export async function validateSessionFromCookie(
 export async function invalidateSession(token: string): Promise<boolean> {
 	const tokenHash = hashSessionToken(token);
 
-	const { error } = await supabaseAdmin.from('sessions').delete().eq('token_hash', tokenHash);
+	// Use RPC function with SECURITY DEFINER to bypass RLS
+	const { error: rpcError } = await supabaseAdmin.rpc('delete_session', {
+		p_token_hash: tokenHash
+	});
 
-	if (error) {
-		console.error('[Session] Failed to invalidate session:', error);
-		return false;
+	if (rpcError) {
+		console.error('[Session] RPC delete_session failed:', rpcError);
+		// Fallback to direct delete
+		const { error } = await supabaseAdmin.from('sessions').delete().eq('token_hash', tokenHash);
+		if (error) {
+			console.error('[Session] Direct delete also failed:', error);
+			return false;
+		}
 	}
 
 	return true;
