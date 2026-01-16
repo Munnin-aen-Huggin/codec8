@@ -9,16 +9,26 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
 	const userId = await getValidatedUserId(cookies);
 
 	// Get user profile to check tier
-	const { data: profile } = await supabaseAdmin
+	const { data: profile, error: profileError } = await supabaseAdmin
 		.from('profiles')
 		.select('subscription_tier, plan, default_team_id, repos_used_this_month')
 		.eq('id', userId)
 		.single();
 
+	console.log('[Analytics] Profile:', {
+		userId,
+		subscription_tier: profile?.subscription_tier,
+		plan: profile?.plan,
+		repos_used: profile?.repos_used_this_month,
+		error: profileError?.message
+	});
+
 	const tier = profile?.subscription_tier || profile?.plan || 'free';
+	console.log('[Analytics] Detected tier:', tier);
 
 	// Only Pro, Team, Enterprise, LTD, and DFY users can access detailed analytics
 	if (!['pro', 'team', 'enterprise', 'ltd', 'dfy'].includes(tier)) {
+		console.log('[Analytics] Access denied for tier:', tier);
 		throw error(403, 'Pro or Team subscription required for analytics');
 	}
 
@@ -29,10 +39,25 @@ export const GET: RequestHandler = async ({ cookies, url }) => {
 	try {
 		if (tier === 'team' && teamId) {
 			const data = await getTeamDetailedStats(teamId);
+			console.log('[Analytics] Team stats:', {
+				teamId,
+				totalDocs: data.stats.totalDocs,
+				quotaUsed: data.quotaUsed,
+				quotaLimit: data.quotaLimit,
+				dailyUsageLength: data.stats.dailyUsage?.length,
+				dailyUsageSample: data.stats.dailyUsage?.slice(-3)
+			});
 			return json(data);
 		} else {
 			const stats = await getUserDetailedStats(userId, null, days);
 			const usageStats = await getUsageStats(userId);
+			console.log('[Analytics] User stats:', {
+				userId,
+				totalDocs: stats.totalDocs,
+				reposConnected: stats.reposConnected,
+				quotaUsed: usageStats.used,
+				quotaLimit: usageStats.limit
+			});
 			return json({
 				stats,
 				quotaUsed: usageStats.used,

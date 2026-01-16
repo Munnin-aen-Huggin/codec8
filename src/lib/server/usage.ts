@@ -377,16 +377,23 @@ interface LogUsageParams {
 
 export async function logUsage(params: LogUsageParams): Promise<void> {
 	try {
-		await supabaseAdmin.from('usage_logs').insert({
+		console.log('[Usage] Logging usage:', params);
+		const { data, error } = await supabaseAdmin.from('usage_logs').insert({
 			user_id: params.userId,
 			team_id: params.teamId,
 			repo_id: params.repoId,
 			doc_type: params.docType,
 			tokens_used: params.tokensUsed,
 			generation_time_ms: params.generationTimeMs
-		});
+		}).select('id').single();
+
+		if (error) {
+			console.error('[Usage] Failed to insert usage log:', error);
+		} else {
+			console.log('[Usage] Usage logged successfully:', data?.id);
+		}
 	} catch (err) {
-		console.error('Failed to log usage:', err);
+		console.error('[Usage] Failed to log usage:', err);
 		// Don't throw - usage logging should not break generation
 	}
 }

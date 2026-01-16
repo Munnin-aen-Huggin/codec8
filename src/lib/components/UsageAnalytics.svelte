@@ -132,13 +132,14 @@
 			<!-- Daily Usage Chart -->
 			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
 				<h3 class="text-lg font-semibold text-white mb-4">Daily Usage (Last 30 Days)</h3>
-				<div class="h-40 flex items-end gap-1">
+				<div class="h-40 flex items-end gap-[2px]" style="height: 160px;">
 					{#each stats.dailyUsage as day}
-						{@const height = getMaxDailyCount() > 0 ? (day.count / getMaxDailyCount()) * 100 : 0}
-						<div class="flex-1 flex flex-col items-center group relative">
+						{@const maxCount = getMaxDailyCount()}
+						{@const barHeightPx = maxCount > 0 ? Math.max((day.count / maxCount) * 150, day.count > 0 ? 8 : 2) : 2}
+						<div class="flex-1 flex flex-col justify-end items-center group relative" style="height: 160px;">
 							<div
-								class="w-full bg-violet-500/80 rounded-t transition-all hover:bg-violet-500"
-								style="height: {Math.max(height, 2)}%"
+								class="w-full bg-violet-500 rounded-t transition-all hover:bg-violet-400"
+								style="height: {barHeightPx}px;"
 							></div>
 							<!-- Tooltip -->
 							<div class="absolute bottom-full mb-2 hidden group-hover:block z-10">

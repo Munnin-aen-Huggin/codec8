@@ -233,6 +233,18 @@ export const POST: RequestHandler = async ({ cookies, request }) => {
 			try {
 				await incrementUsage(userId);
 				console.log(`[Usage] Incremented usage for user ${userId}`);
+
+				// Also increment team usage if user belongs to a team
+				if (profile.default_team_id) {
+					const { error: teamError } = await supabaseAdmin.rpc('increment_team_usage', {
+						team_id: profile.default_team_id
+					});
+					if (teamError) {
+						console.error('[Usage] Failed to increment team usage:', teamError);
+					} else {
+						console.log(`[Usage] Incremented team usage for team ${profile.default_team_id}`);
+					}
+				}
 			} catch (usageError) {
 				console.error('[Usage] Failed to increment usage:', usageError);
 				// Don't fail the request if usage tracking fails
