@@ -106,25 +106,16 @@ export async function validateSession(token: string): Promise<SessionValidationR
 
 	const tokenHash = hashSessionToken(token);
 
-	// Use RPC function with SECURITY DEFINER to bypass RLS
-	const { data: sessions, error: rpcError } = await supabaseAdmin.rpc('get_session_by_token', {
-		p_token_hash: tokenHash
-	});
+	// Direct query - RLS policies now allow this
+	const { data: session, error } = await supabaseAdmin
+		.from('sessions')
+		.select('id, user_id, token_hash, expires_at, last_active_at')
+		.eq('token_hash', tokenHash)
+		.single();
 
-	let session = sessions?.[0];
-
-	// Fallback to direct query if RPC fails
-	if (rpcError || !session) {
-		const { data: directSession, error } = await supabaseAdmin
-			.from('sessions')
-			.select('id, user_id, token_hash, expires_at, last_active_at')
-			.eq('token_hash', tokenHash)
-			.single();
-
-		if (error || !directSession) {
-			return { valid: false, error: 'Session not found' };
-		}
-		session = directSession;
+	if (error || !session) {
+		console.log('[Session] Session not found for token hash');
+		return { valid: false, error: 'Session not found' };
 	}
 
 	// Verify token hash matches (constant-time comparison)
@@ -135,13 +126,18 @@ export async function validateSession(token: string): Promise<SessionValidationR
 	// Check expiration
 	const expiresAt = new Date(session.expires_at);
 	if (expiresAt < new Date()) {
-		// Clean up expired session using RPC
-		supabaseAdmin.rpc('delete_expired_session', { p_session_id: session.id }).catch(() => {});
+		// Clean up expired session
+		supabaseAdmin.from('sessions').delete().eq('id', session.id).then(() => {}).catch(() => {});
 		return { valid: false, error: 'Session expired' };
 	}
 
-	// Update last active timestamp using RPC (don't wait for this)
-	supabaseAdmin.rpc('touch_session', { p_session_id: session.id }).catch(() => {});
+	// Update last active timestamp (don't wait for this)
+	supabaseAdmin
+		.from('sessions')
+		.update({ last_active_at: new Date().toISOString() })
+		.eq('id', session.id)
+		.then(() => {})
+		.catch(() => {});
 
 	return {
 		valid: true,
