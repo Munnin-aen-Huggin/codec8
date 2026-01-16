@@ -219,6 +219,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				}
 			} else {
 				// RPC succeeded - use returned user ID (handles upsert)
+				console.log('[Auth Callback] RPC returned:', createdUserId, 'type:', typeof createdUserId);
 				userId = createdUserId || newUserId;
 				if (createdUserId && createdUserId !== newUserId) {
 					// User already existed, was updated
@@ -227,6 +228,20 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				} else {
 					console.log('[Auth Callback] Profile created via RPC, userId:', userId);
 				}
+
+				// VERIFY: Check if profile actually exists
+				const { data: verifyProfile, error: verifyError } = await supabaseAdmin
+					.from('profiles')
+					.select('id, email, github_username')
+					.eq('id', userId)
+					.single();
+
+				if (verifyError || !verifyProfile) {
+					console.error('[Auth Callback] PROFILE VERIFICATION FAILED!', verifyError);
+					console.error('[Auth Callback] Profile not found with id:', userId);
+					throw error(500, 'Profile creation verification failed');
+				}
+				console.log('[Auth Callback] Profile verified:', verifyProfile.github_username);
 			}
 		}
 
