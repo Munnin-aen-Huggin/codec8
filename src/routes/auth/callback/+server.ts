@@ -145,60 +145,88 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		let isNewUser = false;
 
 		if (existingProfile) {
-			// Update existing user's token
+			// Update existing user's token using RPC function (bypasses RLS)
 			userId = existingProfile.id;
 			console.log('[Auth Callback] Found existing profile, userId:', userId);
-			const { error: updateError } = await supabaseAdmin
-				.from('profiles')
-				.update({
-					github_token: tokenData.access_token,
-					email: userEmail
-				})
-				.eq('id', userId);
+			const { error: updateError } = await supabaseAdmin.rpc('update_user_profile', {
+				p_id: userId,
+				p_github_token: tokenData.access_token,
+				p_email: userEmail
+			});
 			if (updateError) {
 				console.error('[Auth Callback] Profile update error:', updateError);
+				// Fallback to direct update
+				await supabaseAdmin
+					.from('profiles')
+					.update({
+						github_token: tokenData.access_token,
+						email: userEmail
+					})
+					.eq('id', userId);
 			}
 		} else {
-			// Create new user profile
+			// Create new user profile using RPC function (bypasses RLS with SECURITY DEFINER)
 			isNewUser = true;
 			const newUserId = crypto.randomUUID();
 			console.log('[Auth Callback] Creating new profile with userId:', newUserId);
-			const { error: insertError } = await supabaseAdmin.from('profiles').insert({
-				id: newUserId,
-				email: userEmail,
-				github_username: githubUser.login,
-				github_token: tokenData.access_token,
-				plan: 'free'
+
+			const { data: createdUserId, error: rpcError } = await supabaseAdmin.rpc('create_user_profile', {
+				p_id: newUserId,
+				p_email: userEmail,
+				p_github_username: githubUser.login,
+				p_github_token: tokenData.access_token,
+				p_plan: 'free'
 			});
 
-			if (insertError) {
-				console.error('[Auth Callback] Failed to create user profile:', JSON.stringify(insertError, null, 2));
-				console.error('[Auth Callback] Insert error code:', insertError.code);
-				console.error('[Auth Callback] Insert error message:', insertError.message);
-				console.error('[Auth Callback] Insert error details:', insertError.details);
+			if (rpcError) {
+				console.error('[Auth Callback] RPC create_user_profile failed:', JSON.stringify(rpcError, null, 2));
 
-				// If it's a unique constraint violation, try to find the existing profile
-				if (insertError.code === '23505') {
-					console.log('[Auth Callback] Unique constraint violation, trying to find existing profile');
-					const { data: existingByUsername } = await supabaseAdmin
-						.from('profiles')
-						.select('id')
-						.eq('github_username', githubUser.login)
-						.single();
+				// Fallback: Try direct insert (in case RPC function doesn't exist yet)
+				console.log('[Auth Callback] Falling back to direct insert...');
+				const { error: insertError } = await supabaseAdmin.from('profiles').insert({
+					id: newUserId,
+					email: userEmail,
+					github_username: githubUser.login,
+					github_token: tokenData.access_token,
+					plan: 'free'
+				});
 
-					if (existingByUsername) {
-						userId = existingByUsername.id;
-						isNewUser = false;
-						console.log('[Auth Callback] Found existing profile after conflict:', userId);
+				if (insertError) {
+					console.error('[Auth Callback] Direct insert also failed:', JSON.stringify(insertError, null, 2));
+
+					// If it's a unique constraint violation, try to find the existing profile
+					if (insertError.code === '23505') {
+						console.log('[Auth Callback] Unique constraint violation, trying to find existing profile');
+						const { data: existingByUsername } = await supabaseAdmin
+							.from('profiles')
+							.select('id')
+							.eq('github_username', githubUser.login)
+							.single();
+
+						if (existingByUsername) {
+							userId = existingByUsername.id;
+							isNewUser = false;
+							console.log('[Auth Callback] Found existing profile after conflict:', userId);
+						} else {
+							throw error(500, `Failed to create user profile: ${insertError.message || insertError.code}`);
+						}
 					} else {
 						throw error(500, `Failed to create user profile: ${insertError.message || insertError.code}`);
 					}
 				} else {
-					throw error(500, `Failed to create user profile: ${insertError.message || insertError.code}`);
+					userId = newUserId;
+					console.log('[Auth Callback] Profile created via direct insert');
 				}
 			} else {
-				userId = newUserId;
-				console.log('[Auth Callback] Profile created successfully');
+				// RPC succeeded - use returned user ID (handles upsert)
+				userId = createdUserId || newUserId;
+				if (createdUserId && createdUserId !== newUserId) {
+					// User already existed, was updated
+					isNewUser = false;
+					console.log('[Auth Callback] Profile updated via RPC, existing userId:', userId);
+				} else {
+					console.log('[Auth Callback] Profile created via RPC, userId:', userId);
+				}
 			}
 		}
 
