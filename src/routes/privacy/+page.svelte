@@ -51,7 +51,7 @@
 			<p>We use the following third-party services:</p>
 			<ul>
 				<li><strong>GitHub:</strong> For authentication and repository access</li>
-				<li><strong>Anthropic (Claude AI):</strong> For documentation generation</li>
+				<li><strong>Anthropic:</strong> For AI-powered documentation generation</li>
 				<li><strong>Stripe:</strong> For payment processing</li>
 			</ul>
 		</section>

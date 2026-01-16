@@ -190,7 +190,7 @@
 			<div class="step">
 				<div class="step-number">2</div>
 				<h3>AI generates docs</h3>
-				<p>Claude AI analyzes your code and creates documentation.</p>
+				<p>Our AI analyzes your code and creates documentation.</p>
 			</div>
 			<div class="step">
 				<div class="step-number">3</div>

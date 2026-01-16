@@ -18,7 +18,7 @@
 	];
 
 	const defaultTemplates: Record<string, string> = {
-		readme: `Generate a comprehensive README.md for this repository.
+		readme: `Generate a comprehensive README for this repository.
 Include:
 - Project title and description
 - Features and highlights
@@ -170,7 +170,7 @@ Format as a clear, numbered guide.`
 			id="prompt"
 			bind:value={promptTemplate}
 			rows={12}
-			placeholder="Enter the prompt template that will be sent to Claude..."
+			placeholder="Enter the prompt template for AI documentation generation..."
 			class="w-full bg-zinc-800 text-white px-4 py-3 rounded-lg border border-zinc-700 focus:border-violet-500 focus:outline-none placeholder:text-zinc-500 font-mono text-sm resize-y"
 			disabled={saving}
 		></textarea>

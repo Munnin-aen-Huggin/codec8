@@ -2,18 +2,18 @@
  * AI Prompt Templates for Documentation Generation
  *
  * Each prompt builder takes a RepoContext and returns a structured prompt
- * for Claude to generate high-quality documentation.
+ * for the AI to generate high-quality documentation.
  */
 
 import type { RepoContext } from './parser';
 
 /**
- * Builds a prompt for generating a comprehensive README.md
+ * Builds a prompt for generating a comprehensive README
  */
 export function buildReadmePrompt(context: RepoContext): string {
 	const { repoName, description, framework, language, packageJson, fileTree, keyFiles } = context;
 
-	return `You are an expert technical writer. Generate a professional README.md for the following repository.
+	return `You are an expert technical writer. Generate a professional README for the following repository.
 
 ## Repository Information
 - **Name:** ${repoName}
@@ -35,7 +35,7 @@ ${fileTree}
 ${keyFiles.map((f) => `### ${f.path}\n\`\`\`${f.language || ''}\n${f.content}\n\`\`\``).join('\n\n')}
 
 ## Instructions
-Generate a comprehensive README.md that includes:
+Generate a comprehensive README that includes:
 
 1. **Title and Badges** - Project name with relevant badges (build status placeholder, license, version from package.json if available)
 

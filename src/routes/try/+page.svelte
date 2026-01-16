@@ -15,7 +15,7 @@
 		{ icon: '⚡', text: 'CodeDoc AI analyzes your entire codebase in under 60 seconds.' },
 		{ icon: '💰', text: 'Professional technical writers charge $50-100/hour.' },
 		{ icon: '🚀', text: 'Great documentation increases developer adoption by 3x.' },
-		{ icon: '✨', text: 'We use Claude AI to understand your code context deeply.' }
+		{ icon: '✨', text: 'We use advanced AI to understand your code context deeply.' }
 	];
 	let currentTipIndex = 0;
 	let tipInterval: ReturnType<typeof setInterval> | null = null;
@@ -353,7 +353,7 @@
 						<div class="w-3 h-3 rounded-full bg-red-500"></div>
 						<div class="w-3 h-3 rounded-full bg-yellow-500"></div>
 						<div class="w-3 h-3 rounded-full bg-green-500"></div>
-						<span class="text-xs text-zinc-500 ml-2">README.md</span>
+						<span class="text-xs text-zinc-500 ml-2">README</span>
 					</div>
 					<div class="p-6 prose prose-invert prose-sm max-w-none prose-headings:text-white prose-p:text-zinc-300 prose-li:text-zinc-300 prose-strong:text-white prose-code:text-emerald-400 prose-code:bg-zinc-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-zinc-800 prose-a:text-emerald-400">
 						{@html renderedMarkdown}
@@ -411,7 +411,7 @@
 								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
 								</svg>
-								README.md
+								README
 							</div>
 							<div class="flex items-center gap-2 text-zinc-300">
 								<svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
