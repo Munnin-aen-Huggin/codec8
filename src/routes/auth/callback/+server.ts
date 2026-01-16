@@ -158,8 +158,11 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			});
 
 			if (insertError) {
-				console.error('[Auth Callback] Failed to create user profile:', insertError);
-				throw error(500, 'Failed to create user profile');
+				console.error('[Auth Callback] Failed to create user profile:', JSON.stringify(insertError, null, 2));
+				console.error('[Auth Callback] Insert error code:', insertError.code);
+				console.error('[Auth Callback] Insert error message:', insertError.message);
+				console.error('[Auth Callback] Insert error details:', insertError.details);
+				throw error(500, `Failed to create user profile: ${insertError.message || insertError.code}`);
 			}
 			console.log('[Auth Callback] Profile created successfully');
 
