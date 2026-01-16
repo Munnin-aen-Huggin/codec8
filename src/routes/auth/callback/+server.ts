@@ -114,13 +114,27 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 		console.log('[Auth Callback] Got user email:', userEmail);
 
-		// Check if user exists in profiles table
+		// Check if user exists in profiles table (by github_username or email)
 		console.log('[Auth Callback] Looking for profile with github_username:', githubUser.login);
-		const { data: existingProfile, error: lookupError } = await supabaseAdmin
+		let { data: existingProfile, error: lookupError } = await supabaseAdmin
 			.from('profiles')
 			.select('id')
 			.eq('github_username', githubUser.login)
 			.single();
+
+		// If not found by github_username, try by email
+		if (!existingProfile && userEmail) {
+			console.log('[Auth Callback] Not found by username, trying email:', userEmail);
+			const { data: profileByEmail } = await supabaseAdmin
+				.from('profiles')
+				.select('id')
+				.eq('email', userEmail)
+				.single();
+			if (profileByEmail) {
+				existingProfile = profileByEmail;
+				console.log('[Auth Callback] Found existing profile by email');
+			}
+		}
 
 		if (lookupError && lookupError.code !== 'PGRST116') {
 			console.error('[Auth Callback] Profile lookup error:', lookupError);
@@ -162,11 +176,30 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 				console.error('[Auth Callback] Insert error code:', insertError.code);
 				console.error('[Auth Callback] Insert error message:', insertError.message);
 				console.error('[Auth Callback] Insert error details:', insertError.details);
-				throw error(500, `Failed to create user profile: ${insertError.message || insertError.code}`);
-			}
-			console.log('[Auth Callback] Profile created successfully');
 
-			userId = newUserId;
+				// If it's a unique constraint violation, try to find the existing profile
+				if (insertError.code === '23505') {
+					console.log('[Auth Callback] Unique constraint violation, trying to find existing profile');
+					const { data: existingByUsername } = await supabaseAdmin
+						.from('profiles')
+						.select('id')
+						.eq('github_username', githubUser.login)
+						.single();
+
+					if (existingByUsername) {
+						userId = existingByUsername.id;
+						isNewUser = false;
+						console.log('[Auth Callback] Found existing profile after conflict:', userId);
+					} else {
+						throw error(500, `Failed to create user profile: ${insertError.message || insertError.code}`);
+					}
+				} else {
+					throw error(500, `Failed to create user profile: ${insertError.message || insertError.code}`);
+				}
+			} else {
+				userId = newUserId;
+				console.log('[Auth Callback] Profile created successfully');
+			}
 		}
 
 		// Track signup or login event
