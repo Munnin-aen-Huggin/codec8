@@ -248,7 +248,11 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 		// Set session cookie with the token
 		setSessionCookie(cookies, userId, sessionResult.token, sessionResult.expiresAt, dev);
-		console.log('[Auth Callback] Session created and cookie set successfully');
+		console.log('[Auth Callback] Session cookie set for userId:', userId);
+
+		// Verify the cookie was set
+		const verifySession = cookies.get('session');
+		console.log('[Auth Callback] Cookie verification:', verifySession ? 'SET' : 'NOT SET');
 
 		// Clear intended plan cookie if it exists
 		cookies.delete('intended_plan', { path: '/' });
@@ -257,17 +261,25 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 		const checkoutTier = cookies.get('checkout_tier');
 		if (checkoutTier) {
 			cookies.delete('checkout_tier', { path: '/' });
-			// Redirect to a page that will initiate checkout
+			console.log('[Auth Callback] Redirecting to checkout for tier:', checkoutTier);
 			throw redirect(302, `/dashboard?checkout=${checkoutTier}`);
 		}
+
+		// Success - redirect to dashboard
+		console.log('[Auth Callback] SUCCESS - Redirecting to /dashboard');
+		throw redirect(302, '/dashboard');
 	} catch (err) {
-		console.error('OAuth callback error:', err);
+		// Check if this is a redirect (which is expected)
+		if (err && typeof err === 'object' && 'status' in err && 'location' in err) {
+			console.log('[Auth Callback] Throwing redirect to:', (err as { location: string }).location);
+			throw err;
+		}
+		// Check if this is an HTTP error
 		if (err && typeof err === 'object' && 'status' in err) {
 			throw err;
 		}
+		console.error('[Auth Callback] Unexpected error:', err);
 		throw error(500, 'Authentication failed');
 	}
-
-	throw redirect(302, '/dashboard');
 };
 

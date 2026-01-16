@@ -1,30 +1,43 @@
 import { supabaseAdmin } from '$lib/server/supabase';
-import { validateSessionFromCookie, clearSessionCookie } from '$lib/server/session';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ cookies }) => {
-	// CRITICAL SECURITY: Validate session server-side
-	const sessionResult = await validateSessionFromCookie(cookies);
+	// Check for session cookie - don't validate here, let pages handle auth
+	const sessionCookie = cookies.get('session');
 
-	if (!sessionResult.valid || !sessionResult.userId) {
-		// Clear invalid session cookie if present
-		if (cookies.get('session')) {
-			clearSessionCookie(cookies);
-		}
+	if (!sessionCookie) {
 		return { user: null };
 	}
 
-	const userId = sessionResult.userId;
+	// Parse session cookie to get userId
+	let userId: string;
+	try {
+		const session = JSON.parse(sessionCookie);
+		userId = session.userId;
+	} catch {
+		// Invalid format but don't clear - let dashboard handle it
+		console.log('[Layout] Invalid session cookie format');
+		return { user: null };
+	}
 
-	const { data: profile } = await supabaseAdmin
+	if (!userId) {
+		return { user: null };
+	}
+
+	// Fetch profile for navigation display
+	const { data: profile, error: profileError } = await supabaseAdmin
 		.from('profiles')
 		.select('id, email, github_username, plan')
 		.eq('id', userId)
 		.single();
 
+	if (profileError) {
+		console.error('[Layout] Profile fetch error:', profileError);
+	}
+
 	if (!profile) {
-		// User no longer exists, clear session
-		clearSessionCookie(cookies);
+		// User no longer exists but don't clear cookie here
+		console.log('[Layout] Profile not found for userId:', userId);
 		return { user: null };
 	}
 
