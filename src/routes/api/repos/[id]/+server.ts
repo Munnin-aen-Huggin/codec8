@@ -1,84 +1,57 @@
 import { json, error } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
+import { getValidatedUserId } from '$lib/server/session';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies, params }) => {
-  const session = cookies.get('session');
-  if (!session) {
-    throw error(401, 'Unauthorized');
-  }
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
-  let userId: string;
-  try {
-    const parsed = JSON.parse(session);
-    userId = parsed.userId;
-  } catch {
-    throw error(401, 'Invalid session');
-  }
+	const { id } = params;
 
-  if (!userId) {
-    throw error(401, 'Invalid session');
-  }
+	const { data: repo, error: dbError } = await supabaseAdmin
+		.from('repositories')
+		.select('*')
+		.eq('id', id)
+		.eq('user_id', userId)
+		.single();
 
-  const { id } = params;
+	if (dbError || !repo) {
+		throw error(404, 'Repository not found');
+	}
 
-  const { data: repo, error: dbError } = await supabaseAdmin
-    .from('repositories')
-    .select('*')
-    .eq('id', id)
-    .eq('user_id', userId)
-    .single();
-
-  if (dbError || !repo) {
-    throw error(404, 'Repository not found');
-  }
-
-  return json(repo);
+	return json(repo);
 };
 
 export const DELETE: RequestHandler = async ({ cookies, params }) => {
-  const session = cookies.get('session');
-  if (!session) {
-    throw error(401, 'Unauthorized');
-  }
+	// CRITICAL SECURITY: Validate session server-side
+	const userId = await getValidatedUserId(cookies);
 
-  let userId: string;
-  try {
-    const parsed = JSON.parse(session);
-    userId = parsed.userId;
-  } catch {
-    throw error(401, 'Invalid session');
-  }
+	const { id } = params;
 
-  if (!userId) {
-    throw error(401, 'Invalid session');
-  }
+	const { data: repo } = await supabaseAdmin
+		.from('repositories')
+		.select('id')
+		.eq('id', id)
+		.eq('user_id', userId)
+		.single();
 
-  const { id } = params;
+	if (!repo) {
+		throw error(404, 'Repository not found');
+	}
 
-  const { data: repo } = await supabaseAdmin
-    .from('repositories')
-    .select('id')
-    .eq('id', id)
-    .eq('user_id', userId)
-    .single();
+	await supabaseAdmin.from('documentation').delete().eq('repo_id', id);
 
-  if (!repo) {
-    throw error(404, 'Repository not found');
-  }
+	const { error: deleteError } = await supabaseAdmin
+		.from('repositories')
+		.delete()
+		.eq('id', id)
+		.eq('user_id', userId);
 
-  await supabaseAdmin.from('documentation').delete().eq('repo_id', id);
+	if (deleteError) {
+		console.error('Failed to disconnect repository:', deleteError);
+		throw error(500, 'Failed to disconnect repository');
+	}
 
-  const { error: deleteError } = await supabaseAdmin
-    .from('repositories')
-    .delete()
-    .eq('id', id)
-    .eq('user_id', userId);
-
-  if (deleteError) {
-    console.error('Failed to disconnect repository:', deleteError);
-    throw error(500, 'Failed to disconnect repository');
-  }
-
-  return json({ success: true });
+	return json({ success: true });
 };

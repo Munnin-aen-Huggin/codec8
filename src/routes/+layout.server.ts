@@ -1,29 +1,32 @@
 import { supabaseAdmin } from '$lib/server/supabase';
+import { validateSessionFromCookie, clearSessionCookie } from '$lib/server/session';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ cookies }) => {
-  const session = cookies.get('session');
+	// CRITICAL SECURITY: Validate session server-side
+	const sessionResult = await validateSessionFromCookie(cookies);
 
-  if (!session) return { user: null };
+	if (!sessionResult.valid || !sessionResult.userId) {
+		// Clear invalid session cookie if present
+		if (cookies.get('session')) {
+			clearSessionCookie(cookies);
+		}
+		return { user: null };
+	}
 
-  let userId: string;
-  try {
-    const parsed = JSON.parse(session);
-    userId = parsed.userId;
-  } catch {
-    // Invalid session format, treat as logged out
-    return { user: null };
-  }
+	const userId = sessionResult.userId;
 
-  if (!userId) {
-    return { user: null };
-  }
+	const { data: profile } = await supabaseAdmin
+		.from('profiles')
+		.select('id, email, github_username, plan')
+		.eq('id', userId)
+		.single();
 
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('id, email, github_username, plan')
-    .eq('id', userId)
-    .single();
+	if (!profile) {
+		// User no longer exists, clear session
+		clearSessionCookie(cookies);
+		return { user: null };
+	}
 
-  return { user: profile || null };
+	return { user: profile };
 };

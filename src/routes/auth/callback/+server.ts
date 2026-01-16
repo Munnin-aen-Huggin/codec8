@@ -3,6 +3,7 @@ import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_APP_URL } from '$env/static/public';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { trackEvent, EVENTS } from '$lib/server/analytics';
+import { createSession, setSessionCookie } from '$lib/server/session';
 import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
 
@@ -172,21 +173,18 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 			userId
 		);
 
-		// Create session token
-		const sessionToken = crypto.randomUUID();
-		const sessionExpiry = new Date();
-		sessionExpiry.setDate(sessionExpiry.getDate() + 7); // 7 days
+		// Create server-side session (CRITICAL SECURITY FIX)
+		console.log('[Auth Callback] Creating server-side session for userId:', userId);
+		const sessionResult = await createSession(userId);
 
-		// Store session in cookie
-		console.log('[Auth Callback] Setting session cookie for userId:', userId);
-		cookies.set('session', JSON.stringify({ userId, token: sessionToken }), {
-			path: '/',
-			httpOnly: true,
-			secure: !dev,
-			sameSite: 'lax',
-			expires: sessionExpiry
-		});
-		console.log('[Auth Callback] Session cookie set successfully');
+		if (!sessionResult) {
+			console.error('[Auth Callback] Failed to create session');
+			throw error(500, 'Failed to create session');
+		}
+
+		// Set session cookie with the token
+		setSessionCookie(cookies, userId, sessionResult.token, sessionResult.expiresAt, dev);
+		console.log('[Auth Callback] Session created and cookie set successfully');
 
 		// Clear intended plan cookie if it exists
 		cookies.delete('intended_plan', { path: '/' });
