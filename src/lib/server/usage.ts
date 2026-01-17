@@ -446,12 +446,21 @@ export async function getUserDetailedStats(
 	// Get repos connected count
 	let reposConnected = 0;
 	if (teamId) {
-		// For team, count team repos
-		const { count } = await supabaseAdmin
-			.from('repositories')
-			.select('*', { count: 'exact', head: true })
+		// For team, count repos owned by team members OR directly assigned to team
+		const { data: teamMembers } = await supabaseAdmin
+			.from('team_members')
+			.select('user_id')
 			.eq('team_id', teamId);
-		reposConnected = count || 0;
+
+		const memberIds = teamMembers?.map(m => m.user_id) || [];
+
+		if (memberIds.length > 0) {
+			const { count } = await supabaseAdmin
+				.from('repositories')
+				.select('*', { count: 'exact', head: true })
+				.or(`team_id.eq.${teamId},user_id.in.(${memberIds.join(',')})`);
+			reposConnected = count || 0;
+		}
 	} else {
 		// For individual user
 		const { count } = await supabaseAdmin
