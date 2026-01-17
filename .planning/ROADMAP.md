@@ -2,10 +2,12 @@
 
 ## Milestones
 
-- [v1.0 MVP Launch](milestones/v1.0-ROADMAP.md) — Phases 1-8 (SHIPPED 2026-01-14)
-- [v1.1 Growth](milestones/v1.1-ROADMAP.md) — Phases 9-11 (SHIPPED 2026-01-15)
-- **v1.2 Upsells** — Phase 12 (SHIPPED 2026-01-15)
-- **v2.0 Enterprise** — Phase 13 (SHIPPED 2026-01-15)
+| Version | Name | Phases | Status | Git Tag |
+|---------|------|--------|--------|---------|
+| [v1.0](milestones/v1.0-ROADMAP.md) | MVP Launch | 1-8 | SHIPPED 2026-01-14 | `v1.0` |
+| [v1.1](milestones/v1.1-ROADMAP.md) | Growth | 9-11 | SHIPPED 2026-01-15 | `v1.1` |
+| [v1.2](milestones/v1.2-ROADMAP.md) | Upsells | 12 | SHIPPED 2026-01-15 | `v1.2` |
+| [v2.0](milestones/v2.0-ROADMAP.md) | Enterprise | 13 | SHIPPED 2026-01-15 | `v2.0` |
 
 ---
 
@@ -65,6 +67,8 @@ See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 - Stale documentation alerts system
 - Stripe webhook handling for add-on subscriptions
 
+See [v1.2-ROADMAP.md](milestones/v1.2-ROADMAP.md) for full details.
+
 </details>
 
 <details>
@@ -88,6 +92,8 @@ See [v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md) for full details.
 - [x] 13-05: JIT Provisioning (auto-create users)
 - [x] 13-06: Directory Sync (SCIM 2.0 stubs)
 - [x] 13-07: Enterprise Tier & Pricing
+
+See [v2.0-ROADMAP.md](milestones/v2.0-ROADMAP.md) for full details.
 
 </details>
 
