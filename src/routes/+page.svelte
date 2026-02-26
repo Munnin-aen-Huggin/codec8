@@ -7,6 +7,128 @@
 		content="Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. In 60 seconds. Not 6 hours."
 	/>
 
+	<!-- Canonical -->
+	<link rel="canonical" href="https://codec8.com" />
+
+	<!-- Open Graph -->
+	<meta property="og:title" content="Codec8 - AI Documentation Generator" />
+	<meta property="og:description" content="Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. In 60 seconds. Not 6 hours." />
+	<meta property="og:url" content="https://codec8.com" />
+	<meta property="og:image" content="https://codec8.com/og-image.png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="630" />
+
+	<!-- Twitter Card -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Codec8 - AI Documentation Generator" />
+	<meta name="twitter:description" content="Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. In 60 seconds. Not 6 hours." />
+	<meta name="twitter:image" content="https://codec8.com/og-image.png" />
+
+	<!-- JSON-LD: Organization -->
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		"name": "Codec8",
+		"url": "https://codec8.com",
+		"logo": "https://codec8.com/og-image.png",
+		"sameAs": ["https://twitter.com/code_c8"],
+		"contactPoint": {
+			"@type": "ContactPoint",
+			"email": "support@codec8.com",
+			"contactType": "customer support"
+		}
+	})}</script>`}
+
+	<!-- JSON-LD: SoftwareApplication -->
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "SoftwareApplication",
+		"name": "Codec8",
+		"applicationCategory": "DeveloperApplication",
+		"operatingSystem": "Web",
+		"description": "AI-powered documentation generator for GitHub repositories. Generates README, API docs, architecture diagrams, and setup guides in 60 seconds.",
+		"offers": [
+			{
+				"@type": "Offer",
+				"price": "0",
+				"priceCurrency": "USD",
+				"name": "Free Demo"
+			},
+			{
+				"@type": "Offer",
+				"price": "99",
+				"priceCurrency": "USD",
+				"name": "Single Repo"
+			},
+			{
+				"@type": "Offer",
+				"price": "149",
+				"priceCurrency": "USD",
+				"name": "Pro",
+				"priceSpecification": {
+					"@type": "UnitPriceSpecification",
+					"billingDuration": "P1M"
+				}
+			}
+		]
+	})}</script>`}
+
+	<!-- JSON-LD: FAQPage -->
+	{@html `<script type="application/ld+json">${JSON.stringify({
+		"@context": "https://schema.org",
+		"@type": "FAQPage",
+		"mainEntity": [
+			{
+				"@type": "Question",
+				"name": "Why $99?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "The average technical writer charges $50-100/hour. Writing proper documentation takes 6-8 hours minimum. That's $400-800 in writer fees, or 8 hours of your own time. Codec8: $99. 60 seconds. Done."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "What languages do you support?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "JavaScript, TypeScript, Python, Go, Rust, Java, Ruby, PHP, and more. We support all major frameworks including React, Next.js, Express, Django, FastAPI, Rails, and Laravel."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "Is my code secure?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Yes. We never store your code after processing. All analysis happens in isolated environments. Your code is transmitted securely and deleted immediately after documentation generation."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "Why only README in the free demo?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "The free demo lets you experience the quality of our AI-generated documentation without commitment. README is the most essential doc type. Purchase Single Repo or subscribe to Pro/Team for all 4 documentation types."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "Can I edit the generated docs?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "Absolutely. All generated documentation is editable before export. You can refine, add sections, or modify anything. Paid tiers include a full markdown editor with live preview."
+				}
+			},
+			{
+				"@type": "Question",
+				"name": "What if I'm not satisfied?",
+				"acceptedAnswer": {
+					"@type": "Answer",
+					"text": "All purchases include a 30-day refund guarantee. If the documentation doesn't meet your expectations, contact us for a full refund. Pro and Team subscriptions can be canceled anytime."
+				}
+			}
+		]
+	})}</script>`}
+
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 	<link

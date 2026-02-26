@@ -5,6 +5,7 @@
 <svelte:head>
 	<title>Terms of Service - Codec8</title>
 	<meta name="description" content="Codec8 Terms of Service" />
+	<link rel="canonical" href="https://codec8.com/terms" />
 </svelte:head>
 
 <Header />

@@ -47,6 +47,13 @@
 <svelte:head>
 	<title>Beta Program - Codec8</title>
 	<meta name="description" content="Join the Codec8 beta program and get early access to AI-powered documentation generation." />
+	<link rel="canonical" href="https://codec8.com/beta" />
+	<meta property="og:title" content="Beta Program - Codec8" />
+	<meta property="og:description" content="Join the Codec8 beta program and get early access to AI-powered documentation generation." />
+	<meta property="og:url" content="https://codec8.com/beta" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Beta Program - Codec8" />
+	<meta name="twitter:description" content="Join the Codec8 beta program and get early access to AI-powered documentation generation." />
 </svelte:head>
 
 {#if data.user}

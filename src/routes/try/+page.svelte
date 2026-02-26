@@ -166,6 +166,13 @@
 <svelte:head>
 	<title>Try Codec8 - Generate README Without Signup</title>
 	<meta name="description" content="Generate professional README documentation for your GitHub repository. No signup required. Try it now!" />
+	<link rel="canonical" href="https://codec8.com/try" />
+	<meta property="og:title" content="Try Codec8 - Generate README Without Signup" />
+	<meta property="og:description" content="Generate professional README documentation for your GitHub repository. No signup required. Try it now!" />
+	<meta property="og:url" content="https://codec8.com/try" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Try Codec8 - Generate README Without Signup" />
+	<meta name="twitter:description" content="Generate professional README documentation for your GitHub repository. No signup required. Try it now!" />
 </svelte:head>
 
 <div class="min-h-screen bg-[#09090b] text-white">

@@ -5,6 +5,7 @@
 <svelte:head>
 	<title>Privacy Policy - Codec8</title>
 	<meta name="description" content="Codec8 Privacy Policy - How we handle your data" />
+	<link rel="canonical" href="https://codec8.com/privacy" />
 </svelte:head>
 
 <Header />
