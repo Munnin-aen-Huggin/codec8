@@ -1,13 +1,13 @@
 # Codec8 - Current State
 
-**Last Updated:** 2026-01-16
+**Last Updated:** 2026-02-26
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-01-15)
 
 **Core value:** Speed — complete docs in 60 seconds
-**Current focus:** v2.0 Enterprise - SSO/SAML, customization
+**Current focus:** LAUNCHED — marketing and customer acquisition
 
 ## Milestone Status
 
@@ -15,17 +15,21 @@ See: .planning/PROJECT.md (updated 2026-01-15)
 **v1.1 Growth:** SHIPPED 2026-01-15
 **v1.2 Upsells:** SHIPPED 2026-01-15
 **v2.0 Enterprise:** SHIPPED 2026-01-15
+**Phase 14 (Enterprise Customization):** DEFERRED — handling bespoke via paywall
 
 ## Current Position
 
-Phase: 13 — Enterprise Authentication (SSO/SAML)
-Plan: Complete (.planning/phases/phase-13/PLAN.md)
-Status: COMPLETED
-Last activity: 2026-01-15 — Phase 13 implementation complete
+Phase: All phases complete / Phase 14 deferred
+Status: LIVE IN PRODUCTION
+Last activity: 2026-02-26 — Full production launch
 
-Progress: [██████████] 7/7 tasks in Phase 13
+**Live at:** https://codec8.com
+**Stripe:** Live mode (real payments enabled)
+**Webhook:** Configured at codec8.com/api/stripe/webhook
+**GitHub Repo:** Munnin-aen-Huggin/codec8
+**Hosting:** Vercel (all 22 env vars configured)
 
-**Next Action:** Launch and gather enterprise customer feedback
+**Next Action:** Submit launch posts and acquire customers
 
 ## Feature Status
 
@@ -94,17 +98,21 @@ npm run test:e2e     # Run E2E tests
 npm run check        # TypeScript check
 ```
 
-## Manual Launch Tasks
+## Launch Readiness (2026-02-26)
 
-- [ ] Record demo video using script
-- [ ] Capture screenshots for Product Hunt
-- [ ] Create Stripe products with new price IDs
-- [ ] Update Vercel env vars
-- [ ] Product Hunt submission
-- [ ] Hacker News Show HN post
-- [ ] Reddit posts
-- [ ] Email list setup
-- [ ] Monitoring setup
+- [x] Stripe live keys configured
+- [x] 9 live products/prices created in Stripe
+- [x] Stripe webhook endpoint set up
+- [x] All 22 Vercel env vars updated
+- [x] Video demo replaced with animated CSS mockup
+- [x] codec8.com domain configured on Vercel
+- [x] Production deployment live
+- [x] Launch posts drafted (Product Hunt, Show HN, Reddit)
+- [ ] Submit Product Hunt launch
+- [ ] Post Show HN
+- [ ] Post to r/SaaS, r/webdev, r/Entrepreneur
+- [ ] Email list setup (Kit/ConvertKit)
+- [ ] Monitoring/alerting setup
 
 ## Key Decisions Made
 
@@ -130,9 +138,10 @@ npm run check        # TypeScript check
 
 ## Next Steps
 
-1. **Launch:** Execute launch runbook (Product Hunt, HN, Reddit)
+1. **Launch posts:** Submit Product Hunt, Show HN, and Reddit posts (drafts ready)
 2. **Gather feedback:** Monitor user signups and conversions
-3. **Enterprise outreach:** Target companies needing SSO/SAML for team onboarding
+3. **Enterprise requests:** Handle via paywall + bespoke manual process
+4. **Email list:** Set up Kit/ConvertKit for lead capture
 
 ---
 
@@ -140,3 +149,4 @@ npm run check        # TypeScript check
 *v1.1 shipped: 2026-01-15*
 *v1.2 shipped: 2026-01-15*
 *v2.0 shipped: 2026-01-15*
+*Production launch: 2026-02-26*

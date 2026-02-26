@@ -1,6 +1,6 @@
-import { KIT_API_SECRET } from '$env/static/private';
+import { KIT_API_KEY } from '$env/static/private';
 
-const KIT_API_BASE = 'https://api.convertkit.com/v4';
+const KIT_API_BASE = 'https://api.convertkit.com/v3';
 
 // Cache tag IDs to reduce API calls
 const tagIdCache = new Map<string, number>();
@@ -16,12 +16,21 @@ interface KitTag {
 	name: string;
 }
 
-async function kitFetch(path: string, options: RequestInit = {}): Promise<Response> {
-	return fetch(`${KIT_API_BASE}${path}`, {
+async function kitFetch(
+	path: string,
+	options: RequestInit = {},
+	queryParams: Record<string, string> = {}
+): Promise<Response> {
+	const url = new URL(`${KIT_API_BASE}${path}`);
+	url.searchParams.set('api_key', KIT_API_KEY);
+	for (const [k, v] of Object.entries(queryParams)) {
+		url.searchParams.set(k, v);
+	}
+
+	return fetch(url.toString(), {
 		...options,
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: `Bearer ${KIT_API_SECRET}`,
 			...options.headers
 		}
 	});
@@ -52,7 +61,7 @@ async function getOrCreateTag(tagName: string): Promise<number | null> {
 		// Create tag if it doesn't exist
 		const createRes = await kitFetch('/tags', {
 			method: 'POST',
-			body: JSON.stringify({ tag: { name: tagName } })
+			body: JSON.stringify({ api_key: KIT_API_KEY, tag: { name: tagName } })
 		});
 
 		if (!createRes.ok) {
@@ -61,7 +70,7 @@ async function getOrCreateTag(tagName: string): Promise<number | null> {
 		}
 
 		const created = await createRes.json();
-		const tagId = created.tag?.id;
+		const tagId = created.id ?? created.tag?.id;
 		if (tagId) {
 			tagIdCache.set(tagName, tagId);
 		}
@@ -84,40 +93,22 @@ export async function subscribeToKit(
 	try {
 		const normalizedEmail = email.trim().toLowerCase();
 
-		// Create/subscribe the subscriber
-		const subscriberBody: Record<string, unknown> = {
-			email_address: normalizedEmail
-		};
-		if (firstName) {
-			subscriberBody.first_name = firstName;
-		}
-
-		const res = await kitFetch('/subscribers', {
-			method: 'POST',
-			body: JSON.stringify(subscriberBody)
-		});
-
-		if (!res.ok) {
-			console.error('[Kit] Failed to create subscriber:', res.status, await res.text());
-			return;
-		}
-
-		const data: { subscriber: KitSubscriber } = await res.json();
-		const subscriberId = data.subscriber?.id;
-
-		if (!subscriberId) {
-			console.error('[Kit] No subscriber ID returned');
-			return;
-		}
-
-		// Apply tags
+		// Apply tags by subscribing to each tag (v3 API pattern)
 		for (const tagName of tags) {
 			const tagId = await getOrCreateTag(tagName);
 			if (!tagId) continue;
 
-			const tagRes = await kitFetch(`/tags/${tagId}/subscribers`, {
+			const body: Record<string, unknown> = {
+				api_key: KIT_API_KEY,
+				email: normalizedEmail
+			};
+			if (firstName) {
+				body.first_name = firstName;
+			}
+
+			const tagRes = await kitFetch(`/tags/${tagId}/subscribe`, {
 				method: 'POST',
-				body: JSON.stringify({ email_address: normalizedEmail })
+				body: JSON.stringify(body)
 			});
 
 			if (!tagRes.ok) {

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock the environment variable
 vi.mock('$env/static/private', () => ({
-	KIT_API_SECRET: 'test-api-secret'
+	KIT_API_KEY: 'test-api-key'
 }));
 
 // Mock global fetch
@@ -18,47 +18,42 @@ beforeEach(() => {
 
 describe('subscribeToKit', () => {
 	it('normalizes email to lowercase and trimmed', async () => {
+		// v3 API: first call is tag lookup, second is subscribe to tag
 		mockFetch
-			.mockResolvedValueOnce({
-				ok: true,
-				json: () => Promise.resolve({ subscriber: { id: 1 } })
-			})
 			.mockResolvedValueOnce({
 				ok: true,
 				json: () => Promise.resolve({ tags: [{ id: 100, name: 'codec8' }] })
 			})
-			.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+			.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ subscription: { subscriber: { id: 1 } } })
+			});
 
 		await subscribeToKit('  Test@Example.COM  ', ['codec8']);
 
-		const subscriberCall = mockFetch.mock.calls[0];
-		const body = JSON.parse(subscriberCall[1].body);
-		expect(body.email_address).toBe('test@example.com');
+		// The subscribe call should use normalized email
+		const subscribeCall = mockFetch.mock.calls[1];
+		const body = JSON.parse(subscribeCall[1].body);
+		expect(body.email).toBe('test@example.com');
 	});
 
 	it('includes firstName when provided', async () => {
-		mockFetch.mockResolvedValueOnce({
-			ok: true,
-			json: () => Promise.resolve({ subscriber: { id: 1 } })
-		});
+		mockFetch
+			.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ tags: [{ id: 100, name: 'mytag' }] })
+			})
+			.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ subscription: { subscriber: { id: 1 } } })
+			});
 
-		await subscribeToKit('test@example.com', [], 'Alice');
+		await subscribeToKit('test@example.com', ['mytag'], 'Alice');
 
-		const subscriberCall = mockFetch.mock.calls[0];
-		const body = JSON.parse(subscriberCall[1].body);
+		const subscribeCall = mockFetch.mock.calls[1];
+		const body = JSON.parse(subscribeCall[1].body);
 		expect(body.first_name).toBe('Alice');
-		expect(body.email_address).toBe('test@example.com');
-	});
-
-	it('does not throw on subscriber creation failure', async () => {
-		mockFetch.mockResolvedValueOnce({
-			ok: false,
-			status: 500,
-			text: () => Promise.resolve('Internal Server Error')
-		});
-
-		// Should not throw
-		await expect(subscribeToKit('test@example.com', ['codec8'])).resolves.toBeUndefined();
+		expect(body.email).toBe('test@example.com');
 	});
 
 	it('does not throw on network error', async () => {
@@ -67,30 +62,19 @@ describe('subscribeToKit', () => {
 		await expect(subscribeToKit('test@example.com', ['codec8'])).resolves.toBeUndefined();
 	});
 
-	it('does not throw when tag creation fails', async () => {
-		mockFetch
-			.mockResolvedValueOnce({
-				ok: true,
-				json: () => Promise.resolve({ subscriber: { id: 1 } })
-			})
-			.mockResolvedValueOnce({
-				ok: false,
-				status: 500
-			});
+	it('does not throw when tag lookup fails', async () => {
+		mockFetch.mockResolvedValueOnce({
+			ok: false,
+			status: 500
+		});
 
 		await expect(subscribeToKit('test@example.com', ['bad-tag'])).resolves.toBeUndefined();
 	});
 
-	it('applies tags to subscriber', async () => {
-		// Use unique tag names to avoid cache interference from prior tests
+	it('applies tags to subscriber via v3 tag subscribe endpoint', async () => {
 		mockFetch
-			// Create subscriber
+			// Tag lookup
 			.mockResolvedValueOnce({
-				ok: true,
-				json: () => Promise.resolve({ subscriber: { id: 42 } })
-			})
-			// Remaining calls: tag lookups and applications (order depends on cache)
-			.mockResolvedValue({
 				ok: true,
 				json: () =>
 					Promise.resolve({
@@ -99,14 +83,24 @@ describe('subscribeToKit', () => {
 							{ id: 600, name: 'tag-b' }
 						]
 					})
+			})
+			// Subscribe to tag-a
+			.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ subscription: { subscriber: { id: 42 } } })
+			})
+			// Tag lookup (cached, but may refetch)
+			.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ subscription: { subscriber: { id: 42 } } })
 			});
 
 		await subscribeToKit('test@example.com', ['tag-a', 'tag-b']);
 
-		// Verify that tag application calls were made (contain /tags/{id}/subscribers)
+		// Verify that tag subscribe calls were made (contain /tags/{id}/subscribe)
 		const allUrls = mockFetch.mock.calls.map((c: unknown[]) => c[0] as string);
-		const tagApplicationCalls = allUrls.filter((url: string) => /\/tags\/\d+\/subscribers/.test(url));
-		expect(tagApplicationCalls.length).toBeGreaterThanOrEqual(2);
+		const tagSubscribeCalls = allUrls.filter((url: string) => /\/tags\/\d+\/subscribe/.test(url));
+		expect(tagSubscribeCalls.length).toBeGreaterThanOrEqual(2);
 	});
 });
 
@@ -115,18 +109,20 @@ describe('subscribeWithSource', () => {
 		mockFetch
 			.mockResolvedValueOnce({
 				ok: true,
-				json: () => Promise.resolve({ subscriber: { id: 1 } })
+				json: () => Promise.resolve({ tags: [{ id: 100, name: 'codec8' }] })
 			})
 			.mockResolvedValueOnce({
 				ok: true,
-				json: () => Promise.resolve({ tags: [{ id: 100, name: 'codec8' }] })
+				json: () => Promise.resolve({ subscription: { subscriber: { id: 1 } } })
 			})
-			.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) })
 			.mockResolvedValueOnce({
 				ok: true,
 				json: () => Promise.resolve({ tags: [{ id: 200, name: 'newsletter' }] })
 			})
-			.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
+			.mockResolvedValueOnce({
+				ok: true,
+				json: () => Promise.resolve({ subscription: { subscriber: { id: 1 } } })
+			});
 
 		subscribeWithSource('test@example.com', 'newsletter');
 
@@ -134,9 +130,6 @@ describe('subscribeWithSource', () => {
 		await new Promise((r) => setTimeout(r, 50));
 
 		expect(mockFetch).toHaveBeenCalled();
-		const subscriberCall = mockFetch.mock.calls[0];
-		const body = JSON.parse(subscriberCall[1].body);
-		expect(body.email_address).toBe('test@example.com');
 	});
 
 	it('does not throw even if underlying call fails', () => {
