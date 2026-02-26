@@ -2,7 +2,7 @@
 
 ## Overview
 
-This runbook provides a step-by-step checklist for CodeDoc AI's launch day, covering timing, monitoring, community engagement, and incident response.
+This runbook provides a step-by-step checklist for Codec8's launch day, covering timing, monitoring, community engagement, and incident response.
 
 **Target Launch Day:** Tuesday-Thursday (best PH visibility)
 **Launch Time:** 12:01 AM PST (8:01 AM UTC)

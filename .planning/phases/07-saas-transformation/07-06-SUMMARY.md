@@ -27,7 +27,7 @@
   - `anonymousId` store - Subscribable store with current anonymous ID
   - `getAnonymousId()` function - Synchronous getter for anonymous ID
   - UUID v4 generation for new visitors
-  - Persistence in localStorage (`codedoc_anonymous_id` key)
+  - Persistence in localStorage (`codec8_anonymous_id` key)
   - SSR-safe (returns empty string on server)
 
 ### Task 3: Added Event Tracking to Key Flows

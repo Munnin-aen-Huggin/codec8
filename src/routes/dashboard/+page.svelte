@@ -287,7 +287,7 @@
 </script>
 
 <svelte:head>
-  <title>Dashboard - CodeDoc AI</title>
+  <title>Dashboard - Codec8</title>
 </svelte:head>
 
 <div class="min-h-screen bg-dark-900">
@@ -303,7 +303,7 @@
             </svg>
           </div>
           <span class="font-bold text-lg text-text-primary hidden sm:block group-hover:text-accent transition-colors">
-            CodeDoc AI
+            Codec8
           </span>
         </a>
 

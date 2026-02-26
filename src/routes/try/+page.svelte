@@ -12,7 +12,7 @@
 	// Rotating tips for generating state
 	const tips = [
 		{ icon: '💡', text: 'Did you know? The average developer spends 6-8 hours writing documentation.' },
-		{ icon: '⚡', text: 'CodeDoc AI analyzes your entire codebase in under 60 seconds.' },
+		{ icon: '⚡', text: 'Codec8 analyzes your entire codebase in under 60 seconds.' },
 		{ icon: '💰', text: 'Professional technical writers charge $50-100/hour.' },
 		{ icon: '🚀', text: 'Great documentation increases developer adoption by 3x.' },
 		{ icon: '✨', text: 'We use advanced AI to understand your code context deeply.' }
@@ -164,7 +164,7 @@
 </script>
 
 <svelte:head>
-	<title>Try CodeDoc AI - Generate README Without Signup</title>
+	<title>Try Codec8 - Generate README Without Signup</title>
 	<meta name="description" content="Generate professional README documentation for your GitHub repository. No signup required. Try it now!" />
 </svelte:head>
 
@@ -173,7 +173,7 @@
 	<header class="border-b border-zinc-800">
 		<div class="container mx-auto px-4 py-4 flex items-center justify-between">
 			<a href="/" class="text-xl font-bold hover:text-emerald-400 transition-colors">
-				CodeDoc AI
+				Codec8
 			</a>
 			<a href="/auth/login" class="text-sm text-zinc-400 hover:text-white transition-colors">
 				Sign In

@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let calendlyUrl: string = 'https://calendly.com/codedoc-ai/demo';
+	export let calendlyUrl: string = 'https://calendly.com/codec8/demo';
 </script>
 
 <section class="enterprise-section">

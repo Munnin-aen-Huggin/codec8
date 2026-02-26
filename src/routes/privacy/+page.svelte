@@ -3,8 +3,8 @@
 </script>
 
 <svelte:head>
-	<title>Privacy Policy - CodeDoc AI</title>
-	<meta name="description" content="CodeDoc AI Privacy Policy - How we handle your data" />
+	<title>Privacy Policy - Codec8</title>
+	<meta name="description" content="Codec8 Privacy Policy - How we handle your data" />
 </svelte:head>
 
 <Header />
@@ -16,7 +16,7 @@
 
 		<section>
 			<h2>1. Information We Collect</h2>
-			<p>When you use CodeDoc AI, we collect:</p>
+			<p>When you use Codec8, we collect:</p>
 			<ul>
 				<li><strong>Account Information:</strong> Email address and GitHub username when you sign in with GitHub OAuth</li>
 				<li><strong>Repository Data:</strong> Public repository metadata and code content that you explicitly connect for documentation generation</li>
@@ -74,7 +74,7 @@
 
 		<section>
 			<h2>7. Contact Us</h2>
-			<p>For privacy-related questions, contact us at: <a href="mailto:privacy@codedoc.ai">privacy@codedoc.ai</a></p>
+			<p>For privacy-related questions, contact us at: <a href="mailto:privacy@codec8.com">privacy@codec8.com</a></p>
 		</section>
 	</div>
 </main>

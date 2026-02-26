@@ -69,7 +69,7 @@ describe('Analytics Store', () => {
 
 			// Should have called setItem with the storage key
 			expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-				'codedoc_anonymous_id',
+				'codec8_anonymous_id',
 				expect.any(String)
 			);
 		});
@@ -100,7 +100,7 @@ describe('Analytics Store', () => {
 			// setItem should not be called since ID already exists
 			// (Note: It's called once during module init if ID doesn't exist)
 			const setItemCalls = mockLocalStorage.setItem.mock.calls.filter(
-				(call) => call[0] === 'codedoc_anonymous_id'
+				(call) => call[0] === 'codec8_anonymous_id'
 			);
 			expect(setItemCalls.length).toBe(0);
 		});

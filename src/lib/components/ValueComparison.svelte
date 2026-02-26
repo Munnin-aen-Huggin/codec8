@@ -35,9 +35,9 @@
 				</ul>
 			</div>
 
-			<!-- With CodeDoc AI -->
-			<div class="comparison-card codedoc-way">
-				<h3 class="card-title">WITH CODEDOC AI</h3>
+			<!-- With Codec8 -->
+			<div class="comparison-card codec8-way">
+				<h3 class="card-title">WITH CODEC8</h3>
 				<ul class="steps">
 					<li>Paste URL</li>
 					<li>Wait 60 seconds</li>
@@ -119,7 +119,7 @@
 		border-color: rgba(239, 68, 68, 0.3);
 	}
 
-	.comparison-card.codedoc-way {
+	.comparison-card.codec8-way {
 		border-color: #10b981;
 		background: rgba(16, 185, 129, 0.05);
 		box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
@@ -137,7 +137,7 @@
 		color: #ef4444;
 	}
 
-	.codedoc-way .card-title {
+	.codec8-way .card-title {
 		color: #10b981;
 	}
 
@@ -154,7 +154,7 @@
 		text-align: center;
 	}
 
-	.codedoc-way .steps li {
+	.codec8-way .steps li {
 		color: #fff;
 	}
 
@@ -177,7 +177,7 @@
 		opacity: 0.8;
 	}
 
-	.codedoc-way .price {
+	.codec8-way .price {
 		color: #10b981;
 	}
 

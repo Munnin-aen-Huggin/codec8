@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { supabaseAdmin } from '$lib/server/supabase';
 import { trackBetaSignup } from '$lib/utils/analytics';
+import { subscribeWithSource } from '$lib/server/kit';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -46,6 +47,9 @@ export const POST: RequestHandler = async ({ request }) => {
 			console.error('Beta signup error:', insertError);
 			throw error(500, 'Failed to save signup. Please try again.');
 		}
+
+		// Sync to Kit (fire and forget)
+		subscribeWithSource(email, 'beta', name);
 
 		// Track analytics event
 		trackBetaSignup(email);

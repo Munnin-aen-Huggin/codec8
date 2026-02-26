@@ -1,7 +1,7 @@
 <svelte:head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>CodeDoc AI - AI Documentation Generator</title>
+	<title>Codec8 - AI Documentation Generator</title>
 	<meta
 		name="description"
 		content="Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. In 60 seconds. Not 6 hours."
@@ -18,7 +18,7 @@
 <!-- Sticky Header (appears on scroll) -->
 <header class="sticky-header" id="stickyHeader">
 	<div class="container">
-		<div class="logo">CodeDoc AI</div>
+		<div class="logo">Codec8</div>
 		<div class="header-actions">
 			<a href="/auth/login" class="header-link" rel="external">Sign In</a>
 			<a href="#pricing" class="cta-small">View Pricing</a>
@@ -29,7 +29,7 @@
 <!-- Top Navigation -->
 <nav class="top-nav">
 	<div class="container">
-		<div class="logo">CodeDoc AI</div>
+		<div class="logo">Codec8</div>
 		<div class="nav-actions">
 			<a href="#pricing" class="nav-link">Pricing</a>
 			<a href="/auth/login" class="nav-link" rel="external">Sign In</a>
@@ -400,9 +400,9 @@
 		<div class="footer-links">
 			<a href="/privacy">Privacy</a>
 			<a href="/terms">Terms</a>
-			<a href="mailto:support@codedoc.ai">Contact</a>
+			<a href="mailto:support@codec8.com">Contact</a>
 		</div>
-		<p class="footer-copy">2026 CodeDoc AI</p>
+		<p class="footer-copy">2026 Codec8</p>
 	</div>
 </footer>
 
@@ -436,7 +436,7 @@
 	const faqs = [
 		{
 			question: 'Why $99?',
-			answer: 'The average technical writer charges $50-100/hour. Writing proper documentation takes 6-8 hours minimum. That\'s $400-800 in writer fees, or 8 hours of your own time. CodeDoc AI: $99. 60 seconds. Done.'
+			answer: 'The average technical writer charges $50-100/hour. Writing proper documentation takes 6-8 hours minimum. That\'s $400-800 in writer fees, or 8 hours of your own time. Codec8: $99. 60 seconds. Done.'
 		},
 		{
 			question: 'What languages do you support?',

@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock environment variables first (before any imports)
 vi.mock('$env/static/public', () => ({
-	PUBLIC_APP_URL: 'https://app.codedoc.ai'
+	PUBLIC_APP_URL: 'https://app.codec8.com'
 }));
 
 vi.mock('$env/dynamic/private', () => ({
@@ -118,7 +118,7 @@ describe('SAML Library', () => {
 		it('should include SP entity ID', () => {
 			const metadata = generateMetadata();
 
-			expect(metadata).toContain('entityID="https://app.codedoc.ai/saml/metadata"');
+			expect(metadata).toContain('entityID="https://app.codec8.com/saml/metadata"');
 		});
 
 		it('should use custom entity ID when provided', () => {
@@ -131,13 +131,13 @@ describe('SAML Library', () => {
 		it('should include assertion consumer service URL', () => {
 			const metadata = generateMetadata();
 
-			expect(metadata).toContain('Location="https://app.codedoc.ai/auth/sso/callback"');
+			expect(metadata).toContain('Location="https://app.codec8.com/auth/sso/callback"');
 		});
 
 		it('should include single logout service URL', () => {
 			const metadata = generateMetadata();
 
-			expect(metadata).toContain('Location="https://app.codedoc.ai/auth/sso/logout"');
+			expect(metadata).toContain('Location="https://app.codec8.com/auth/sso/logout"');
 		});
 
 		it('should specify email as NameID format', () => {

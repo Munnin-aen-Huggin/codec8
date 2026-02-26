@@ -8,7 +8,7 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 
-const STORAGE_KEY = 'codedoc_anonymous_id';
+const STORAGE_KEY = 'codec8_anonymous_id';
 
 /**
  * Generate a UUID v4 for anonymous tracking

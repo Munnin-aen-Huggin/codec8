@@ -1,4 +1,4 @@
-# CodeDoc AI - Technical Architecture
+# Codec8 - Technical Architecture
 
 ## System Overview
 

@@ -4,7 +4,7 @@ test.describe('Landing Page', () => {
 	test.describe('Page Load', () => {
 		test('landing page loads successfully', async ({ page }) => {
 			await page.goto('/');
-			await expect(page).toHaveTitle(/CodeDoc AI/);
+			await expect(page).toHaveTitle(/Codec8/);
 		});
 
 		test('has visible h1 heading', async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe('Landing Page', () => {
 		test('navigation links are present', async ({ page }) => {
 			await page.goto('/');
 			// Top nav has logo and sign in
-			await expect(page.locator('.top-nav .logo')).toContainText('CodeDoc AI');
+			await expect(page.locator('.top-nav .logo')).toContainText('Codec8');
 			await expect(page.locator('.nav-link').filter({ hasText: 'Sign In' })).toBeVisible();
 		});
 	});
@@ -158,7 +158,7 @@ test.describe('Landing Page', () => {
 	test.describe('Navigation', () => {
 		test('header contains logo', async ({ page }) => {
 			await page.goto('/');
-			await expect(page.locator('.top-nav .logo')).toContainText('CodeDoc AI');
+			await expect(page.locator('.top-nav .logo')).toContainText('Codec8');
 		});
 
 		test('sign in link is visible', async ({ page }) => {

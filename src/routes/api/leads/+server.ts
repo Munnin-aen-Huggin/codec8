@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { supabase } from '$lib/server/supabase';
+import { subscribeWithSource } from '$lib/server/kit';
 
 // Simple rate limiting using in-memory store (per instance)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -86,6 +87,9 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 			}
 			return json({ error: 'Failed to save email. Please try again.' }, { status: 500 });
 		}
+
+		// Sync to Kit (fire and forget)
+		subscribeWithSource(trimmedEmail, 'lead');
 
 		// Track analytics event (fire and forget)
 		try {

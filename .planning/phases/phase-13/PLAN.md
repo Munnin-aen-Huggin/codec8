@@ -17,7 +17,7 @@ Add SSO/SAML authentication for enterprise customers, enabling them to use their
 ### SAML 2.0 Flow
 
 ```
-User → CodeDoc Login → IdP Selection → IdP Authentication → SAML Response → CodeDoc Session
+User → Codec8 Login → IdP Selection → IdP Authentication → SAML Response → Codec8 Session
 ```
 
 ### Database Schema
@@ -253,7 +253,7 @@ interface SAMLUser {
 ## Environment Variables
 
 ```
-SAML_SP_ENTITY_ID=https://app.codedoc.ai/saml/metadata
+SAML_SP_ENTITY_ID=https://app.codec8.com/saml/metadata
 SAML_PRIVATE_KEY_PATH=/path/to/sp.key
 SAML_CERTIFICATE_PATH=/path/to/sp.crt
 ```

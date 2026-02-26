@@ -4,7 +4,7 @@ test.describe('Demo/Try Page', () => {
 	test.describe('Page Load', () => {
 		test('demo page loads at /try route', async ({ page }) => {
 			await page.goto('/try');
-			await expect(page).toHaveTitle(/Try CodeDoc AI/);
+			await expect(page).toHaveTitle(/Try Codec8/);
 		});
 
 		test('has main heading', async ({ page }) => {
@@ -81,7 +81,7 @@ test.describe('Demo/Try Page', () => {
 			await page.goto('/try');
 			const header = page.locator('header');
 			await expect(header).toBeVisible();
-			await expect(header.locator('a').first()).toContainText('CodeDoc AI');
+			await expect(header.locator('a').first()).toContainText('Codec8');
 		});
 
 		test('has sign in link in header', async ({ page }) => {

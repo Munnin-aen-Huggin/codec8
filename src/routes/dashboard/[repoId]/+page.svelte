@@ -303,7 +303,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.repo.name} - Documentation - CodeDoc AI</title>
+	<title>{data.repo.name} - Documentation - Codec8</title>
 </svelte:head>
 
 <div class="min-h-screen bg-dark-900">

@@ -2,7 +2,7 @@
  * SCIM 2.0 Groups Endpoint
  *
  * Handles group operations from identity providers.
- * Groups in CodeDoc map to team roles (admin, member).
+ * Groups in Codec8 map to team roles (admin, member).
  *
  * Note: This is a stub implementation. Full group sync
  * would allow IdPs to manage team roles via SCIM.
@@ -86,7 +86,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	// Group creation not supported - we use fixed role-based groups
-	return json(createSCIMError(501, 'Group creation not supported. CodeDoc uses role-based groups.'), {
+	return json(createSCIMError(501, 'Group creation not supported. Codec8 uses role-based groups.'), {
 		status: 501,
 		headers: { 'Content-Type': SCIM_CONTENT_TYPE }
 	});

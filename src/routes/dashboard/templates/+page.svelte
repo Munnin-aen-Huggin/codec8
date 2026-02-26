@@ -92,7 +92,7 @@
 </script>
 
 <svelte:head>
-	<title>Documentation Templates - CodeDoc AI</title>
+	<title>Documentation Templates - Codec8</title>
 </svelte:head>
 
 <div class="min-h-screen bg-[#09090b]">

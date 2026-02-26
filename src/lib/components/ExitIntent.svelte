@@ -8,7 +8,7 @@
 	let submitted = false;
 	let error = '';
 
-	const STORAGE_KEY = 'codedoc_exit_intent_shown';
+	const STORAGE_KEY = 'codec8_exit_intent_shown';
 
 	function handleMouseLeave(e: MouseEvent) {
 		// Only trigger when mouse actually leaves the document (not just moving to nav)

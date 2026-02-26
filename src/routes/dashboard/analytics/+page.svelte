@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Usage Analytics - CodeDoc AI</title>
+	<title>Usage Analytics - Codec8</title>
 </svelte:head>
 
 <div class="min-h-screen bg-[#09090b]">

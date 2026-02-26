@@ -2,7 +2,7 @@
  * Directory Sync (SCIM 2.0) Stubs
  *
  * SCIM (System for Cross-domain Identity Management) allows IdPs to
- * automatically provision and deprovision users in CodeDoc.
+ * automatically provision and deprovision users in Codec8.
  *
  * This file contains stubs for future SCIM 2.0 implementation.
  * Full implementation would support:
@@ -398,7 +398,7 @@ export async function scimGetUser(
 
 /**
  * STUB: Group operations placeholder
- * Groups map to team roles in CodeDoc
+ * Groups map to team roles in Codec8
  */
 export async function scimListGroups(
 	teamId: string

@@ -33,7 +33,7 @@ async function githubFetch<T>(
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: 'application/vnd.github.v3+json',
-      'User-Agent': 'CodeDoc-AI',
+      'User-Agent': 'Codec8',
       ...options.headers
     }
   });
@@ -193,7 +193,7 @@ export async function deleteRepoWebhook(
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: 'application/vnd.github.v3+json',
-        'User-Agent': 'CodeDoc-AI'
+        'User-Agent': 'Codec8'
       }
     }
   );

@@ -95,7 +95,7 @@ async function fetchRepoInfo(
 		const response = await fetch(`${GITHUB_API_URL}/repos/${owner}/${repo}`, {
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
-				'User-Agent': 'CodeDoc-AI'
+				'User-Agent': 'Codec8'
 			}
 		});
 
@@ -131,7 +131,7 @@ async function fetchRepoContents(
 		const response = await fetch(`${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${path}`, {
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
-				'User-Agent': 'CodeDoc-AI'
+				'User-Agent': 'Codec8'
 			}
 		});
 
@@ -162,7 +162,7 @@ async function fetchFileContent(owner: string, repo: string, path: string): Prom
 		const response = await fetch(`${GITHUB_API_URL}/repos/${owner}/${repo}/contents/${path}`, {
 			headers: {
 				Accept: 'application/vnd.github.v3+json',
-				'User-Agent': 'CodeDoc-AI'
+				'User-Agent': 'Codec8'
 			}
 		});
 

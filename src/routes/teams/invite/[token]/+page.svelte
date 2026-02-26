@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-	<title>Join {data.invitation.team.name} | CodeDoc AI</title>
+	<title>Join {data.invitation.team.name} | Codec8</title>
 </svelte:head>
 
 <div class="min-h-screen bg-[#09090b] flex items-center justify-center px-4">
@@ -97,7 +97,7 @@
 		<!-- Back Link -->
 		<div class="text-center mt-6">
 			<a href="/" class="text-zinc-500 hover:text-zinc-400 text-sm">
-				← Back to CodeDoc AI
+				← Back to Codec8
 			</a>
 		</div>
 	</div>

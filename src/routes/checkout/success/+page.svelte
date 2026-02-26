@@ -30,7 +30,7 @@
 </script>
 
 <svelte:head>
-  <title>Payment Successful - CodeDoc AI</title>
+  <title>Payment Successful - Codec8</title>
 </svelte:head>
 
 <div class="success-page">
@@ -43,7 +43,7 @@
     </div>
 
     <h1>Payment Successful!</h1>
-    <p class="subtitle">Welcome to CodeDoc AI {tierNames[data.tier || 'ltd']}</p>
+    <p class="subtitle">Welcome to Codec8 {tierNames[data.tier || 'ltd']}</p>
 
     <div class="details">
       <div class="detail-item">
@@ -178,7 +178,7 @@
     </div>
 
     <p class="support">
-      Questions? Contact us at <a href="mailto:support@codedoc.ai">support@codedoc.ai</a>
+      Questions? Contact us at <a href="mailto:support@codec8.com">support@codec8.com</a>
     </p>
   </div>
 </div>

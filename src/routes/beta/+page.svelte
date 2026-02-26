@@ -45,8 +45,8 @@
 </script>
 
 <svelte:head>
-	<title>Beta Program - CodeDoc AI</title>
-	<meta name="description" content="Join the CodeDoc AI beta program and get early access to AI-powered documentation generation." />
+	<title>Beta Program - Codec8</title>
+	<meta name="description" content="Join the Codec8 beta program and get early access to AI-powered documentation generation." />
 </svelte:head>
 
 {#if data.user}
@@ -86,7 +86,7 @@
 					Be an Early Tester
 				</h1>
 				<p class="text-lg text-gray-600 max-w-lg mx-auto">
-					Get free access to CodeDoc AI and help shape the future of AI-powered documentation.
+					Get free access to Codec8 and help shape the future of AI-powered documentation.
 					Beta testers receive a free Pro trial!
 				</p>
 			</div>
@@ -140,7 +140,7 @@
 
 					<div>
 						<label for="useCase" class="block text-sm font-medium text-gray-700 mb-1">
-							How will you use CodeDoc AI? <span class="text-gray-400">(optional)</span>
+							How will you use Codec8? <span class="text-gray-400">(optional)</span>
 						</label>
 						<textarea
 							id="useCase"
@@ -161,7 +161,7 @@
 				</form>
 
 				<p class="mt-6 text-center text-sm text-gray-500">
-					By signing up, you agree to provide feedback and help us improve CodeDoc AI.
+					By signing up, you agree to provide feedback and help us improve Codec8.
 				</p>
 			</div>
 

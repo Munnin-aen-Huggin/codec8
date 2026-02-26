@@ -47,7 +47,7 @@
           </svg>
         </div>
         <span class="font-bold text-lg text-text-primary hidden sm:block group-hover:text-accent transition-colors">
-          CodeDoc AI
+          Codec8
         </span>
       </a>
 

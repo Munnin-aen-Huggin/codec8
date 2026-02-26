@@ -1,4 +1,4 @@
-# CodeDoc AI - Current State
+# Codec8 - Current State
 
 **Last Updated:** 2026-01-16
 

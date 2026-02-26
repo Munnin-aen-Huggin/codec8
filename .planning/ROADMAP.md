@@ -1,4 +1,4 @@
-# CodeDoc AI Roadmap
+# Codec8 Roadmap
 
 ## Milestones
 

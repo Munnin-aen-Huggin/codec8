@@ -41,7 +41,7 @@
             <span></span>
             <span></span>
           </div>
-          <div class="browser-url">codedoc.ai/demo</div>
+          <div class="browser-url">codec8.com/demo</div>
         </div>
         <div class="demo-preview">
           <div class="demo-sidebar">
@@ -89,7 +89,7 @@
       <div class="video-container">
         <iframe
           src="{videoUrl}?autoplay=1"
-          title="CodeDoc AI Demo"
+          title="Codec8 Demo"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen

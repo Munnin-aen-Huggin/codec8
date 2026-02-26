@@ -124,7 +124,7 @@
 				Trusted by developers
 			</div>
 			<h2 class="section-title">Loved by <span>Developers</span></h2>
-			<p class="section-subtitle">See what developers are saying about CodeDoc AI</p>
+			<p class="section-subtitle">See what developers are saying about Codec8</p>
 		</div>
 
 		<!-- Testimonial Cards -->

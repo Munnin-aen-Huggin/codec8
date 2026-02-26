@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { supabaseAdmin } from '$lib/server/supabase';
 import type { RequestHandler } from './$types';
+import { subscribeWithSource } from '$lib/server/kit';
 
 export const POST: RequestHandler = async ({ request }) => {
 	try {
@@ -22,6 +23,9 @@ export const POST: RequestHandler = async ({ request }) => {
 				email: email.toLowerCase().trim(),
 				source: 'landing_page'
 			});
+
+		// Sync to Kit (fire and forget)
+		subscribeWithSource(email.toLowerCase().trim(), 'newsletter');
 
 		// Handle duplicate emails gracefully - if it's a duplicate, still return success
 		if (error) {

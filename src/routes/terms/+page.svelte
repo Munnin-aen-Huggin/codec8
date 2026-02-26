@@ -3,8 +3,8 @@
 </script>
 
 <svelte:head>
-	<title>Terms of Service - CodeDoc AI</title>
-	<meta name="description" content="CodeDoc AI Terms of Service" />
+	<title>Terms of Service - Codec8</title>
+	<meta name="description" content="Codec8 Terms of Service" />
 </svelte:head>
 
 <Header />
@@ -16,12 +16,12 @@
 
 		<section>
 			<h2>1. Acceptance of Terms</h2>
-			<p>By accessing or using CodeDoc AI, you agree to be bound by these Terms of Service. If you do not agree, please do not use our service.</p>
+			<p>By accessing or using Codec8, you agree to be bound by these Terms of Service. If you do not agree, please do not use our service.</p>
 		</section>
 
 		<section>
 			<h2>2. Description of Service</h2>
-			<p>CodeDoc AI is a software-as-a-service (SaaS) platform that automatically generates documentation for GitHub repositories using artificial intelligence. Our service includes:</p>
+			<p>Codec8 is a software-as-a-service (SaaS) platform that automatically generates documentation for GitHub repositories using artificial intelligence. Our service includes:</p>
 			<ul>
 				<li>README generation</li>
 				<li>API documentation</li>
@@ -32,7 +32,7 @@
 
 		<section>
 			<h2>3. Account Registration</h2>
-			<p>To use CodeDoc AI, you must:</p>
+			<p>To use Codec8, you must:</p>
 			<ul>
 				<li>Have a valid GitHub account</li>
 				<li>Provide accurate account information</li>
@@ -43,7 +43,7 @@
 
 		<section>
 			<h2>4. Pricing and Payments</h2>
-			<p>CodeDoc AI offers the following plans:</p>
+			<p>Codec8 offers the following plans:</p>
 			<ul>
 				<li><strong>Free Demo:</strong> Limited to README generation for public repos</li>
 				<li><strong>Single Repo ($99):</strong> One-time purchase for complete documentation of one repository</li>
@@ -68,12 +68,12 @@
 		<section>
 			<h2>6. Intellectual Property</h2>
 			<p><strong>Your Content:</strong> You retain all rights to your code and repositories. The documentation generated belongs to you.</p>
-			<p><strong>Our Service:</strong> CodeDoc AI and its underlying technology are owned by us and protected by intellectual property laws.</p>
+			<p><strong>Our Service:</strong> Codec8 and its underlying technology are owned by us and protected by intellectual property laws.</p>
 		</section>
 
 		<section>
 			<h2>7. Disclaimer of Warranties</h2>
-			<p>CodeDoc AI is provided "as is" without warranties of any kind. We do not guarantee that:</p>
+			<p>Codec8 is provided "as is" without warranties of any kind. We do not guarantee that:</p>
 			<ul>
 				<li>The service will be uninterrupted or error-free</li>
 				<li>Generated documentation will be 100% accurate</li>
@@ -84,7 +84,7 @@
 
 		<section>
 			<h2>8. Limitation of Liability</h2>
-			<p>To the maximum extent permitted by law, CodeDoc AI shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service.</p>
+			<p>To the maximum extent permitted by law, Codec8 shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service.</p>
 		</section>
 
 		<section>
@@ -102,7 +102,7 @@
 
 		<section>
 			<h2>11. Contact</h2>
-			<p>For questions about these terms, contact us at: <a href="mailto:legal@codedoc.ai">legal@codedoc.ai</a></p>
+			<p>For questions about these terms, contact us at: <a href="mailto:legal@codec8.com">legal@codec8.com</a></p>
 		</section>
 	</div>
 </main>

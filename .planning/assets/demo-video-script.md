@@ -1,4 +1,4 @@
-# CodeDoc AI Demo Video Script
+# Codec8 Demo Video Script
 
 **Duration:** 2-3 minutes
 **Format:** Screen recording with voiceover
@@ -17,16 +17,16 @@
 >
 > What if AI could generate professional documentation from your code in minutes?"
 
-**Action:** Transition to CodeDoc AI landing page
+**Action:** Transition to Codec8 landing page
 
 ---
 
 ## Scene 2: Introduction (0:30 - 0:45)
 
-**Visual:** CodeDoc AI landing page hero section
+**Visual:** Codec8 landing page hero section
 
 **Voiceover:**
-> "Introducing CodeDoc AI - the fastest way to create professional documentation for your GitHub repositories.
+> "Introducing Codec8 - the fastest way to create professional documentation for your GitHub repositories.
 >
 > Connect your repo, click generate, and get a complete README, API docs, architecture diagrams, and setup guides - all powered by Claude AI."
 
@@ -52,7 +52,7 @@
 **Voiceover:**
 > "From your dashboard, connect any repository. I'll select this TypeScript project I've been working on.
 >
-> CodeDoc AI analyzes your codebase - package.json, folder structure, key files - to understand what you've built."
+> Codec8 analyzes your codebase - package.json, folder structure, key files - to understand what you've built."
 
 **Action:**
 1. Click "Connect Repository"
@@ -119,7 +119,7 @@
 **Visual:** Landing page with signup button
 
 **Voiceover:**
-> "CodeDoc AI - Professional documentation in minutes, not hours. Sign up free at codedoc.ai"
+> "Codec8 - Professional documentation in minutes, not hours. Sign up free at codec8.com"
 
 **Action:** Show URL, end on hero section
 

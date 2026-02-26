@@ -2,7 +2,7 @@
 
 ## Basic Information
 
-**Product Name:** CodeDoc AI
+**Product Name:** Codec8
 
 **Tagline:** (60 characters max)
 ```
@@ -33,14 +33,14 @@ Character count: 248
 ```
 Every developer knows the pain: you've built something amazing, but your documentation is missing, outdated, or sitting on your to-do list for weeks.
 
-CodeDoc AI fixes this in minutes.
+Codec8 fixes this in minutes.
 
 🔗 **Connect your GitHub repo** - One-click OAuth, read-only access
 🤖 **AI analyzes your code** - Understands your project structure, dependencies, and purpose
 📝 **Get 4 types of docs** - README, API documentation, architecture diagrams (Mermaid), setup guides
 ✏️ **Edit & export** - Fine-tune in our editor, export markdown, or create a PR directly
 
-**Why CodeDoc AI?**
+**Why Codec8?**
 - Powered by Claude AI for high-quality, context-aware documentation
 - Understands your actual codebase - not generic templates
 - Works with any language: TypeScript, Python, Go, Rust, and more
@@ -53,7 +53,7 @@ CodeDoc AI fixes this in minutes.
 
 Built by developers, for developers who'd rather be coding than writing docs.
 
-Try it free at codedoc.ai
+Try it free at codec8.com
 ```
 
 ---
@@ -63,11 +63,11 @@ Try it free at codedoc.ai
 ```
 Hey Product Hunt! 👋
 
-I'm [Name], the maker of CodeDoc AI.
+I'm [Name], the maker of Codec8.
 
 Like most developers, I have a love-hate relationship with documentation. I know it's important, but it always ends up at the bottom of my to-do list.
 
-So I built CodeDoc AI to solve this for myself - and hopefully for you too.
+So I built Codec8 to solve this for myself - and hopefully for you too.
 
 Here's what makes it different:
 - It actually reads your code, not just your file names
@@ -101,10 +101,10 @@ Ask me anything in the comments! 🙌
 **Prepared responses:**
 
 *For "How does it handle [language]?"*
-> Great question! CodeDoc AI works with any language - it analyzes your project structure, package files, and key source files. [Language] projects work great because we detect [specific pattern]. Want me to try it on one of your repos?
+> Great question! Codec8 works with any language - it analyzes your project structure, package files, and key source files. [Language] projects work great because we detect [specific pattern]. Want me to try it on one of your repos?
 
 *For "How is this different from Copilot/ChatGPT?"*
-> Great question! While you could paste code into ChatGPT, CodeDoc AI is purpose-built for documentation: it automatically fetches your repo structure, identifies key files, and generates properly formatted markdown. Plus it creates PRs directly to your repo. It's the difference between a Swiss Army knife and a specialized tool.
+> Great question! While you could paste code into ChatGPT, Codec8 is purpose-built for documentation: it automatically fetches your repo structure, identifies key files, and generates properly formatted markdown. Plus it creates PRs directly to your repo. It's the difference between a Swiss Army knife and a specialized tool.
 
 *For "Is my code safe?"*
 > Security is a top priority. We only request read-only access to your repos, and we never store your source code. We only keep the generated documentation. You can revoke access anytime from GitHub settings.

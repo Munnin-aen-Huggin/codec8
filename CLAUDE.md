@@ -1,8 +1,8 @@
-# CodeDoc AI
+# Codec8
 
 ## Project Overview
 
-CodeDoc AI is a SaaS application that automatically generates professional documentation from GitHub repositories using Claude AI. Users connect their GitHub repos and receive README files, API documentation, architecture diagrams (Mermaid), and setup guides.
+Codec8 is a SaaS application that automatically generates professional documentation from GitHub repositories using Claude AI. Users connect their GitHub repos and receive README files, API documentation, architecture diagrams (Mermaid), and setup guides.
 
 **Business Model:** Three-tier pricing
 - Free: 1 repo
@@ -63,7 +63,7 @@ CodeDoc AI is a SaaS application that automatically generates professional docum
 ## Project Structure
 
 ```
-codedoc-ai/
+codec8/
 ├── src/
 │   ├── routes/
 │   │   ├── +page.svelte                 # Landing page

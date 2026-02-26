@@ -4,7 +4,7 @@
 
 ### Tweet 1 (Hook)
 ```
-I just launched CodeDoc AI 🚀
+I just launched Codec8 🚀
 
 It generates professional documentation for your GitHub repos in minutes using Claude AI.
 
@@ -27,7 +27,7 @@ Good docs take hours. Who has time for that?
 
 ### Tweet 3 (Solution)
 ```
-CodeDoc AI reads your actual codebase:
+Codec8 reads your actual codebase:
 
 → Analyzes package.json, configs, folder structure
 → Understands your frameworks and dependencies
@@ -73,7 +73,7 @@ The LTD won't last forever. No subscriptions, no recurring fees.
 
 ### Tweet 7 (CTA)
 ```
-Try it free → codedoc.ai
+Try it free → codec8.com
 
 Launching on Product Hunt today - would love your support! 🙏
 
@@ -88,14 +88,14 @@ What project would you document first? Drop a link below and I might generate do
 
 **Title:**
 ```
-Show HN: CodeDoc AI – Generate professional documentation from GitHub repos with Claude AI
+Show HN: Codec8 – Generate professional documentation from GitHub repos with Claude AI
 ```
 
 **Body:**
 ```
 Hey HN,
 
-I built CodeDoc AI to solve a problem I've had for years: documentation debt.
+I built Codec8 to solve a problem I've had for years: documentation debt.
 
 We all know documentation is important, but it always ends up at the bottom of the to-do list. After yet another weekend spent writing READMEs, I decided to automate it.
 
@@ -124,7 +124,7 @@ Would love feedback, especially on:
 1. What documentation formats would you add?
 2. Any repos I can test it on? I'll share the output.
 
-Try it: https://codedoc.ai
+Try it: https://codec8.com
 ```
 
 ---
@@ -133,7 +133,7 @@ Try it: https://codedoc.ai
 
 **Title:**
 ```
-I built an AI tool that generates documentation for GitHub repos - CodeDoc AI
+I built an AI tool that generates documentation for GitHub repos - Codec8
 ```
 
 **Body:**
@@ -143,7 +143,7 @@ Hey r/SideProject!
 After years of putting off documentation, I finally built something to automate it.
 
 **What is it?**
-CodeDoc AI connects to your GitHub repos and generates professional documentation using Claude AI. Not generic templates - it actually reads your code and creates docs specific to your project.
+Codec8 connects to your GitHub repos and generates professional documentation using Claude AI. Not generic templates - it actually reads your code and creates docs specific to your project.
 
 **What it generates:**
 - README with project overview, features, quick start
@@ -168,20 +168,20 @@ I maintain a few open source projects and the documentation was always the last 
 
 Would love to hear what you think! Happy to answer any questions or generate docs for your projects.
 
-🔗 https://codedoc.ai
+🔗 https://codec8.com
 ```
 
 ---
 
 ## Email to Beta Users
 
-**Subject:** We're live! 🚀 CodeDoc AI is now public
+**Subject:** We're live! 🚀 Codec8 is now public
 
 **Body:**
 ```
 Hey [Name],
 
-Big news - CodeDoc AI is officially live!
+Big news - Codec8 is officially live!
 
 Thank you for being one of our beta testers. Your feedback shaped the product, and we couldn't have done this without you.
 
@@ -197,7 +197,7 @@ Just sign in and enter this key to unlock unlimited repos forever.
 - Security improvements
 
 **Help us launch:**
-We're live on Product Hunt today! If you've found CodeDoc AI useful, we'd really appreciate an upvote:
+We're live on Product Hunt today! If you've found Codec8 useful, we'd really appreciate an upvote:
 👉 [Product Hunt Link]
 
 Every upvote helps us reach more developers who hate writing docs as much as we do 😄
@@ -216,7 +216,7 @@ P.S. Know another developer who'd love this? Forward this email and I'll extend 
 ## LinkedIn Post
 
 ```
-I just launched CodeDoc AI 🚀
+I just launched Codec8 🚀
 
 It's an AI tool that generates professional documentation for GitHub repositories.
 
@@ -231,7 +231,7 @@ What it does:
 
 Built with SvelteKit, TypeScript, and Claude AI.
 
-Try it free: codedoc.ai
+Try it free: codec8.com
 
 What project would you document first?
 
@@ -247,7 +247,7 @@ Hey everyone! 👋
 
 Just launched something that might help with the "I'll write the docs later" problem.
 
-**CodeDoc AI** generates professional documentation for your GitHub repos using AI.
+**Codec8** generates professional documentation for your GitHub repos using AI.
 
 What you get:
 📝 README
@@ -265,5 +265,5 @@ Free for 1 repo, $99 lifetime for unlimited.
 
 Would love feedback from the community! What features would make this more useful for you?
 
-https://codedoc.ai
+https://codec8.com
 ```

@@ -5,7 +5,7 @@
 ## Directory Layout
 
 ```
-codedoc-ai/
+codec8/
 ├── src/                    # Application source code
 │   ├── routes/            # SvelteKit pages and API endpoints
 │   ├── lib/               # Shared libraries and components

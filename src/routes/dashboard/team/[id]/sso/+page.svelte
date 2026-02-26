@@ -146,7 +146,7 @@
 </script>
 
 <svelte:head>
-	<title>SSO Settings - {data.team.name} | CodeDoc AI</title>
+	<title>SSO Settings - {data.team.name} | Codec8</title>
 </svelte:head>
 
 <div class="sso-settings">

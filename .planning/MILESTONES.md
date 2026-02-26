@@ -1,4 +1,4 @@
-# Project Milestones: CodeDoc AI
+# Project Milestones: Codec8
 
 ## v1.1 Growth (Shipped: 2026-01-15)
 
