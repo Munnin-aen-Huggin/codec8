@@ -1,0 +1,9 @@
+{
+  "launchDate": "2026-02-26",
+  "producthunt": { "done": false, "date": null },
+  "hackernews": { "done": true, "date": "2026-02-26T00:00:00Z" },
+  "twitter": { "done": true, "date": "2026-02-26T00:00:00Z" },
+  "reddit_sideproject": { "done": false, "date": null },
+  "reddit_webdev": { "done": false, "date": null },
+  "linkedin": { "done": false, "date": null }
+}

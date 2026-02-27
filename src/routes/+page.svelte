@@ -23,6 +23,7 @@
 	<meta name="twitter:title" content="Codec8 - AI Documentation Generator" />
 	<meta name="twitter:description" content="Complete README, API docs, architecture diagrams, and setup guides from any GitHub repo. In 60 seconds. Not 6 hours." />
 	<meta name="twitter:image" content="https://codec8.com/og-image.png" />
+	<meta name="twitter:site" content="@code_c8" />
 
 	<!-- JSON-LD: Organization -->
 	{@html `<script type="application/ld+json">${JSON.stringify({
@@ -65,6 +66,16 @@
 				"price": "149",
 				"priceCurrency": "USD",
 				"name": "Pro",
+				"priceSpecification": {
+					"@type": "UnitPriceSpecification",
+					"billingDuration": "P1M"
+				}
+			},
+			{
+				"@type": "Offer",
+				"price": "399",
+				"priceCurrency": "USD",
+				"name": "Team",
 				"priceSpecification": {
 					"@type": "UnitPriceSpecification",
 					"billingDuration": "P1M"
@@ -246,6 +257,20 @@
 				<span class="separator">•</span>
 				<span>No signup</span>
 			</div>
+
+			<!-- Live Counter -->
+			{#if docsGenerated > 0}
+				<div class="docs-counter">
+					<strong>{docsGenerated.toLocaleString()}</strong> docs generated and counting
+				</div>
+			{/if}
+
+			<!-- UTM-Aware Messaging -->
+			{#if utmSource === 'reddit'}
+				<div class="utm-message">Fellow Redditor? Try the demo first, no signup needed.</div>
+			{:else if utmSource === 'hackernews'}
+				<div class="utm-message">Welcome from HN — try the demo first, no signup needed.</div>
+			{/if}
 		</div>
 	</div>
 </section>
@@ -437,6 +462,27 @@
 		</div>
 
 		<PaymentBadges />
+
+		<!-- Inline Email Capture -->
+		<div class="notify-section">
+			{#if notifySubmitted}
+				<p class="notify-success">You're on the list! We'll email you when deals drop.</p>
+			{:else}
+				<p class="notify-text">Not ready to buy? Get notified when we run deals.</p>
+				<form class="notify-form" on:submit|preventDefault={submitNotifyEmail}>
+					<input
+						type="email"
+						placeholder="your@email.com"
+						bind:value={notifyEmail}
+						class="notify-input"
+						disabled={notifySubmitting}
+					/>
+					<button type="submit" class="notify-btn" disabled={notifySubmitting || !notifyEmail.trim()}>
+						{notifySubmitting ? 'Sending...' : 'Notify Me'}
+					</button>
+				</form>
+			{/if}
+		</div>
 	</div>
 </section>
 
@@ -554,6 +600,11 @@
 	let pricingSection: HTMLElement;
 	let valueSection: HTMLElement;
 	let cleanupFns: (() => void)[] = [];
+	let docsGenerated = 0;
+	let utmSource = '';
+	let notifyEmail = '';
+	let notifySubmitting = false;
+	let notifySubmitted = false;
 
 	const faqs = [
 		{
@@ -617,7 +668,36 @@
 		openFaq = openFaq === index ? null : index;
 	}
 
+	async function submitNotifyEmail() {
+		if (!notifyEmail.trim()) return;
+		notifySubmitting = true;
+		try {
+			const response = await fetch('/api/leads', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email: notifyEmail.trim(), source: 'pricing_section' })
+			});
+			if (response.ok) {
+				notifySubmitted = true;
+			}
+		} catch {
+			// Silently fail
+		} finally {
+			notifySubmitting = false;
+		}
+	}
+
 	onMount(() => {
+		// Fetch docs generated count
+		fetch('/api/stats')
+			.then(r => r.json())
+			.then(data => { docsGenerated = data.docsGenerated || 0; })
+			.catch(() => {});
+
+		// Detect UTM source
+		const url = new URL(window.location.href);
+		utmSource = url.searchParams.get('utm_source') || '';
+
 		// Sticky header on scroll
 		const stickyHeader = document.getElementById('stickyHeader');
 
@@ -1129,6 +1209,103 @@
 		font-size: 0.85rem;
 		color: var(--text-muted);
 		flex-wrap: wrap;
+	}
+
+	/* Live Counter */
+	.docs-counter {
+		text-align: center;
+		margin-top: 16px;
+		font-size: 0.9rem;
+		color: var(--text-secondary);
+	}
+
+	.docs-counter strong {
+		color: var(--accent);
+		font-size: 1.1rem;
+	}
+
+	/* UTM Message */
+	.utm-message {
+		text-align: center;
+		margin-top: 12px;
+		font-size: 0.9rem;
+		color: var(--accent);
+		background: rgba(16, 185, 129, 0.08);
+		border: 1px solid rgba(16, 185, 129, 0.2);
+		border-radius: 8px;
+		padding: 8px 16px;
+		display: inline-block;
+	}
+
+	/* Inline Email Capture */
+	.notify-section {
+		text-align: center;
+		margin-top: 40px;
+		padding: 24px;
+		background: var(--bg-elevated);
+		border: 1px solid var(--border);
+		border-radius: 12px;
+	}
+
+	.notify-text {
+		color: var(--text-secondary);
+		margin-bottom: 12px;
+		font-size: 0.95rem;
+	}
+
+	.notify-form {
+		display: flex;
+		gap: 8px;
+		justify-content: center;
+		max-width: 400px;
+		margin: 0 auto;
+	}
+
+	.notify-input {
+		flex: 1;
+		padding: 10px 16px;
+		background: var(--bg);
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		color: var(--text);
+		font-size: 0.9rem;
+		outline: none;
+		transition: border-color 0.2s;
+	}
+
+	.notify-input:focus {
+		border-color: var(--accent);
+	}
+
+	.notify-input::placeholder {
+		color: var(--text-muted);
+	}
+
+	.notify-btn {
+		padding: 10px 20px;
+		background: var(--accent);
+		color: #000;
+		border: none;
+		border-radius: 8px;
+		font-weight: 600;
+		font-size: 0.9rem;
+		cursor: pointer;
+		transition: all 0.2s;
+		white-space: nowrap;
+	}
+
+	.notify-btn:hover:not(:disabled) {
+		background: var(--accent-hover);
+	}
+
+	.notify-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+
+	.notify-success {
+		color: var(--accent);
+		font-weight: 500;
 	}
 
 	.demo-details .separator {

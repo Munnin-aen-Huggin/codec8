@@ -114,19 +114,19 @@
 				<div class="success-state">
 					<div class="success-icon">✓</div>
 					<h2>Check your inbox!</h2>
-					<p>We've sent you the "Documentation That Doesn't Suck" checklist.</p>
+					<p>We're generating a sample doc for you right now. It'll land in your inbox in about 2 minutes.</p>
 					<button class="close-link" on:click={close}>Close</button>
 				</div>
 			{:else}
-				<h2 id="exit-intent-title">Wait — before you go...</h2>
+				<h2 id="exit-intent-title">Wait — want to see what Codec8 generates?</h2>
 				<p class="popup-subtitle">
-					Get our <strong>"Documentation That Doesn't Suck"</strong> checklist
+					Enter your email and we'll generate a sample doc for the <strong>most popular open source repo this week</strong> — delivered to your inbox in 2 minutes.
 				</p>
 
 				<div class="checklist-preview">
-					<div class="checklist-item">✓ 12-point README quality check</div>
-					<div class="checklist-item">✓ API documentation structure template</div>
-					<div class="checklist-item">✓ Common doc mistakes to avoid</div>
+					<div class="checklist-item">✓ Real AI-generated README, not a template</div>
+					<div class="checklist-item">✓ See the actual output quality</div>
+					<div class="checklist-item">✓ Plus our best documentation tips (2 emails, then we stop)</div>
 				</div>
 
 				<form on:submit={handleSubmit}>
@@ -144,12 +144,12 @@
 						{#if submitting}
 							Sending...
 						{:else}
-							Send Me The Checklist
+							Send Me A Sample Doc
 						{/if}
 					</button>
 				</form>
 
-				<p class="privacy-note">No spam. Unsubscribe anytime.</p>
+				<p class="privacy-note">No spam. 2 emails, then we stop. Unsubscribe anytime.</p>
 			{/if}
 		</div>
 	</div>
