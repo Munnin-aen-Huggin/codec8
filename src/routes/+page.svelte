@@ -1,5 +1,5 @@
 <svelte:head>
-	<meta name="google-site-verification" content="google27a52d0c3a3855dc" />
+	<meta name="google-site-verification" content="nzMyGSeh1CWgD94xR203NHRGZGzuNmT6XPOjOk3_1vg" />
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Codec8 - AI Documentation Generator</title>
