@@ -14,7 +14,15 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run && npm run test:e2e",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"trending-prs": "node scripts/trending-pr-bot.js run",
+		"trending-prs:dry": "node scripts/trending-pr-bot.js dry-run",
+		"trending-prs:status": "node scripts/trending-pr-bot.js status",
+		"reddit": "node scripts/reddit-bot.js",
+		"launch": "node scripts/launch-bot.js",
+		"launch:browser": "node scripts/launch-browser.js",
+		"directory": "node scripts/directory-auto.js all",
+		"directory:status": "node scripts/directory-auto.js status"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.4.0",
@@ -53,6 +61,8 @@
 		"marked": "^17.0.1",
 		"mermaid": "^11.12.2",
 		"nanoid": "^5.1.6",
-		"stripe": "^20.1.2"
+		"snoowrap": "^1.23.0",
+		"stripe": "^20.1.2",
+		"twitter-api-v2": "^1.29.0"
 	}
 }
