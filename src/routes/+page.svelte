@@ -1,4 +1,5 @@
 <svelte:head>
+	<meta name="google-site-verification" content="google27a52d0c3a3855dc" />
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>Codec8 - AI Documentation Generator</title>
@@ -153,6 +154,7 @@
 	<div class="container">
 		<div class="logo">Codec8</div>
 		<div class="header-actions">
+			<a href="/blog" class="header-link">Blog</a>
 			<a href="/auth/login" class="header-link" rel="external">Sign In</a>
 			<a href="#pricing" class="cta-small">View Pricing</a>
 		</div>
@@ -164,6 +166,7 @@
 	<div class="container">
 		<div class="logo">Codec8</div>
 		<div class="nav-actions">
+			<a href="/blog" class="nav-link">Blog</a>
 			<a href="#pricing" class="nav-link">Pricing</a>
 			<a href="/auth/login" class="nav-link" rel="external">Sign In</a>
 			<button class="nav-cta" on:click={scrollToHero}>Try Demo</button>
@@ -566,6 +569,7 @@
 <footer>
 	<div class="container">
 		<div class="footer-links">
+			<a href="/blog">Blog</a>
 			<a href="/privacy">Privacy</a>
 			<a href="/terms">Terms</a>
 			<a href="mailto:support@codec8.com">Contact</a>
