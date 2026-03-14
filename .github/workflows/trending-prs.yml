@@ -1,0 +1,40 @@
+name: Trending PR Bot
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Every day at 9am UTC
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore bot state
+        uses: actions/cache@v4
+        with:
+          path: scripts/.trending-pr-state.json
+          key: trending-pr-state-${{ github.run_id }}
+          restore-keys: trending-pr-state-
+
+      - name: Run trending PR bot
+        env:
+          GITHUB_BOT_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/trending-pr-bot.js run
+
+      - name: Save bot state
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: scripts/.trending-pr-state.json
+          key: trending-pr-state-${{ github.run_id }}
