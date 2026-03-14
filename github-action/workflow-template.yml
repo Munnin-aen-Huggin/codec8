@@ -1,0 +1,18 @@
+name: Auto-generate Documentation
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Documentation with Codec8
+        uses: codec8/auto-docs-action@v1
+        with:
+          api-token: ${{ secrets.CODEC8_API_TOKEN }}
+          user-id: ${{ secrets.CODEC8_USER_ID }}
+          # Optional: specify which docs to generate
+          # doc-types: readme,api,architecture,setup

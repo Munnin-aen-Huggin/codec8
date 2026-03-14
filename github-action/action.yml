@@ -1,0 +1,27 @@
+name: 'Codec8 Auto Docs'
+description: 'Automatically regenerate your documentation when code changes'
+author: 'Codec8'
+
+branding:
+  icon: 'book-open'
+  color: 'green'
+
+inputs:
+  api-token:
+    description: 'Your Codec8 API token (GitHub token from connected account). Store as CODEC8_API_TOKEN secret.'
+    required: true
+  user-id:
+    description: 'Your Codec8 user ID. Found in your dashboard settings.'
+    required: true
+  doc-types:
+    description: 'Comma-separated list of doc types to generate: readme,api,architecture,setup'
+    required: false
+    default: 'readme,api,architecture,setup'
+
+outputs:
+  docs-generated:
+    description: 'Number of documentation files generated'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
